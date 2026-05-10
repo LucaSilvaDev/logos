@@ -43,28 +43,33 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   callbacks: {
     ...authConfig.callbacks,
     async jwt({ token, user, account, profile }) {
-      // Credentials login: user object has the DB id
-      if (user?.id) {
-        token.id = user.id
+      // Google OAuth first sign-in: account is only present on first auth
+      // Must check this BEFORE user?.id because NextAuth also sets user for OAuth
+      if (account?.provider === "google" && profile?.email) {
+        try {
+          const email = profile.email as string
+          let dbUser = await db.user.findUnique({ where: { email } })
+          if (!dbUser) {
+            dbUser = await db.user.create({
+              data: {
+                email,
+                name: (profile.name as string) ?? null,
+                image: ((profile as Record<string, unknown>).picture as string) ?? null,
+              },
+            })
+          }
+          token.id = dbUser.id
+          token.name = dbUser.name
+          token.email = dbUser.email
+          token.picture = dbUser.image
+        } catch (err) {
+          console.error("[auth] Google jwt error:", err)
+        }
         return token
       }
-      // Google OAuth: look up or create user manually (no PrismaAdapter)
-      if (account?.provider === "google" && profile?.email) {
-        const email = profile.email as string
-        let dbUser = await db.user.findUnique({ where: { email } })
-        if (!dbUser) {
-          dbUser = await db.user.create({
-            data: {
-              email,
-              name: (profile.name as string) ?? null,
-              image: ((profile as Record<string, unknown>).picture as string) ?? null,
-            },
-          })
-        }
-        token.id = dbUser.id
-        token.name = dbUser.name
-        token.email = dbUser.email
-        token.picture = dbUser.image
+      // Credentials login: authorize() already validated and returned DB user
+      if (user?.id) {
+        token.id = user.id
       }
       return token
     },
