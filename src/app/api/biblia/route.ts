@@ -68,28 +68,46 @@ async function fetchFromYouVersion(bookId: string, chapter: string, version: str
 
 const BIBLIA_ONLINE_VERSIONS = new Set(["nvt", "naa"])
 
+function decodeEntities(s: string): string {
+  return s
+    .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&apos;/g, "'")
+    .replace(/&amp;/g,  "&").replace(/&lt;/g,   "<").replace(/&gt;/g,   ">")
+    .replace(/&nbsp;/g, " ").replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
+}
+
 function parseBibliaOnlineHtml(html: string): { number: number; text: string }[] {
-  // Real structure (confirmed from live HTML):
-  //   <span data-v=".1." class="v">1<!-- --> </span>
-  //   <span data-v=".1." class="t">No princípio, Deus criou os céus e a terra.</span>
-  // The verse TEXT is inside class="t", not as raw text after the number span.
+  // Structure (confirmed from live HTML):
+  //   <span class="v">1<!-- --> </span>
+  //   <span class="t">texto parte 1</span>
+  //   <span class="t">texto parte 2</span>   ← a verse can have MULTIPLE class="t" spans
+  //
+  // Strategy: split HTML by class="v" markers; for each segment collect
+  // ALL subsequent class="t" spans before the next verse marker.
 
   const verses: { number: number; text: string }[] = []
   const seen = new Set<number>()
 
-  // Match each class="v" span (verse number) followed by a class="t" span (verse text).
-  // Non-greedy [\s\S]*? handles any attributes/comments between them.
-  const re = /<span[^>]*class="v"[^>]*>(\d+)[\s\S]*?<span[^>]*class="t"[^>]*>([\s\S]*?)<\/span>/gi
-  let m: RegExpExecArray | null
+  const segments = html.split(/<span[^>]*class="v"[^>]*>/i)
 
-  while ((m = re.exec(html)) !== null) {
-    const num = parseInt(m[1])
-    const text = m[2]
-      .replace(/<[^>]+>/g, " ")
-      .replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&nbsp;/g, " ")
-      .replace(/\s+/g, " ")
-      .trim()
-    if (num > 0 && text.length > 0 && !seen.has(num)) {
+  for (let i = 1; i < segments.length; i++) {
+    const seg = segments[i]
+
+    const numMatch = seg.match(/^(\d+)/)
+    if (!numMatch) continue
+    const num = parseInt(numMatch[1])
+    if (seen.has(num)) continue
+
+    // Collect every <span class="t">…</span> in this segment
+    const tRe = /<span[^>]*class="t"[^>]*>([\s\S]*?)<\/span>/gi
+    let m: RegExpExecArray | null
+    const parts: string[] = []
+    while ((m = tRe.exec(seg)) !== null) {
+      const chunk = decodeEntities(m[1].replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim()
+      if (chunk) parts.push(chunk)
+    }
+
+    const text = parts.join(" ").trim()
+    if (num > 0 && text.length > 0) {
       seen.add(num)
       verses.push({ number: num, text })
     }
