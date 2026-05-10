@@ -17,7 +17,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="pt-BR" className="h-full" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{
-          __html: `try{var t=localStorage.getItem('selah-theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');}catch(e){}`
+          __html: `try{var t=localStorage.getItem('selah-theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');}catch(e){}
+if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js')}`
         }} />
         <meta name="theme-color" content="#12111e" />
         <meta name="mobile-web-app-capable" content="yes" />
