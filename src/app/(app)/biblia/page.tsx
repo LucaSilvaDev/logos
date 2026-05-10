@@ -142,7 +142,27 @@ export default function BibliaPage() {
 
   function goChapter(delta: number) {
     const next = chapter + delta
-    if (next < 1 || next > book.chapters) return
+    const bookIdx = BOOKS.findIndex(b => b.id === book.id)
+
+    if (next < 1) {
+      if (bookIdx <= 0) return
+      const prev = BOOKS[bookIdx - 1]
+      setBook(prev)
+      setChapter(prev.chapters)
+      setDirection("prev")
+      setAnimKey(k => k + 1)
+      return
+    }
+
+    if (next > book.chapters) {
+      if (bookIdx >= BOOKS.length - 1) return
+      setBook(BOOKS[bookIdx + 1])
+      setChapter(1)
+      setDirection("next")
+      setAnimKey(k => k + 1)
+      return
+    }
+
     setDirection(delta > 0 ? "next" : "prev")
     setAnimKey(k => k + 1)
     setChapter(next)
@@ -174,6 +194,8 @@ export default function BibliaPage() {
   }
 
   const chapterArr = Array.from({ length: book.chapters }, (_, i) => i + 1)
+  const isFirstInBible = book.id === "GEN" && chapter === 1
+  const isLastInBible  = book.id === "REV" && chapter === book.chapters
 
   return (
     <div className="relative">
@@ -254,7 +276,7 @@ export default function BibliaPage() {
       </div>
 
       {/* Side chapter navigation */}
-      {!loading && !apiError && verses.length > 0 && chapter > 1 && (
+      {!loading && !apiError && verses.length > 0 && !isFirstInBible && (
         <button
           onClick={() => goChapter(-1)}
           className="chapter-side-nav left-0"
@@ -263,7 +285,7 @@ export default function BibliaPage() {
           <span className="chapter-side-chevron chapter-side-chevron-left" />
         </button>
       )}
-      {!loading && !apiError && verses.length > 0 && chapter < book.chapters && (
+      {!loading && !apiError && verses.length > 0 && !isLastInBible && (
         <button
           onClick={() => goChapter(1)}
           className="chapter-side-nav right-0"
@@ -355,13 +377,15 @@ export default function BibliaPage() {
 
             {/* Chapter navigation footer */}
             <div className="flex justify-between mt-16 pt-6" style={{ borderTop: "1px solid rgba(46,43,66,0.4)" }}>
-              <button onClick={() => goChapter(-1)} disabled={chapter === 1}
+              <button onClick={() => goChapter(-1)} disabled={isFirstInBible}
                 className="flex items-center gap-1.5 text-sm font-serif text-[#55524a] hover:text-[#c9a654] disabled:opacity-20 transition-colors duration-200">
-                <ChevronLeft className="w-4 h-4" /> Capítulo anterior
+                <ChevronLeft className="w-4 h-4" />
+                {chapter === 1 ? "Livro anterior" : "Capítulo anterior"}
               </button>
-              <button onClick={() => goChapter(1)} disabled={chapter === book.chapters}
+              <button onClick={() => goChapter(1)} disabled={isLastInBible}
                 className="flex items-center gap-1.5 text-sm font-serif text-[#55524a] hover:text-[#c9a654] disabled:opacity-20 transition-colors duration-200">
-                Próximo capítulo <ChevronRight className="w-4 h-4" />
+                {chapter === book.chapters ? "Próximo livro" : "Próximo capítulo"}
+                <ChevronRight className="w-4 h-4" />
               </button>
             </div>
           </div>
