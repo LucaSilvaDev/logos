@@ -69,26 +69,33 @@ async function fetchFromYouVersion(bookId: string, chapter: string, version: str
 const BIBLIA_ONLINE_VERSIONS = new Set(["nvt", "naa"])
 
 function parseBibliaOnlineHtml(html: string): { number: number; text: string }[] {
-  const articleMatch = html.match(/<article[^>]*coreBibleStyles[^>]*>([\s\S]*?)<\/article>/i)
-  if (!articleMatch) return []
+  // Real structure (confirmed from live HTML):
+  //   <span data-v=".1." class="v">1<!-- --> </span>
+  //   <span data-v=".1." class="t">No princípio, Deus criou os céus e a terra.</span>
+  // The verse TEXT is inside class="t", not as raw text after the number span.
 
-  const content = articleMatch[1]
   const verses: { number: number; text: string }[] = []
+  const seen = new Set<number>()
 
-  // Split by <span class="v">N</span> markers
-  const parts = content.split(/<span class="v">(\d+)<\/span>/i)
-  // parts layout: [before_v1, "1", text_v1, "2", text_v2, ...]
-  for (let i = 1; i < parts.length; i += 2) {
-    const num = parseInt(parts[i])
-    const raw = parts[i + 1] ?? ""
-    const text = raw
-      .replace(/<span class="t">[\s\S]*?<\/span>/gi, "") // remove section titles
+  // Match each class="v" span (verse number) followed by a class="t" span (verse text).
+  // Non-greedy [\s\S]*? handles any attributes/comments between them.
+  const re = /<span[^>]*class="v"[^>]*>(\d+)[\s\S]*?<span[^>]*class="t"[^>]*>([\s\S]*?)<\/span>/gi
+  let m: RegExpExecArray | null
+
+  while ((m = re.exec(html)) !== null) {
+    const num = parseInt(m[1])
+    const text = m[2]
       .replace(/<[^>]+>/g, " ")
+      .replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&nbsp;/g, " ")
       .replace(/\s+/g, " ")
       .trim()
-    if (num > 0 && text.length > 0) verses.push({ number: num, text })
+    if (num > 0 && text.length > 0 && !seen.has(num)) {
+      seen.add(num)
+      verses.push({ number: num, text })
+    }
   }
-  return verses
+
+  return verses.sort((a, b) => a.number - b.number)
 }
 
 async function fetchFromBibliaOnline(bookId: string, chapter: string, version: string) {
