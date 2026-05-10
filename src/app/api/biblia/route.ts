@@ -63,6 +63,71 @@ async function fetchFromYouVersion(bookId: string, chapter: string, version: str
   }
 }
 
+// --- BibliaOnline.com.br (NVT, NAA) ---
+// Scraping SSR HTML — versículos em <span class="v"> dentro de <article coreBibleStyles>
+
+const BIBLIA_ONLINE_VERSIONS = new Set(["nvt", "naa"])
+
+function parseBibliaOnlineHtml(html: string): { number: number; text: string }[] {
+  const articleMatch = html.match(/<article[^>]*coreBibleStyles[^>]*>([\s\S]*?)<\/article>/i)
+  if (!articleMatch) return []
+
+  const content = articleMatch[1]
+  const verses: { number: number; text: string }[] = []
+
+  // Split by <span class="v">N</span> markers
+  const parts = content.split(/<span class="v">(\d+)<\/span>/i)
+  // parts layout: [before_v1, "1", text_v1, "2", text_v2, ...]
+  for (let i = 1; i < parts.length; i += 2) {
+    const num = parseInt(parts[i])
+    const raw = parts[i + 1] ?? ""
+    const text = raw
+      .replace(/<span class="t">[\s\S]*?<\/span>/gi, "") // remove section titles
+      .replace(/<[^>]+>/g, " ")
+      .replace(/\s+/g, " ")
+      .trim()
+    if (num > 0 && text.length > 0) verses.push({ number: num, text })
+  }
+  return verses
+}
+
+async function fetchFromBibliaOnline(bookId: string, chapter: string, version: string) {
+  const abbr = ABBR_MAP[bookId]
+  if (!abbr) return NextResponse.json({ error: "Livro inválido" }, { status: 400 })
+
+  const url = `https://www.bibliaonline.com.br/${version}/${encodeURIComponent(abbr)}/${chapter}`
+
+  try {
+    const res = await fetch(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language": "pt-BR,pt;q=0.9",
+      },
+      next: { revalidate: 86400 }, // cache 24h — texto bíblico não muda
+    })
+
+    if (!res.ok) {
+      console.error("[biblia/bibliaonline] HTTP %d %s", res.status, url)
+      return NextResponse.json({ error: "API_ERROR", detail: `HTTP ${res.status}` }, { status: res.status })
+    }
+
+    const html = await res.text()
+    const verses = parseBibliaOnlineHtml(html)
+
+    if (verses.length === 0) {
+      console.error("[biblia/bibliaonline] No verses found — url=%s html_len=%d snippet=%s",
+        url, html.length, html.slice(0, 300))
+      return NextResponse.json({ error: "API_ERROR", detail: "Nenhum versículo encontrado no HTML" }, { status: 502 })
+    }
+
+    return NextResponse.json({ verses, version, book: bookId, chapter: parseInt(chapter) })
+  } catch (err) {
+    console.error("[biblia/bibliaonline] Network error:", err)
+    return NextResponse.json({ error: "NETWORK_ERROR" }, { status: 502 })
+  }
+}
+
 // --- AbibliaDigital (NVI, ACF, RA) ---
 
 const ABBR_MAP: Record<string, string> = {
@@ -91,6 +156,10 @@ export async function GET(req: Request) {
 
   if (version in YV_VERSION_IDS) {
     return fetchFromYouVersion(bookId, chapter, version)
+  }
+
+  if (BIBLIA_ONLINE_VERSIONS.has(version)) {
+    return fetchFromBibliaOnline(bookId, chapter, version)
   }
 
   const abbr = ABBR_MAP[bookId]

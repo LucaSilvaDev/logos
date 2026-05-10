@@ -78,10 +78,12 @@ const BOOKS = [
 
 const VERSIONS = [
   { id: "nvi",  label: "NVI",   desc: "Nova Versão Internacional" },
+  { id: "naa",  label: "NAA",   desc: "Nova Almeida Atualizada" },
+  { id: "nvt",  label: "NVT",   desc: "Nova Versão Transformadora" },
   { id: "nbvp", label: "NBV-P", desc: "Nova Bíblia Viva" },
-  { id: "blt",  label: "BLT",   desc: "Bíblia Livre de Tradução" },
   { id: "acf",  label: "ACF",   desc: "Almeida Corrigida Fiel" },
   { id: "ra",   label: "RA",    desc: "Revista e Atualizada" },
+  { id: "blt",  label: "BLT",   desc: "Bíblia Livre de Tradução" },
 ]
 
 const HL_COLORS = [
