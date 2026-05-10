@@ -4,6 +4,8 @@ import GoogleProvider from "next-auth/providers/google"
 
 // Config segura para Edge Runtime (sem Node.js APIs, sem banco de dados)
 export const authConfig: NextAuthConfig = {
+  secret: process.env.NEXTAUTH_SECRET ?? process.env.AUTH_SECRET,
+  trustHost: true,
   pages: {
     signIn: "/entrar",
     error: "/entrar",
