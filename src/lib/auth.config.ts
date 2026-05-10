@@ -29,8 +29,11 @@ export const authConfig: NextAuthConfig = {
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user
-      const publicPaths = ["/", "/entrar", "/cadastro", "/esqueci-senha", "/redefinir-senha"]
-      const isPublic = publicPaths.some((p) => nextUrl.pathname.startsWith(p))
+      const exactPublic = ["/"]
+      const prefixPublic = ["/entrar", "/cadastro", "/esqueci-senha", "/redefinir-senha"]
+      const isPublic =
+        exactPublic.includes(nextUrl.pathname) ||
+        prefixPublic.some((p) => nextUrl.pathname.startsWith(p))
 
       if (!isLoggedIn && !isPublic) return false
       if (isLoggedIn && isPublic) {
