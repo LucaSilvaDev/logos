@@ -4,10 +4,11 @@ import { PrismaClient } from "@/generated/prisma/client"
 const globalForPrisma = globalThis as unknown as { prisma: PrismaClient }
 
 function createPrisma() {
-  const url = process.env.TURSO_DATABASE_URL
+  const rawUrl = process.env.TURSO_DATABASE_URL ?? ""
   const authToken = process.env.TURSO_AUTH_TOKEN
 
-  if (!url) throw new Error("TURSO_DATABASE_URL is not set")
+  // Vercel serverless is more compatible with https:// than libsql:// (WebSocket)
+  const url = rawUrl.replace(/^libsql:\/\//, "https://")
 
   const adapter = new PrismaLibSql({ url, authToken })
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

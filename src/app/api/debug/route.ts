@@ -2,37 +2,38 @@ import { NextResponse } from "next/server"
 import { createClient } from "@libsql/client"
 
 export async function GET() {
-  const tursoUrl = process.env.TURSO_DATABASE_URL
-  const tursoToken = process.env.TURSO_AUTH_TOKEN
+  const rawUrl = process.env.TURSO_DATABASE_URL ?? ""
+  const authToken = process.env.TURSO_AUTH_TOKEN
+  const httpsUrl = rawUrl.replace(/^libsql:\/\//, "https://")
 
   const env = {
-    TURSO_DATABASE_URL: tursoUrl ? tursoUrl.slice(0, 50) + "..." : "MISSING",
-    TURSO_AUTH_TOKEN: tursoToken ? "SET" : "MISSING",
-    NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET ? "SET" : "MISSING",
+    TURSO_DATABASE_URL: rawUrl ? rawUrl.slice(0, 50) : "MISSING",
     NEXTAUTH_URL: process.env.NEXTAUTH_URL ?? "MISSING",
-    DATABASE_URL: process.env.DATABASE_URL ?? "MISSING",
   }
 
-  // Test direct libsql connection (bypasses Prisma)
-  let directTest: string
+  // Test 1: libsql:// protocol
+  let libsqlTest: string
   try {
-    if (!tursoUrl) throw new Error("TURSO_DATABASE_URL not set")
-    const client = createClient({ url: tursoUrl, authToken: tursoToken })
-    await client.execute("SELECT 1")
-    directTest = "OK"
-  } catch (err) {
-    directTest = String(err)
-  }
+    const c = createClient({ url: rawUrl, authToken })
+    await c.execute("SELECT 1")
+    libsqlTest = "OK"
+  } catch (e) { libsqlTest = String(e) }
 
-  // Test Prisma
+  // Test 2: https:// protocol
+  let httpsTest: string
+  try {
+    const c = createClient({ url: httpsUrl, authToken })
+    await c.execute("SELECT 1")
+    httpsTest = "OK"
+  } catch (e) { httpsTest = String(e) }
+
+  // Test 3: Prisma via db.ts
   let prismaTest: string
   try {
     const { db } = await import("@/lib/db")
-    const count = await db.user.count()
-    prismaTest = `OK - ${count} users`
-  } catch (err) {
-    prismaTest = String(err)
-  }
+    const n = await db.user.count()
+    prismaTest = `OK - ${n} users`
+  } catch (e) { prismaTest = String(e) }
 
-  return NextResponse.json({ env, directTest, prismaTest })
+  return NextResponse.json({ env, libsqlTest, httpsTest, prismaTest })
 }
