@@ -76,44 +76,43 @@ function decodeEntities(s: string): string {
 }
 
 function parseBibliaOnlineHtml(html: string): { number: number; text: string }[] {
-  // Structure (confirmed from live HTML):
-  //   <span class="v">1<!-- --> </span>
-  //   <span class="t">texto parte 1</span>
-  //   <span class="t">texto parte 2</span>   ← a verse can have MULTIPLE class="t" spans
-  //
-  // Strategy: split HTML by class="v" markers; for each segment collect
-  // ALL subsequent class="t" spans before the next verse marker.
+  // Each verse paragraph: <p data-v=".N."> … </p>
+  // One verse may span multiple <p> elements (poetry lines), all sharing the same data-v.
+  // Styled words like "Senhor" appear in <span class="c sc"> WITHOUT class="t",
+  // so we cannot rely on class="t" alone — we strip ALL tags after removing
+  // structural spans (bookmark + verse-number labels).
 
-  const verses: { number: number; text: string }[] = []
-  const seen = new Set<number>()
+  const verseMap = new Map<number, string[]>()
 
-  const segments = html.split(/<span[^>]*class="v"[^>]*>/i)
+  const pRe = /<p[^>]*\bdata-v="([^"]+)"[^>]*>([\s\S]*?)<\/p>/gi
+  let m: RegExpExecArray | null
 
-  for (let i = 1; i < segments.length; i++) {
-    const seg = segments[i]
+  while ((m = pRe.exec(html)) !== null) {
+    const dataV  = m[1]   // e.g. ".2."  or  ".3.4."
+    const inner  = m[2]
 
-    const numMatch = seg.match(/^(\d+)/)
-    if (!numMatch) continue
-    const num = parseInt(numMatch[1])
-    if (seen.has(num)) continue
+    // Pull all verse numbers from data-v (".3.4.5." → [3,4,5])
+    const nums = [...dataV.matchAll(/(\d+)/g)].map(n => parseInt(n[1]))
+    if (nums.length === 0) continue
 
-    // Collect every <span class="t">…</span> in this segment
-    const tRe = /<span[^>]*class="t"[^>]*>([\s\S]*?)<\/span>/gi
-    let m: RegExpExecArray | null
-    const parts: string[] = []
-    while ((m = tRe.exec(seg)) !== null) {
-      const chunk = decodeEntities(m[1].replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim()
-      if (chunk) parts.push(chunk)
-    }
+    const text = decodeEntities(
+      inner
+        .replace(/<span[^>]*class="bv"[^>]*>[\s\S]*?<\/span>/gi, "") // remove bookmark markers
+        .replace(/<span[^>]*class="v"[^>]*>[\s\S]*?<\/span>/gi,  "") // remove verse-number labels
+        .replace(/<[^>]+>/g, " ")                                     // strip all remaining tags
+    ).replace(/\s+/g, " ").trim()
 
-    const text = parts.join(" ").trim()
-    if (num > 0 && text.length > 0) {
-      seen.add(num)
-      verses.push({ number: num, text })
-    }
+    if (!text) continue
+
+    // Attribute text to the primary (first) verse number
+    const key = nums[0]
+    if (!verseMap.has(key)) verseMap.set(key, [])
+    verseMap.get(key)!.push(text)
   }
 
-  return verses.sort((a, b) => a.number - b.number)
+  return Array.from(verseMap.entries())
+    .map(([number, parts]) => ({ number, text: parts.join(" ") }))
+    .sort((a, b) => a.number - b.number)
 }
 
 async function fetchFromBibliaOnline(bookId: string, chapter: string, version: string) {
