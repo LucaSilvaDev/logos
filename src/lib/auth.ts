@@ -1,5 +1,4 @@
 import NextAuth from "next-auth"
-import { PrismaAdapter } from "@auth/prisma-adapter"
 import CredentialsProvider from "next-auth/providers/credentials"
 import GoogleProvider from "next-auth/providers/google"
 import bcrypt from "bcryptjs"
@@ -14,7 +13,6 @@ const credentialsSchema = z.object({
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
-  adapter: PrismaAdapter(db),
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -42,4 +40,33 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       },
     }),
   ],
+  callbacks: {
+    ...authConfig.callbacks,
+    async jwt({ token, user, account, profile }) {
+      // Credentials login: user object has the DB id
+      if (user?.id) {
+        token.id = user.id
+        return token
+      }
+      // Google OAuth: look up or create user manually (no PrismaAdapter)
+      if (account?.provider === "google" && profile?.email) {
+        const email = profile.email as string
+        let dbUser = await db.user.findUnique({ where: { email } })
+        if (!dbUser) {
+          dbUser = await db.user.create({
+            data: {
+              email,
+              name: (profile.name as string) ?? null,
+              image: ((profile as Record<string, unknown>).picture as string) ?? null,
+            },
+          })
+        }
+        token.id = dbUser.id
+        token.name = dbUser.name
+        token.email = dbUser.email
+        token.picture = dbUser.image
+      }
+      return token
+    },
+  },
 })
