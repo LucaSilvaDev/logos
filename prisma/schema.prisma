@@ -1,0 +1,264 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+// ─── AUTH ─────────────────────────────────────────────────────────────────────
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts             Account[]
+  sessions             Session[]
+  profile              UserProfile?
+  devotionals          Devotional[]
+  highlights           Highlight[]
+  bookmarks            Bookmark[]
+  prayers              Prayer[]
+  studyNotes           StudyNote[]
+  readingPlanProgress  ReadingPlanProgress[]
+  eschatologyNotes     EschatologyNote[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ─── PERFIL TEOLÓGICO ─────────────────────────────────────────────────────────
+
+model UserProfile {
+  id                  String  @id @default(cuid())
+  userId              String  @unique
+  theologicalLine     String  @default("Reformado")
+  calvinPoints        String  @default("TULIP - 5 Pontos")
+  eschatologyPosition String  @default("Pós-Tribulacionista · Pré-Milenista Histórico")
+  readingPlanType     String?
+  preferredVersions   String  @default("NAA,NVT,A21")
+  dailyReminderTime   String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─── BÍBLIA ───────────────────────────────────────────────────────────────────
+
+model Highlight {
+  id         String   @id @default(cuid())
+  userId     String
+  book       String
+  chapter    Int
+  verseStart Int
+  verseEnd   Int
+  version    String
+  color      String   @default("yellow")
+  note       String?
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, book, chapter])
+}
+
+model Bookmark {
+  id        String   @id @default(cuid())
+  userId    String
+  book      String
+  chapter   Int
+  verse     Int?
+  version   String
+  label     String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─── DEVOCIONAL ───────────────────────────────────────────────────────────────
+
+model Devotional {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  content   String
+  date      DateTime @default(now())
+  bibleRef  String?
+  tags      String   @default("[]")
+  mood      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  links NoteLink[] @relation("DevotionalLinks")
+
+  @@index([userId, date])
+}
+
+// ─── ESTUDO APROFUNDADO ───────────────────────────────────────────────────────
+
+model StudyNote {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  content   String
+  book      String
+  chapter   Int?
+  verse     Int?
+  type      String   @default("exegesis")
+  tags      String   @default("[]")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user  User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  links NoteLink[] @relation("StudyNoteLinks")
+
+  @@index([userId, book])
+}
+
+// ─── LINKAGEM BIDIRECIONAL ────────────────────────────────────────────────────
+
+model NoteLink {
+  id           String  @id @default(cuid())
+  devotionalId String?
+  studyNoteId  String?
+  targetRef    String
+  linkType     String  @default("verse")
+
+  devotional Devotional? @relation("DevotionalLinks", fields: [devotionalId], references: [id], onDelete: Cascade)
+  studyNote  StudyNote?  @relation("StudyNoteLinks", fields: [studyNoteId], references: [id], onDelete: Cascade)
+}
+
+// ─── ORAÇÕES ──────────────────────────────────────────────────────────────────
+
+model Prayer {
+  id          String    @id @default(cuid())
+  userId      String
+  title       String
+  content     String
+  category    String    @default("personal")
+  answered    Boolean   @default(false)
+  answeredAt  DateTime?
+  createdAt   DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model QuoteLibrary {
+  id        String  @id @default(cuid())
+  author    String
+  authorEra String
+  content   String
+  source    String?
+  category  String  @default("theology")
+  bibleRef  String?
+  isDaily   Boolean @default(true)
+}
+
+// ─── PLANO DE LEITURA ─────────────────────────────────────────────────────────
+
+model ReadingPlan {
+  id          String       @id @default(cuid())
+  name        String
+  type        String
+  description String?
+  totalDays   Int
+  readings    ReadingDay[]
+}
+
+model ReadingDay {
+  id       String @id @default(cuid())
+  planId   String
+  day      Int
+  passages String
+
+  plan     ReadingPlan           @relation(fields: [planId], references: [id])
+  progress ReadingPlanProgress[]
+}
+
+model ReadingPlanProgress {
+  id           String   @id @default(cuid())
+  userId       String
+  readingDayId String
+  completedAt  DateTime @default(now())
+
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  readingDay ReadingDay @relation(fields: [readingDayId], references: [id])
+
+  @@unique([userId, readingDayId])
+}
+
+// ─── ESCATOLOGIA ──────────────────────────────────────────────────────────────
+
+model EschatologyNote {
+  id                    String    @id @default(cuid())
+  userId                String
+  book                  String
+  chapter               Int
+  title                 String
+  historicalFulfillment String?
+  futureProphecy        String?
+  tribulationNote       String?
+  christReturnNote      String?
+  generalNotes          String?
+  studiedAt             DateTime?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, book, chapter])
+}
+
+// ─── HISTÓRIA DA IGREJA ───────────────────────────────────────────────────────
+
+model ChurchHistoryEvent {
+  id          String @id @default(cuid())
+  year        Int
+  century     Int
+  title       String
+  description String
+  category    String
+  figures     String @default("[]")
+  bibleRefs   String @default("[]")
+  importance  Int    @default(3)
+}
