@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="38%" r="52%">
+      <stop offset="0%" stop-color="#c9a654" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#12111e" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <!-- Background -->
+  <rect width="512" height="512" rx="112" fill="#12111e"/>
+  <rect width="512" height="512" rx="112" fill="url(#glow)"/>
+  <!-- BookOpen icon (Lucide, 24×24 scaled to 256×256, centered) -->
+  <g transform="translate(128 128) scale(10.667)"
+     fill="none" stroke="#c9a654" stroke-width="1.8"
+     stroke-linecap="round" stroke-linejoin="round" opacity="0.88">
+    <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+    <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+  </g>
+</svg>

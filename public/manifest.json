@@ -1,0 +1,26 @@
+{
+  "name": "Selah — Pausa e Meditação Bíblica",
+  "short_name": "Selah",
+  "description": "Bíblia, devocionais e plano de leitura para o cristão reformado.",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#12111e",
+  "theme_color": "#12111e",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["books", "lifestyle", "education"]
+}
