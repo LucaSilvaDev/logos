@@ -1,7 +1,27 @@
 "use client"
 
 import { signOut } from "next-auth/react"
+import { usePathname } from "next/navigation"
 import { LogOut, User, Menu, Sun, Moon } from "lucide-react"
+
+const PAGE_TITLES: Record<string, string> = {
+  "/dashboard":   "Início",
+  "/biblia":      "Bíblia",
+  "/plano":       "Plano de Leitura",
+  "/devocional":  "Devocional",
+  "/estudo":      "Estudo",
+  "/oracoes":     "Orações",
+  "/historia":    "História",
+  "/escatologia": "Escatologia",
+  "/biblioteca":  "Biblioteca",
+}
+
+function getTitle(pathname: string): string {
+  for (const [prefix, title] of Object.entries(PAGE_TITLES)) {
+    if (pathname === prefix || pathname.startsWith(prefix + "/")) return title
+  }
+  return "Selah"
+}
 
 interface TopbarProps {
   userName?: string | null
@@ -12,17 +32,27 @@ interface TopbarProps {
 }
 
 export function Topbar({ userName, userImage, theme, onToggleSidebar, onToggleTheme }: TopbarProps) {
+  const pathname = usePathname()
+  const title = getTitle(pathname)
+
   return (
-    <header className="topbar z-20 h-14 flex items-center px-5 flex-shrink-0">
+    <header className="topbar z-20 h-14 flex items-center px-4 flex-shrink-0">
+
+      {/* Hamburger — mobile only (desktop has permanent sidebar) */}
       <button
         onClick={onToggleSidebar}
-        className="text-[#3d3a55] hover:text-[#c9a654] transition-colors duration-200 p-1.5 rounded-lg hover:bg-[#1a1928] mr-3"
+        className="md:hidden text-[#3d3a55] hover:text-[#c9a654] transition-colors duration-200 p-1.5 rounded-lg hover:bg-[#1a1928] mr-2"
         aria-label="Abrir menu"
       >
         <Menu className="w-5 h-5" />
       </button>
 
-      <div className="flex-1" />
+      {/* Page title — centered */}
+      <div className="flex-1 flex justify-center md:justify-start">
+        <span className="font-display text-[#8a8375] text-[11px] tracking-[0.2em] uppercase">
+          {title}
+        </span>
+      </div>
 
       <div className="flex items-center gap-3">
         {/* Theme toggle */}
@@ -48,7 +78,9 @@ export function Topbar({ userName, userImage, theme, onToggleSidebar, onToggleTh
           </div>
         )}
         <span className="text-[13px] text-[#55524a] font-serif hidden sm:block">{userName}</span>
+
         <div className="w-px h-4 bg-[#2e2b42]" />
+
         <button
           onClick={() => signOut({ callbackUrl: "/entrar" })}
           className="text-[#3d3a55] hover:text-[#8a8375] transition-colors duration-200"

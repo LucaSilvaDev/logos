@@ -29,7 +29,7 @@ export const authConfig: NextAuthConfig = {
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user
-      const publicPaths = ["/entrar", "/cadastro", "/esqueci-senha", "/redefinir-senha"]
+      const publicPaths = ["/", "/entrar", "/cadastro", "/esqueci-senha", "/redefinir-senha"]
       const isPublic = publicPaths.some((p) => nextUrl.pathname.startsWith(p))
 
       if (!isLoggedIn && !isPublic) return false
