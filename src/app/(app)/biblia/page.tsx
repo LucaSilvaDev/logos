@@ -176,7 +176,7 @@ export default function BibliaPage() {
   const chapterArr = Array.from({ length: book.chapters }, (_, i) => i + 1)
 
   return (
-    <div>
+    <div className="relative">
       {/* Controls bar — sticky within the scroll container */}
       <div className="sticky top-0 z-10 flex flex-wrap items-center gap-3 px-6 py-3 bg-[#12111e]/95 backdrop-blur-md"
         style={{ boxShadow: "0 1px 0 rgba(46,43,66,0.4)" }}>
@@ -252,6 +252,26 @@ export default function BibliaPage() {
           )}
         </div>
       </div>
+
+      {/* Side chapter navigation */}
+      {!loading && !apiError && verses.length > 0 && chapter > 1 && (
+        <button
+          onClick={() => goChapter(-1)}
+          className="chapter-side-nav left-0"
+          aria-label="Capítulo anterior"
+        >
+          <span className="chapter-side-chevron chapter-side-chevron-left" />
+        </button>
+      )}
+      {!loading && !apiError && verses.length > 0 && chapter < book.chapters && (
+        <button
+          onClick={() => goChapter(1)}
+          className="chapter-side-nav right-0"
+          aria-label="Próximo capítulo"
+        >
+          <span className="chapter-side-chevron chapter-side-chevron-right" />
+        </button>
+      )}
 
       {/* Reading area — overflow-x hidden evita que a animação cause scroll lateral */}
       <div className="overflow-x-hidden">

@@ -393,6 +393,45 @@ body {
 [data-theme="light"] ::-webkit-scrollbar-thumb       { background: rgba(163,128,80,0.35); }
 [data-theme="light"] ::-webkit-scrollbar-thumb:hover { background: rgba(163,128,80,0.55); }
 
+/* ─── CHAPTER SIDE NAV ───────────────────────────────────────────────────── */
+.chapter-side-nav {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  cursor: pointer;
+  background: none;
+  border: none;
+  z-index: 4;
+}
+.chapter-side-nav:hover { opacity: 1; }
+
+.chapter-side-chevron {
+  display: block;
+  width: 11px;
+  height: 22px;
+  border-top: 1.5px solid rgba(201, 166, 84, 0.55);
+  border-right: 1.5px solid rgba(201, 166, 84, 0.55);
+  transition: border-color 0.2s ease;
+}
+.chapter-side-nav:hover .chapter-side-chevron {
+  border-color: rgba(201, 166, 84, 0.9);
+}
+.chapter-side-chevron-left  { transform: rotate(225deg); }
+.chapter-side-chevron-right { transform: rotate(45deg);  }
+
+[data-theme="light"] .chapter-side-chevron {
+  border-color: rgba(122, 79, 10, 0.4);
+}
+[data-theme="light"] .chapter-side-nav:hover .chapter-side-chevron {
+  border-color: rgba(122, 79, 10, 0.85);
+}
+
 /* ─── BOTTOM NAV ─────────────────────────────────────────────────────────── */
 .bottom-nav {
   background: rgba(14, 13, 25, 0.97);
