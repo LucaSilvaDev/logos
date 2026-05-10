@@ -111,6 +111,12 @@ export default function LoginPage() {
             {loading && <Loader2 className="w-4 h-4 animate-spin" />}
             Entrar
           </button>
+
+          <p className="text-center text-xs text-[#3d3a55] mt-3">
+            <Link href="/esqueci-senha" className="text-[#55524a] hover:text-[#c9a654] transition-colors">
+              Esqueci minha senha
+            </Link>
+          </p>
         </form>
 
         <p className="text-center text-xs text-[#3d3a55] mt-6">

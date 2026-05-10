@@ -1,4 +1,69 @@
 import { NextResponse } from "next/server"
+import { ApiClient, BibleClient } from "@youversion/platform-core"
+
+// YouVersion Platform — platform.youversion.com
+// Available PT versions under accelerated licensing:
+//   129  = NVI  (Nova Versão Internacional — BR)
+//   1966 = NBV-P (Nova Bíblia Viva)
+//   3254 = BLT  (tradução livre, sem copyright)
+const YV_VERSION_IDS: Record<string, number> = {
+  nvi_yv: 129,
+  nbvp:   1966,
+  blt:    3254,
+}
+
+let yvClient: BibleClient | null = null
+function getYVClient(): BibleClient {
+  if (!yvClient) {
+    yvClient = new BibleClient(new ApiClient({ appKey: process.env.YOUVERSION_APP_KEY! }))
+  }
+  return yvClient
+}
+
+// Parses YouVersion HTML into verse objects.
+// Format: <span class="yv-v" v="N"></span><span class="yv-vlbl">N</span>TEXT
+function parseYVHtml(html: string): { number: number; text: string }[] {
+  const verses: { number: number; text: string }[] = []
+  const marker = /<span class="yv-v" v="(\d+)"><\/span><span class="yv-vlbl">\d+<\/span>/g
+  const parts = html.split(marker)
+  // parts: [before_v1, "1", text_v1, "2", text_v2, ...]
+  for (let i = 1; i < parts.length; i += 2) {
+    const num = parseInt(parts[i])
+    const raw = parts[i + 1] ?? ""
+    const text = raw.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim()
+    if (num > 0 && text.length > 0) verses.push({ number: num, text })
+  }
+  return verses
+}
+
+async function fetchFromYouVersion(bookId: string, chapter: string, version: string) {
+  const appKey = process.env.YOUVERSION_APP_KEY
+  if (!appKey || appKey === "COLE_AQUI_SEU_APP_KEY") {
+    return NextResponse.json({ error: "AUTH_REQUIRED", version }, { status: 401 })
+  }
+
+  try {
+    const client = getYVClient()
+    const versionId = YV_VERSION_IDS[version]
+    const usfm = `${bookId}.${chapter}` // e.g. "GEN.1", "JHN.3"
+
+    const passage = await client.getPassage(versionId, usfm, "html")
+    const content = (passage as { content?: string }).content ?? ""
+    const verses = parseYVHtml(content)
+
+    if (verses.length === 0) {
+      console.error("[biblia/youversion] Empty verses for", usfm, "| raw:", content.slice(0, 400))
+      return NextResponse.json({ error: "API_ERROR", detail: "Nenhum versículo retornado" }, { status: 502 })
+    }
+
+    return NextResponse.json({ verses, version, book: bookId, chapter: parseInt(chapter) })
+  } catch (err) {
+    console.error("[biblia/youversion] Error:", err)
+    return NextResponse.json({ error: "NETWORK_ERROR" }, { status: 502 })
+  }
+}
+
+// --- AbibliaDigital (NVI, ACF, RA) ---
 
 const ABBR_MAP: Record<string, string> = {
   GEN: "gn",    EXO: "ex",    LEV: "lv",    NUM: "nm",    DEU: "dt",
@@ -23,6 +88,10 @@ export async function GET(req: Request) {
   const bookId  = searchParams.get("book") ?? ""
   const chapter = searchParams.get("chapter") ?? "1"
   const version = searchParams.get("version") ?? "nvi"
+
+  if (version in YV_VERSION_IDS) {
+    return fetchFromYouVersion(bookId, chapter, version)
+  }
 
   const abbr = ABBR_MAP[bookId]
   if (!abbr) return NextResponse.json({ error: "Livro inválido" }, { status: 400 })
