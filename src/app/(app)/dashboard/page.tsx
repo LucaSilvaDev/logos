@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { getQuoteOfTheDay } from "@/lib/quotes"
+import { getDailyVerse } from "@/lib/daily-verse"
 import { PLAN_CONFIG } from "@/lib/reading-plan"
 import Link from "next/link"
 import {
@@ -21,6 +22,8 @@ export default async function DashboardPage() {
   const session = await auth()
   const userId = session!.user!.id!
   const quote = getQuoteOfTheDay()
+
+  const verse = getDailyVerse()
 
   const [devotionalCount, highlightCount, studyCount, prayerCount, profile] = await Promise.all([
     db.devotional.count({ where: { userId } }),
@@ -61,6 +64,18 @@ export default async function DashboardPage() {
         </h1>
         <div className="h-px w-16 bg-[#c9a654] opacity-40 mt-3" />
       </div>
+
+      {/* Versículo do Dia */}
+      <Link href="/biblia" className="block card-soft relative pl-6 pr-4 py-5 group">
+        <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#c9a654] via-[#c9a654] to-transparent opacity-60 rounded-full" />
+        <p className="font-display text-[9px] text-[#c9a654] uppercase tracking-[0.2em] mb-3 opacity-70">
+          Versículo do Dia
+        </p>
+        <blockquote className="font-serif text-[1.05rem] text-[#c9c0a8] leading-relaxed italic mb-3 group-hover:text-[#e2d9c5] transition-colors">
+          &ldquo;{verse.text}&rdquo;
+        </blockquote>
+        <p className="text-[#c9a654] text-sm font-medium">{verse.ref}</p>
+      </Link>
 
       {/* Citação do Dia */}
       <div className="card-soft relative pl-6 pr-4 py-5">

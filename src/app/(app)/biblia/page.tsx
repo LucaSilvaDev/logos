@@ -5,6 +5,7 @@ import {
   ChevronLeft, ChevronRight, Search, Bookmark,
   Highlighter, X, Loader2, AlertCircle, BookOpen, ChevronDown
 } from "lucide-react"
+import Link from "next/link"
 import { cn } from "@/lib/utils"
 
 const BOOKS = [
@@ -90,23 +91,110 @@ const HL_COLORS = [
 ]
 
 interface Verse { number: number; text: string }
+interface HlEntry { id: string; color: string }
+
+// --- localStorage helpers ---
+
+function readSavedPos() {
+  try {
+    if (typeof window === "undefined") return null
+    const raw = localStorage.getItem("selah-bible-pos")
+    if (!raw) return null
+    const p = JSON.parse(raw)
+    const book = BOOKS.find(b => b.id === p.bookId) ?? null
+    if (!book) return null
+    const chapter = typeof p.chapter === "number" && p.chapter >= 1 ? p.chapter : 1
+    const version = ["nvi", "naa", "nvt"].includes(p.version) ? p.version : "nvi"
+    return { book, chapter, version }
+  } catch { return null }
+}
+
+function readSavedFont(): "sm" | "md" | "lg" {
+  try {
+    if (typeof window === "undefined") return "md"
+    const s = localStorage.getItem("selah-bible-font")
+    return s === "sm" || s === "lg" ? s : "md"
+  } catch { return "md" }
+}
 
 export default function BibliaPage() {
-  const [book, setBook] = useState(BOOKS[0])
-  const [chapter, setChapter] = useState(1)
-  const [version, setVersion] = useState("nvi")
-  const [tab, setTab] = useState<"AT" | "NT">("AT")
+  const pos0 = readSavedPos()
+
+  const [book,    setBook]    = useState(() => pos0?.book    ?? BOOKS[0])
+  const [chapter, setChapter] = useState(() => pos0?.chapter ?? 1)
+  const [version, setVersion] = useState(() => pos0?.version ?? "nvi")
+  const [fontSize, setFontSize] = useState<"sm" | "md" | "lg">(readSavedFont)
+
+  const [tab,    setTab]    = useState<"AT" | "NT">("AT")
   const [filter, setFilter] = useState("")
   const [hlColor, setHlColor] = useState<string | null>(null)
-  const [highlighted, setHighlighted] = useState<Record<string, string>>({})
-  const [bookmarked, setBookmarked] = useState<Set<string>>(new Set())
-  const [verses, setVerses] = useState<Verse[]>([])
-  const [loading, setLoading] = useState(false)
-  const [apiError, setApiError] = useState<"ERROR" | "AUTH_REQUIRED" | "RATE_LIMIT" | null>(null)
+
+  // highlights: verseKey → { id, color }
+  const [highlighted, setHighlighted] = useState<Record<string, HlEntry>>({})
+  // bookmarks: verseKey → bookmarkId
+  const [bookmarked, setBookmarked] = useState<Record<string, string>>({})
+
+  const [verses,    setVerses]    = useState<Verse[]>([])
+  const [loading,   setLoading]   = useState(false)
+  const [apiError,  setApiError]  = useState<"ERROR" | "AUTH_REQUIRED" | "RATE_LIMIT" | null>(null)
   const [apiDetail, setApiDetail] = useState("")
   const [direction, setDirection] = useState<"next" | "prev">("next")
-  const [animKey, setAnimKey] = useState(0)
+  const [animKey,   setAnimKey]   = useState(0)
   const [showBookModal, setShowBookModal] = useState(false)
+
+  // Persist reading position
+  useEffect(() => {
+    try {
+      localStorage.setItem("selah-bible-pos", JSON.stringify({ bookId: book.id, chapter, version }))
+    } catch { /* ignore */ }
+  }, [book, chapter, version])
+
+  // Persist font size
+  useEffect(() => {
+    try { localStorage.setItem("selah-bible-font", fontSize) } catch { /* ignore */ }
+  }, [fontSize])
+
+  // Load highlights from API
+  useEffect(() => {
+    let active = true
+    async function load() {
+      try {
+        const res  = await fetch(`/api/biblia/highlights?book=${book.id}&chapter=${chapter}&version=${version}`)
+        if (!res.ok || !active) return
+        const data: { id: string; verseStart: number; verseEnd: number; color: string }[] = await res.json()
+        const map: Record<string, HlEntry> = {}
+        for (const h of data) {
+          for (let v = h.verseStart; v <= h.verseEnd; v++) {
+            map[`${book.id}-${chapter}-${v}`] = { id: h.id, color: h.color }
+          }
+        }
+        if (active) setHighlighted(map)
+      } catch { /* non-critical */ }
+    }
+    setHighlighted({})
+    load()
+    return () => { active = false }
+  }, [book, chapter, version])
+
+  // Load bookmarks from API
+  useEffect(() => {
+    let active = true
+    async function load() {
+      try {
+        const res  = await fetch(`/api/biblia/bookmarks?book=${book.id}&chapter=${chapter}&version=${version}`)
+        if (!res.ok || !active) return
+        const data: { id: string; verse: number | null }[] = await res.json()
+        const map: Record<string, string> = {}
+        for (const b of data) {
+          if (b.verse != null) map[`${book.id}-${chapter}-${b.verse}`] = b.id
+        }
+        if (active) setBookmarked(map)
+      } catch { /* non-critical */ }
+    }
+    setBookmarked({})
+    load()
+    return () => { active = false }
+  }, [book, chapter, version])
 
   const filteredBooks = BOOKS.filter(b =>
     b.testament === tab && b.name.toLowerCase().includes(filter.toLowerCase())
@@ -117,18 +205,16 @@ export default function BibliaPage() {
     setApiError(null)
     setVerses([])
     try {
-      const res = await fetch(`/api/biblia?book=${book.id}&chapter=${chapter}&version=${version}`)
+      const res  = await fetch(`/api/biblia?book=${book.id}&chapter=${chapter}&version=${version}`)
       const data = await res.json()
       if (data.error === "AUTH_REQUIRED") { setApiError("AUTH_REQUIRED"); return }
-      if (data.error === "RATE_LIMIT")    { setApiError("RATE_LIMIT"); return }
+      if (data.error === "RATE_LIMIT")    { setApiError("RATE_LIMIT");    return }
       if (!res.ok || data.error) {
         setApiDetail(data.detail ?? data.error ?? `HTTP ${res.status}`)
         setApiError("ERROR")
         return
       }
-      setVerses((data.verses ?? []).map((v: { number: number; text: string }) => ({
-        number: v.number, text: v.text,
-      })))
+      setVerses((data.verses ?? []).map((v: Verse) => ({ number: v.number, text: v.text })))
     } catch {
       setApiError("ERROR")
     } finally {
@@ -139,7 +225,7 @@ export default function BibliaPage() {
   useEffect(() => { fetchVerses() }, [fetchVerses])
 
   function goChapter(delta: number) {
-    const next = chapter + delta
+    const next    = chapter + delta
     const bookIdx = BOOKS.findIndex(b => b.id === book.id)
 
     if (next < 1) {
@@ -151,7 +237,6 @@ export default function BibliaPage() {
       setAnimKey(k => k + 1)
       return
     }
-
     if (next > book.chapters) {
       if (bookIdx >= BOOKS.length - 1) return
       setBook(BOOKS[bookIdx + 1])
@@ -160,7 +245,6 @@ export default function BibliaPage() {
       setAnimKey(k => k + 1)
       return
     }
-
     setDirection(delta > 0 ? "next" : "prev")
     setAnimKey(k => k + 1)
     setChapter(next)
@@ -173,31 +257,80 @@ export default function BibliaPage() {
     setAnimKey(k => k + 1)
   }
 
-  function toggleVerse(key: string) {
+  async function toggleVerse(key: string, verseNumber: number) {
     if (!hlColor) return
-    setHighlighted(prev => {
-      const next = { ...prev }
-      if (next[key] === hlColor) delete next[key]
-      else next[key] = hlColor
-      return next
-    })
+    const existing = highlighted[key]
+
+    if (existing) {
+      if (existing.color === hlColor) {
+        // Remove
+        setHighlighted(prev => { const n = { ...prev }; delete n[key]; return n })
+        fetch("/api/biblia/highlights", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: existing.id }),
+        }).catch(() => {})
+      } else {
+        // Change color — optimistic update then re-create
+        setHighlighted(prev => ({ ...prev, [key]: { id: existing.id, color: hlColor } }))
+        await fetch("/api/biblia/highlights", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: existing.id }),
+        }).catch(() => {})
+        const res  = await fetch("/api/biblia/highlights", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ book: book.id, chapter, verseStart: verseNumber, verseEnd: verseNumber, version, color: hlColor }),
+        }).catch(() => null)
+        const data = res ? await res.json().catch(() => null) : null
+        if (data?.id) setHighlighted(prev => ({ ...prev, [key]: { id: data.id, color: hlColor } }))
+      }
+    } else {
+      // Add — optimistic
+      const color = hlColor
+      setHighlighted(prev => ({ ...prev, [key]: { id: "pending", color } }))
+      const res  = await fetch("/api/biblia/highlights", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ book: book.id, chapter, verseStart: verseNumber, verseEnd: verseNumber, version, color }),
+      }).catch(() => null)
+      const data = res ? await res.json().catch(() => null) : null
+      if (data?.id) setHighlighted(prev => ({ ...prev, [key]: { id: data.id, color } }))
+    }
   }
 
-  function toggleBookmark(key: string) {
-    setBookmarked(prev => {
-      const next = new Set(prev)
-      next.has(key) ? next.delete(key) : next.add(key)
-      return next
-    })
+  async function toggleBookmark(key: string, verseNumber: number) {
+    const existingId = bookmarked[key]
+    if (existingId) {
+      // Remove — optimistic
+      setBookmarked(prev => { const n = { ...prev }; delete n[key]; return n })
+      fetch("/api/biblia/bookmarks", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: existingId }),
+      }).catch(() => {})
+    } else {
+      // Add — optimistic
+      setBookmarked(prev => ({ ...prev, [key]: "pending" }))
+      const res  = await fetch("/api/biblia/bookmarks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ book: book.id, chapter, verse: verseNumber, version }),
+      }).catch(() => null)
+      const data = res ? await res.json().catch(() => null) : null
+      if (data?.id) setBookmarked(prev => ({ ...prev, [key]: data.id }))
+    }
   }
 
-  const chapterArr = Array.from({ length: book.chapters }, (_, i) => i + 1)
+  const chapterArr     = Array.from({ length: book.chapters }, (_, i) => i + 1)
   const isFirstInBible = book.id === "GEN" && chapter === 1
   const isLastInBible  = book.id === "REV" && chapter === book.chapters
 
   return (
     <div className="relative">
-      {/* Controls bar — sticky within the scroll container */}
+
+      {/* Controls bar */}
       <div className="sticky top-0 z-10 flex flex-wrap items-center gap-3 px-6 py-3 bg-[#12111e]/95 backdrop-blur-md"
         style={{ boxShadow: "0 1px 0 rgba(46,43,66,0.4)" }}>
 
@@ -253,6 +386,36 @@ export default function BibliaPage() {
 
         <div className="flex-1" />
 
+        {/* Font size */}
+        <div className="flex items-center gap-0.5">
+          {(["sm", "md", "lg"] as const).map((s, i) => (
+            <button key={s}
+              onClick={() => setFontSize(s)}
+              className={cn(
+                "w-6 h-5 flex items-center justify-center rounded transition-colors",
+                fontSize === s ? "text-[#c9a654]" : "text-[#3d3a55] hover:text-[#55524a]",
+                s === "sm" && "text-[9px]",
+                s === "md" && "text-[11px]",
+                s === "lg" && "text-[13px]",
+              )}
+              title={["Texto menor", "Texto médio", "Texto maior"][i]}
+            >
+              A
+            </button>
+          ))}
+        </div>
+
+        <div className="w-px h-3.5 bg-[#2e2b42]" />
+
+        {/* Search link */}
+        <Link href="/biblia/busca"
+          className="text-[#3d3a55] hover:text-[#c9a654] transition-colors duration-200"
+          title="Buscar versículos">
+          <Search className="w-3.5 h-3.5" />
+        </Link>
+
+        <div className="w-px h-3.5 bg-[#2e2b42]" />
+
         {/* Highlight tools */}
         <div className="flex items-center gap-1.5">
           <Highlighter className="w-3 h-3 text-[#3d3a55]" />
@@ -275,133 +438,121 @@ export default function BibliaPage() {
 
       {/* Side chapter navigation */}
       {!loading && !apiError && verses.length > 0 && !isFirstInBible && (
-        <button
-          onClick={() => goChapter(-1)}
-          className="chapter-side-nav left-0"
-          aria-label="Capítulo anterior"
-        >
+        <button onClick={() => goChapter(-1)} className="chapter-side-nav left-0" aria-label="Capítulo anterior">
           <span className="chapter-side-chevron chapter-side-chevron-left" />
         </button>
       )}
       {!loading && !apiError && verses.length > 0 && !isLastInBible && (
-        <button
-          onClick={() => goChapter(1)}
-          className="chapter-side-nav right-0"
-          aria-label="Próximo capítulo"
-        >
+        <button onClick={() => goChapter(1)} className="chapter-side-nav right-0" aria-label="Próximo capítulo">
           <span className="chapter-side-chevron chapter-side-chevron-right" />
         </button>
       )}
 
-      {/* Reading area — overflow-x hidden evita que a animação cause scroll lateral */}
+      {/* Reading area */}
       <div className="overflow-x-hidden">
-      <div className="max-w-2xl mx-auto px-8 py-12">
+        <div className="max-w-2xl mx-auto px-8 py-12">
 
-        {/* AUTH_REQUIRED */}
-        {apiError === "AUTH_REQUIRED" && (
-          <div className="text-center py-16 space-y-3">
-            <AlertCircle className="w-6 h-6 text-[#c9a654] opacity-40 mx-auto" />
-            <p className="font-serif text-[#c9c0a8] text-base">Token não carregado</p>
-            <p className="text-[#55524a] text-sm leading-relaxed max-w-sm mx-auto">
-              Reinicie o servidor de desenvolvimento para carregar o token:<br />
-              <code className="text-[#8a8375] font-mono text-xs">Ctrl+C → npm run dev</code>
-            </p>
-          </div>
-        )}
-
-        {/* RATE_LIMIT */}
-        {apiError === "RATE_LIMIT" && (
-          <div className="relative pl-6 py-4 max-w-sm">
-            <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-[#c9a654] opacity-40" />
-            <p className="font-serif text-[#c9a654] text-sm mb-1">Limite de requisições atingido</p>
-            <p className="text-[#55524a] text-xs">Aguarde alguns minutos e tente novamente.</p>
-          </div>
-        )}
-
-        {/* ERROR */}
-        {apiError === "ERROR" && (
-          <div className="text-center py-16 space-y-2">
-            <AlertCircle className="w-6 h-6 text-[#3d3a55] mx-auto mb-3" />
-            <p className="font-serif text-[#55524a] text-sm">Não foi possível carregar os versículos.</p>
-            {apiDetail && <p className="font-mono text-[10px] text-[#3d3a55]">{apiDetail}</p>}
-            <button onClick={fetchVerses} className="text-xs text-[#c9a654] hover:opacity-80 transition-opacity mt-2 block mx-auto">
-              Tentar novamente
-            </button>
-          </div>
-        )}
-
-        {/* Loading */}
-        {loading && (
-          <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-4 h-4 text-[#3d3a55] animate-spin" />
-          </div>
-        )}
-
-        {/* Bible text with page-turn animation */}
-        {!loading && !apiError && verses.length > 0 && (
-          <div key={animKey} className={direction === "next" ? "page-turn-next" : "page-turn-prev"}>
-
-            {/* Chapter heading */}
-            <div className="text-center mb-12">
-              <h1 className="chapter-heading text-base mb-1">{book.name}</h1>
-              <p className="font-sans text-[9px] text-[#3d3a55] tracking-[0.25em] uppercase">
-                Capítulo {chapter}
+          {apiError === "AUTH_REQUIRED" && (
+            <div className="text-center py-16 space-y-3">
+              <AlertCircle className="w-6 h-6 text-[#c9a654] opacity-40 mx-auto" />
+              <p className="font-serif text-[#c9c0a8] text-base">Token não carregado</p>
+              <p className="text-[#55524a] text-sm leading-relaxed max-w-sm mx-auto">
+                Reinicie o servidor: <code className="text-[#8a8375] font-mono text-xs">Ctrl+C → npm run dev</code>
               </p>
-              <div className="w-12 h-px bg-[#c9a654] opacity-30 mx-auto mt-4" />
             </div>
+          )}
 
-            {/* Flowing Bible text */}
-            <div className="bible-text leading-[2.2]">
-              {verses.map(v => {
-                const key = `${book.id}-${chapter}-${v.number}`
-                const hlCls = highlighted[key] ? `hl-${highlighted[key]}` : ""
-                return (
-                  <span key={v.number}
-                    onClick={() => toggleVerse(key)}
-                    className={cn("group relative transition-colors", hlColor && "cursor-pointer", hlCls)}>
-                    <sup className="verse-number">{v.number}</sup>
-                    <span>{v.text}</span>
-                    {" "}
-                    <button
-                      onClick={e => { e.stopPropagation(); toggleBookmark(key) }}
-                      className={cn("inline-flex opacity-0 group-hover:opacity-100 transition-opacity align-middle", bookmarked.has(key) && "opacity-100")}>
-                      <Bookmark className={cn("w-2.5 h-2.5", bookmarked.has(key) ? "text-[#c9a654] fill-[#c9a654]" : "text-[#3d3a55]")} />
-                    </button>
-                    {" "}
-                  </span>
-                )
-              })}
+          {apiError === "RATE_LIMIT" && (
+            <div className="relative pl-6 py-4 max-w-sm">
+              <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-[#c9a654] opacity-40" />
+              <p className="font-serif text-[#c9a654] text-sm mb-1">Limite de requisições atingido</p>
+              <p className="text-[#55524a] text-xs">Aguarde alguns minutos e tente novamente.</p>
             </div>
+          )}
 
-            {/* Chapter navigation footer */}
-            <div className="flex justify-between mt-16 pt-6" style={{ borderTop: "1px solid rgba(46,43,66,0.4)" }}>
-              <button onClick={() => goChapter(-1)} disabled={isFirstInBible}
-                className="flex items-center gap-1.5 text-sm font-serif text-[#55524a] hover:text-[#c9a654] disabled:opacity-20 transition-colors duration-200">
-                <ChevronLeft className="w-4 h-4" />
-                {chapter === 1 ? "Livro anterior" : "Capítulo anterior"}
-              </button>
-              <button onClick={() => goChapter(1)} disabled={isLastInBible}
-                className="flex items-center gap-1.5 text-sm font-serif text-[#55524a] hover:text-[#c9a654] disabled:opacity-20 transition-colors duration-200">
-                {chapter === book.chapters ? "Próximo livro" : "Próximo capítulo"}
-                <ChevronRight className="w-4 h-4" />
+          {apiError === "ERROR" && (
+            <div className="text-center py-16 space-y-2">
+              <AlertCircle className="w-6 h-6 text-[#3d3a55] mx-auto mb-3" />
+              <p className="font-serif text-[#55524a] text-sm">Não foi possível carregar os versículos.</p>
+              {apiDetail && <p className="font-mono text-[10px] text-[#3d3a55]">{apiDetail}</p>}
+              <button onClick={fetchVerses} className="text-xs text-[#c9a654] hover:opacity-80 transition-opacity mt-2 block mx-auto">
+                Tentar novamente
               </button>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+
+          {loading && (
+            <div className="flex items-center justify-center py-20">
+              <Loader2 className="w-4 h-4 text-[#3d3a55] animate-spin" />
+            </div>
+          )}
+
+          {!loading && !apiError && verses.length > 0 && (
+            <div key={animKey} className={direction === "next" ? "page-turn-next" : "page-turn-prev"}>
+
+              {/* Chapter heading */}
+              <div className="text-center mb-12">
+                <h1 className="chapter-heading text-base mb-1">{book.name}</h1>
+                <p className="font-sans text-[9px] text-[#3d3a55] tracking-[0.25em] uppercase">
+                  Capítulo {chapter}
+                </p>
+                <div className="w-12 h-px bg-[#c9a654] opacity-30 mx-auto mt-4" />
+              </div>
+
+              {/* Flowing Bible text */}
+              <div className={cn(
+                "bible-text leading-[2.2]",
+                fontSize === "sm" && "bible-text-sm",
+                fontSize === "lg" && "bible-text-lg",
+              )}>
+                {verses.map(v => {
+                  const key   = `${book.id}-${chapter}-${v.number}`
+                  const hlEntry = highlighted[key]
+                  const hlCls   = hlEntry ? `hl-${hlEntry.color}` : ""
+                  const isBookmarked = key in bookmarked
+                  return (
+                    <span key={v.number}
+                      onClick={() => toggleVerse(key, v.number)}
+                      className={cn("group relative transition-colors", hlColor && "cursor-pointer", hlCls)}>
+                      <sup className="verse-number">{v.number}</sup>
+                      <span>{v.text}</span>
+                      {" "}
+                      <button
+                        onClick={e => { e.stopPropagation(); toggleBookmark(key, v.number) }}
+                        className={cn("inline-flex opacity-0 group-hover:opacity-100 transition-opacity align-middle", isBookmarked && "opacity-100")}>
+                        <Bookmark className={cn("w-2.5 h-2.5", isBookmarked ? "text-[#c9a654] fill-[#c9a654]" : "text-[#3d3a55]")} />
+                      </button>
+                      {" "}
+                    </span>
+                  )
+                })}
+              </div>
+
+              {/* Chapter navigation footer */}
+              <div className="flex justify-between mt-16 pt-6" style={{ borderTop: "1px solid rgba(46,43,66,0.4)" }}>
+                <button onClick={() => goChapter(-1)} disabled={isFirstInBible}
+                  className="flex items-center gap-1.5 text-sm font-serif text-[#55524a] hover:text-[#c9a654] disabled:opacity-20 transition-colors duration-200">
+                  <ChevronLeft className="w-4 h-4" />
+                  {chapter === 1 ? "Livro anterior" : "Capítulo anterior"}
+                </button>
+                <button onClick={() => goChapter(1)} disabled={isLastInBible}
+                  className="flex items-center gap-1.5 text-sm font-serif text-[#55524a] hover:text-[#c9a654] disabled:opacity-20 transition-colors duration-200">
+                  {chapter === book.chapters ? "Próximo livro" : "Próximo capítulo"}
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Book selector modal */}
       {showBookModal && (
         <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 px-4">
-          <div
-            className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-            onClick={() => setShowBookModal(false)}
-          />
-          <div
-            className="relative z-10 w-full max-w-2xl card-soft overflow-hidden flex flex-col modal-enter"
-            style={{ maxHeight: "calc(100vh - 96px)" }}
-          >
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowBookModal(false)} />
+          <div className="relative z-10 w-full max-w-2xl card-soft overflow-hidden flex flex-col modal-enter"
+            style={{ maxHeight: "calc(100vh - 96px)" }}>
+
             {/* Modal header */}
             <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: "1px solid rgba(46,43,66,0.5)" }}>
               <div className="flex gap-2">
@@ -417,10 +568,7 @@ export default function BibliaPage() {
                   </button>
                 ))}
               </div>
-              <button
-                onClick={() => setShowBookModal(false)}
-                className="text-[#3d3a55] hover:text-[#8a8375] transition-colors duration-200"
-              >
+              <button onClick={() => setShowBookModal(false)} className="text-[#3d3a55] hover:text-[#8a8375] transition-colors duration-200">
                 <X className="w-4 h-4" />
               </button>
             </div>

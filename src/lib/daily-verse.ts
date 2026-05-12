@@ -1,0 +1,53 @@
+interface DailyVerse { ref: string; text: string }
+
+const VERSES: DailyVerse[] = [
+  { ref: "João 3:16", text: "Porque Deus amou o mundo de tal maneira que deu o seu Filho unigênito, para que todo aquele que nele crê não pereça, mas tenha a vida eterna." },
+  { ref: "Romanos 8:28", text: "Sabemos que todas as coisas cooperam para o bem daqueles que amam a Deus, daqueles que são chamados segundo o seu propósito." },
+  { ref: "Efésios 2:8-9", text: "Porque pela graça vocês são salvos, por meio da fé, e isso não vem de vocês, é dom de Deus; não por obras, para que ninguém se glorie." },
+  { ref: "Romanos 3:23-24", text: "Pois todos pecaram e estão destituídos da glória de Deus, sendo justificados gratuitamente pela sua graça, mediante a redenção que há em Cristo Jesus." },
+  { ref: "Romanos 6:23", text: "Pois o salário do pecado é a morte, mas o dom gratuito de Deus é a vida eterna em Cristo Jesus, nosso Senhor." },
+  { ref: "Salmos 23:1-3", text: "O Senhor é o meu pastor; de nada me faltarei. Em lugares de verdes pastos me faz repousar; junto a águas tranquilas me conduz. Restaura a minha alma." },
+  { ref: "Jeremias 29:11", text: "Pois eu sei os planos que tenho para vocês, diz o Senhor, planos de fazê-los prosperar e não de lhes causar dano, planos de dar a vocês esperança e um futuro." },
+  { ref: "Filipenses 4:13", text: "Posso fazer tudo por meio daquele que me fortalece." },
+  { ref: "Provérbios 3:5-6", text: "Confie no Senhor de todo o seu coração e não se apoie no seu próprio entendimento; em todos os seus caminhos, reconheça-o, e ele aplainará as suas veredas." },
+  { ref: "Isaías 40:31", text: "Mas os que esperam no Senhor renovam as suas forças. Voam alto como águias; correm e não ficam exaustos, caminham e não se cansam." },
+  { ref: "Filipenses 4:6-7", text: "Não andem ansiosos por coisa alguma, mas em tudo, pela oração e súplicas, e com ação de graças, apresentem seus pedidos a Deus. E a paz de Deus, que excede todo entendimento, guardará o coração e a mente de vocês em Cristo Jesus." },
+  { ref: "Mateus 6:33", text: "Busquem, pois, em primeiro lugar o reino de Deus e a sua justiça, e todas essas coisas serão acrescentadas a vocês." },
+  { ref: "João 14:6", text: "Respondeu Jesus: Eu sou o caminho, a verdade e a vida. Ninguém vem ao Pai, a não ser por mim." },
+  { ref: "Romanos 8:1", text: "Portanto, agora já não há nenhuma condenação para os que estão em Cristo Jesus." },
+  { ref: "Romanos 5:8", text: "Mas Deus demonstra o seu amor por nós: Cristo morreu em nosso favor quando ainda éramos pecadores." },
+  { ref: "Gálatas 2:20", text: "Fui crucificado com Cristo. Assim, já não sou eu quem vive, mas Cristo vive em mim. A vida que agora vivo no corpo, vivo-a pela fé no Filho de Deus, que me amou e se entregou por mim." },
+  { ref: "2 Timóteo 3:16-17", text: "Toda a Escritura é inspirada por Deus e útil para o ensino, para a repreensão, para a correção e para a instrução na justiça, para que o homem de Deus seja apto e plenamente preparado para toda boa obra." },
+  { ref: "Hebreus 11:1", text: "A fé é a certeza daquilo que esperamos e a prova das coisas que não vemos." },
+  { ref: "Isaías 53:5", text: "Mas ele foi transpassado por causa das nossas transgressões; foi esmagado por causa das nossas iniquidades. O castigo que nos trouxe paz estava sobre ele, e pelas suas feridas fomos curados." },
+  { ref: "João 1:14", text: "E o Verbo se fez carne e habitou entre nós, e vimos a sua glória, glória como do unigênito do Pai, cheio de graça e de verdade." },
+  { ref: "Salmos 46:1-2", text: "Deus é o nosso refúgio e fortaleza, socorro bem presente nas tribulações. Portanto não temeremos, ainda que a terra se transforme, e ainda que os montes se movam para o meio do mar." },
+  { ref: "1 João 1:9", text: "Se confessarmos os nossos pecados, ele é fiel e justo para perdoar os nossos pecados e nos purificar de toda injustiça." },
+  { ref: "Romanos 1:16-17", text: "Pois não me envergonho do evangelho, porque é o poder de Deus para a salvação de todo aquele que crê. Pois no evangelho a justiça de Deus é revelada de fé em fé, como está escrito: O justo viverá pela fé." },
+  { ref: "Mateus 11:28-30", text: "Venham a mim, todos os que estão cansados e sobrecarregados, e eu lhes darei descanso. Tomem sobre vocês o meu jugo e aprendam de mim, pois sou manso e humilde de coração, e vocês encontrarão descanso para as almas de vocês." },
+  { ref: "Salmos 119:105", text: "A tua palavra é lâmpada que ilumina os meus passos e luz que clareia o meu caminho." },
+  { ref: "Efésios 1:4-5", text: "Pois nele nos escolheu antes da fundação do mundo, para sermos santos e irrepreensíveis perante ele. Em amor, nos predestinou para sermos adotados como filhos, por meio de Jesus Cristo, de acordo com o seu bom propósito e vontade." },
+  { ref: "João 10:28-29", text: "Eu lhes dou a vida eterna, e elas jamais perecerão; ninguém as arrebatará da minha mão. Meu Pai, que as deu para mim, é maior do que todos; ninguém as pode arrebatar da mão do meu Pai." },
+  { ref: "Colossenses 3:1-2", text: "Portanto, uma vez que vocês ressuscitaram com Cristo, procurem as coisas do alto, onde Cristo está assentado à direita de Deus. Fixem o pensamento nas coisas do alto, não nas da terra." },
+  { ref: "Romanos 8:38-39", text: "Pois estou convicto de que nem morte nem vida, nem anjos nem demônios, nem o presente nem o futuro, nem quaisquer poderes, nem altura nem profundidade, nem qualquer outra coisa na criação será capaz de nos separar do amor de Deus que está em Cristo Jesus, nosso Senhor." },
+  { ref: "Salmos 1:1-2", text: "Feliz aquele que não anda segundo o conselho dos ímpios, nem para no caminho dos pecadores, nem se assenta na roda dos escarnecedores! Ao contrário, seu prazer está na lei do Senhor, e nessa lei medita de dia e de noite." },
+  { ref: "2 Coríntios 5:17", text: "Portanto, se alguém está em Cristo, é nova criação. As coisas antigas já passaram; eis que surgiram coisas novas!" },
+  { ref: "João 11:25-26", text: "Disse-lhe Jesus: Eu sou a ressurreição e a vida. Aquele que crê em mim, ainda que morra, viverá; e quem vive e crê em mim não morrerá eternamente." },
+  { ref: "Salmos 27:1", text: "O Senhor é a minha luz e a minha salvação; a quem temerei? O Senhor é a força da minha vida; de quem me recearei?" },
+  { ref: "Hebreus 12:2", text: "Olhando para Jesus, o autor e consumador da nossa fé, o qual pelo gozo que lhe estava proposto suportou a cruz, desprezando a vergonha, e assentou-se à destra do trono de Deus." },
+  { ref: "Apocalipse 21:3-4", text: "Eis o tabernáculo de Deus com os homens. Ele habitará com eles; eles serão povos de Deus, e o próprio Deus estará com eles. Ele lhes enxugará dos olhos toda lágrima, e a morte já não existirá, nem haverá mais luto, nem choro, nem dor, porque as primeiras coisas já passaram." },
+  { ref: "1 Coríntios 15:3-4", text: "Antes de tudo lhes transmiti o que também recebi: que Cristo morreu pelos nossos pecados segundo as Escrituras, que foi sepultado, que ressuscitou no terceiro dia segundo as Escrituras." },
+  { ref: "Josué 1:9", text: "Não fui eu quem ordenei a você? Seja forte e corajoso! Não se apavore nem desanime, pois o Senhor, o seu Deus, estará com você em todo lugar para onde você for." },
+  { ref: "1 Pedro 5:7", text: "Depositem nele toda a ansiedade de vocês, porque ele tem cuidado de vocês." },
+  { ref: "Efésios 6:10-11", text: "Finalmente, fortaleçam-se no Senhor e no seu imenso poder. Vistam toda a armadura de Deus para que possam firmar-se contra as ciladas do diabo." },
+  { ref: "1 Coríntios 13:4-8", text: "O amor é paciente, é bondoso. O amor não tem inveja, não se vangloria, não se orgulha. Não se comporta com indecência, não procura o que é seu, não se ira, não guarda rancor. O amor não se alegra com a injustiça, mas se alegra com a verdade. Tudo sofre, tudo crê, tudo espera, tudo suporta. O amor jamais acaba." },
+  { ref: "Romanos 12:1-2", text: "Portanto, irmãos, rogo-lhes pelas misericórdias de Deus que se ofereçam em sacrifício vivo, santo e agradável a Deus; este é o culto racional de vocês. Não se amoldem ao padrão deste mundo, mas transformem-se pela renovação da sua mente." },
+  { ref: "João 15:5", text: "Eu sou a videira; vocês são os ramos. Se alguém permanecer em mim e eu nele, esse dará muito fruto; sem mim vocês não podem fazer coisa alguma." },
+  { ref: "2 Coríntios 12:9", text: "Mas ele me disse: A minha graça é suficiente para você, pois o meu poder se aperfeiçoa na fraqueza. Portanto, eu me gloriarei ainda mais alegremente nas minhas fraquezas, para que o poder de Cristo repouse sobre mim." },
+  { ref: "Salmos 139:13-14", text: "Pois tu formaste o meu interior; tu me teceste no ventre de minha mãe. Louvo-te porque sou feito de modo assombroso e maravilhoso. Admiráveis são as tuas obras; isto eu sei muito bem." },
+]
+
+export function getDailyVerse(): DailyVerse {
+  const dayIndex = Math.floor(Date.now() / 86_400_000)
+  return VERSES[dayIndex % VERSES.length]
+}
