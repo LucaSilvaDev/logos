@@ -38,8 +38,8 @@ export async function GET(req: Request) {
   const token    = process.env.BIBLE_API_TOKEN
   const hasToken = Boolean(token && token.length > 10 && token !== "COLE_AQUI_SEU_TOKEN")
 
-  // AbibliaDigital search is a POST endpoint
-  const url = "https://www.abibliadigital.com.br/api/search"
+  // AbibliaDigital: POST /api/verses/search with {version, search}
+  const url = "https://www.abibliadigital.com.br/api/verses/search"
 
   const headers: HeadersInit = {
     "Accept":       "application/json",
@@ -82,7 +82,7 @@ export async function GET(req: Request) {
       text:     v.text,
     })).filter((r: { bookId: string }) => r.bookId !== "")
 
-    return NextResponse.json({ results, total: data.total ?? results.length })
+    return NextResponse.json({ results, total: data.occurrence ?? results.length })
   } catch {
     return NextResponse.json({ error: "NETWORK_ERROR", results: [] }, { status: 502 })
   }
