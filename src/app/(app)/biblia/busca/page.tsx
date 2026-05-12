@@ -34,7 +34,6 @@ function TextWithHighlight({ text, query }: { text: string; query: string }) {
 export default function BuscaBibliaPage() {
   const router = useRouter()
   const [query,   setQuery]   = useState("")
-  const [version, setVersion] = useState("nvi")
   const [results, setResults] = useState<SearchResult[]>([])
   const [total,   setTotal]   = useState(0)
   const [loading, setLoading] = useState(false)
@@ -48,7 +47,7 @@ export default function BuscaBibliaPage() {
     setError("")
     setSearched(true)
     try {
-      const res  = await fetch(`/api/biblia/busca?q=${encodeURIComponent(query.trim())}&version=${version}`)
+      const res  = await fetch(`/api/biblia/busca?q=${encodeURIComponent(query.trim())}&version=nvi`)
       const data = await res.json()
       if (data.error) { setError(data.error); setResults([]); return }
       setResults(data.results ?? [])
@@ -62,7 +61,7 @@ export default function BuscaBibliaPage() {
 
   function goToBible(bookId: string, chapter: number) {
     try {
-      localStorage.setItem("selah-bible-pos", JSON.stringify({ bookId, chapter, version }))
+      localStorage.setItem("selah-bible-pos", JSON.stringify({ bookId, chapter, version: "nvi" }))
     } catch { /* ignore */ }
     router.push("/biblia")
   }
@@ -95,26 +94,21 @@ export default function BuscaBibliaPage() {
         </div>
 
         <div className="flex items-center gap-3">
-          {/* Version selector */}
-          <div className="flex gap-1.5">
-            {[{ id: "nvi", label: "NVI" }, { id: "naa", label: "NAA" }].map(v => (
-              <button type="button" key={v.id}
-                onClick={() => setVersion(v.id)}
-                className={cn(
-                  "px-3 py-1.5 text-[10px] font-medium tracking-wider transition-all duration-200 rounded-full border",
-                  version === v.id
-                    ? "bg-[#c9a65415] text-[#c9a654] border-[#c9a65440]"
-                    : "text-[#3d3a55] border-transparent hover:text-[#55524a] hover:border-[#2e2b42]"
-                )}>
-                {v.label}
-              </button>
-            ))}
-            <span
-              title="NVT é lida por outro serviço que não oferece busca"
-              className="px-3 py-1.5 text-[10px] font-medium tracking-wider rounded-full border border-transparent text-[#2e2b42] cursor-not-allowed select-none"
+          {/* Version selector — only NVI has indexed content */}
+          <div className="flex items-center gap-1.5">
+            <button type="button"
+              className="px-3 py-1.5 text-[10px] font-medium tracking-wider rounded-full border bg-[#c9a65415] text-[#c9a654] border-[#c9a65440]"
             >
-              NVT
-            </span>
+              NVI
+            </button>
+            {["NAA", "NVT"].map(label => (
+              <span key={label}
+                title="Não indexada — busca disponível apenas na NVI"
+                className="px-3 py-1.5 text-[10px] font-medium tracking-wider rounded-full border border-transparent text-[#2e2b42] cursor-not-allowed select-none"
+              >
+                {label}
+              </span>
+            ))}
           </div>
           <div className="flex-1" />
           <button

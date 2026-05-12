@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 
-const SEARCHABLE = new Set(["nvi", "naa"])
+// AbibliaDigital only has NVI content — NAA and NVT return 0 results
+const SEARCHABLE = new Set(["nvi"])
 
 // Maps AbibliaDigital Portuguese abbreviations back to USFM book IDs
 const ABBR_TO_ID: Record<string, string> = {
