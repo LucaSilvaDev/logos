@@ -1,5 +1,19 @@
 import { NextResponse } from "next/server"
 import { ApiClient, BibleClient } from "@youversion/platform-core"
+import { db } from "@/lib/db"
+
+function cacheVerses(book: string, chapter: number, version: string, verses: { number: number; text: string }[]) {
+  const data = verses.map(v => ({
+    id:      `${version}-${book}-${chapter}-${v.number}`,
+    book,
+    chapter,
+    verse:   v.number,
+    version,
+    text:    v.text,
+  }))
+  // fire-and-forget — never blocks the response
+  db.bibleVerse.createMany({ data, skipDuplicates: true }).catch(() => {})
+}
 
 // YouVersion Platform — platform.youversion.com
 // Available PT versions under accelerated licensing:
@@ -56,6 +70,7 @@ async function fetchFromYouVersion(bookId: string, chapter: string, version: str
       return NextResponse.json({ error: "API_ERROR", detail: "Nenhum versículo retornado" }, { status: 502 })
     }
 
+    cacheVerses(bookId, parseInt(chapter), version, verses)
     return NextResponse.json({ verses, version, book: bookId, chapter: parseInt(chapter) })
   } catch (err) {
     console.error("[biblia/youversion] Error:", err)
@@ -145,6 +160,7 @@ async function fetchFromBibliaOnline(bookId: string, chapter: string, version: s
       return NextResponse.json({ error: "API_ERROR", detail: "Nenhum versículo encontrado no HTML" }, { status: 502 })
     }
 
+    cacheVerses(bookId, parseInt(chapter), version, verses)
     return NextResponse.json({ verses, version, book: bookId, chapter: parseInt(chapter) })
   } catch (err) {
     console.error("[biblia/bibliaonline] Network error:", err)
@@ -220,6 +236,7 @@ export async function GET(req: Request) {
       text: v.text,
     }))
 
+    cacheVerses(bookId, parseInt(chapter), version, verses)
     return NextResponse.json({ verses, version, book: bookId, chapter: parseInt(chapter) })
   } catch (err) {
     console.error("[biblia] Network error:", err)

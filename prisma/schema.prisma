@@ -249,6 +249,22 @@ model EschatologyNote {
   @@unique([userId, book, chapter])
 }
 
+// ─── CACHE DE VERSÍCULOS BÍBLICOS ─────────────────────────────────────────────
+// Preenchido automaticamente enquanto o usuário lê capítulos.
+// Permite busca interna sem depender de APIs externas.
+
+model BibleVerse {
+  id      String @id @default(cuid())
+  book    String
+  chapter Int
+  verse   Int
+  version String
+  text    String
+
+  @@unique([book, chapter, verse, version])
+  @@index([version, text])
+}
+
 // ─── HISTÓRIA DA IGREJA ───────────────────────────────────────────────────────
 
 model ChurchHistoryEvent {

@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Search, Loader2, BookOpen, ChevronRight, AlertCircle, ChevronLeft } from "lucide-react"
+import { Search, Loader2, BookOpen, ChevronRight, AlertCircle, ChevronLeft, Database } from "lucide-react"
 import { cn } from "@/lib/utils"
 import Link from "next/link"
 
@@ -13,6 +13,12 @@ interface SearchResult {
   verse:    number
   text:     string
 }
+
+const VERSIONS = [
+  { id: "nvi",    label: "NVI" },
+  { id: "naa",    label: "NAA" },
+  { id: "nvt",    label: "NVT" },
+]
 
 function TextWithHighlight({ text, query }: { text: string; query: string }) {
   const q = query.trim().toLowerCase()
@@ -34,6 +40,7 @@ function TextWithHighlight({ text, query }: { text: string; query: string }) {
 export default function BuscaBibliaPage() {
   const router = useRouter()
   const [query,   setQuery]   = useState("")
+  const [version, setVersion] = useState("nvi")
   const [results, setResults] = useState<SearchResult[]>([])
   const [total,   setTotal]   = useState(0)
   const [loading, setLoading] = useState(false)
@@ -47,7 +54,7 @@ export default function BuscaBibliaPage() {
     setError("")
     setSearched(true)
     try {
-      const res  = await fetch(`/api/biblia/busca?q=${encodeURIComponent(query.trim())}&version=nvi`)
+      const res  = await fetch(`/api/biblia/busca?q=${encodeURIComponent(query.trim())}&version=${version}`)
       const data = await res.json()
       if (data.error) { setError(data.error); setResults([]); return }
       setResults(data.results ?? [])
@@ -61,7 +68,7 @@ export default function BuscaBibliaPage() {
 
   function goToBible(bookId: string, chapter: number) {
     try {
-      localStorage.setItem("selah-bible-pos", JSON.stringify({ bookId, chapter, version: "nvi" }))
+      localStorage.setItem("selah-bible-pos", JSON.stringify({ bookId, chapter, version }))
     } catch { /* ignore */ }
     router.push("/biblia")
   }
@@ -94,20 +101,21 @@ export default function BuscaBibliaPage() {
         </div>
 
         <div className="flex items-center gap-3">
-          {/* Version selector — only NVI has indexed content */}
           <div className="flex items-center gap-1.5">
-            <button type="button"
-              className="px-3 py-1.5 text-[10px] font-medium tracking-wider rounded-full border bg-[#c9a65415] text-[#c9a654] border-[#c9a65440]"
-            >
-              NVI
-            </button>
-            {["NAA", "NVT"].map(label => (
-              <span key={label}
-                title="Não indexada — busca disponível apenas na NVI"
-                className="px-3 py-1.5 text-[10px] font-medium tracking-wider rounded-full border border-transparent text-[#2e2b42] cursor-not-allowed select-none"
+            {VERSIONS.map(v => (
+              <button
+                key={v.id}
+                type="button"
+                onClick={() => setVersion(v.id)}
+                className={cn(
+                  "px-3 py-1.5 text-[10px] font-medium tracking-wider rounded-full border transition-colors",
+                  version === v.id
+                    ? "bg-[#c9a65415] text-[#c9a654] border-[#c9a65440]"
+                    : "border-[#2e2b42] text-[#3d3a55] hover:text-[#55524a]"
+                )}
               >
-                {label}
-              </span>
+                {v.label}
+              </button>
             ))}
           </div>
           <div className="flex-1" />
@@ -132,7 +140,18 @@ export default function BuscaBibliaPage() {
 
       {/* Empty state */}
       {!loading && searched && results.length === 0 && !error && (
-        <p className="text-[#55524a] text-sm font-serif">Nenhum versículo encontrado para &ldquo;{query}&rdquo;.</p>
+        <div className="space-y-2">
+          <p className="text-[#55524a] text-sm font-serif">
+            Nenhum versículo encontrado para &ldquo;{query}&rdquo; em {VERSIONS.find(v => v.id === version)?.label}.
+          </p>
+          <div className="flex items-start gap-2 text-xs text-[#3d3a55]">
+            <Database className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
+            <span>
+              A busca usa versículos já lidos. Acesse capítulos na versão{" "}
+              {VERSIONS.find(v => v.id === version)?.label} para indexá-los.
+            </span>
+          </div>
+        </div>
       )}
 
       {/* Results */}

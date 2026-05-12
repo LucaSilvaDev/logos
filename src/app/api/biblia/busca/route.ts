@@ -1,90 +1,61 @@
 import { NextResponse } from "next/server"
+import { db } from "@/lib/db"
 
-// AbibliaDigital only has NVI content — NAA and NVT return 0 results
-const SEARCHABLE = new Set(["nvi"])
-
-// Maps AbibliaDigital Portuguese abbreviations back to USFM book IDs
-const ABBR_TO_ID: Record<string, string> = {
-  gn: "GEN", ex: "EXO", lv: "LEV", nm: "NUM", dt: "DEU",
-  js: "JOS", jz: "JDG", rt: "RUT", "1sm": "1SA", "2sm": "2SA",
-  "1rs": "1KI", "2rs": "2KI", "1cr": "1CH", "2cr": "2CH",
-  ed: "EZR", ne: "NEH", et: "EST", "jó": "JOB", sl: "PSA",
-  pv: "PRO", ec: "ECC", ct: "SNG", is: "ISA", jr: "JER",
-  lm: "LAM", ez: "EZK", dn: "DAN", os: "HOS", jl: "JOL",
-  am: "AMO", ob: "OBA", jn: "JON", mq: "MIC", na: "NAH",
-  hc: "HAB", sf: "ZEP", ag: "HAG", zc: "ZEC", ml: "MAL",
-  mt: "MAT", mc: "MRK", lc: "LUK", jo: "JHN", at: "ACT",
-  rm: "ROM", "1co": "1CO", "2co": "2CO", gl: "GAL", ef: "EPH",
-  fp: "PHP", cl: "COL", "1ts": "1TH", "2ts": "2TH",
-  "1tm": "1TI", "2tm": "2TI", tt: "TIT", fm: "PHM", hb: "HEB",
-  tg: "JAS", "1pe": "1PE", "2pe": "2PE",
-  "1jo": "1JN", "2jo": "2JN", "3jo": "3JN",
-  jd: "JUD", ap: "REV",
+// Maps USFM book IDs to Portuguese full names
+const BOOK_NAMES: Record<string, string> = {
+  GEN: "Gênesis",     EXO: "Êxodo",       LEV: "Levítico",    NUM: "Números",    DEU: "Deuteronômio",
+  JOS: "Josué",       JDG: "Juízes",      RUT: "Rute",        "1SA": "1 Samuel", "2SA": "2 Samuel",
+  "1KI": "1 Reis",    "2KI": "2 Reis",    "1CH": "1 Crônicas","2CH": "2 Crônicas",
+  EZR: "Esdras",      NEH: "Neemias",     EST: "Ester",       JOB: "Jó",         PSA: "Salmos",
+  PRO: "Provérbios",  ECC: "Eclesiastes", SNG: "Cânticos",    ISA: "Isaías",     JER: "Jeremias",
+  LAM: "Lamentações", EZK: "Ezequiel",    DAN: "Daniel",      HOS: "Oséias",     JOL: "Joel",
+  AMO: "Amós",        OBA: "Obadias",     JON: "Jonas",       MIC: "Miquéias",   NAH: "Naum",
+  HAB: "Habacuque",   ZEP: "Sofonias",    HAG: "Ageu",        ZEC: "Zacarias",   MAL: "Malaquias",
+  MAT: "Mateus",      MRK: "Marcos",      LUK: "Lucas",       JHN: "João",       ACT: "Atos",
+  ROM: "Romanos",     "1CO": "1 Coríntios","2CO": "2 Coríntios",GAL: "Gálatas",  EPH: "Efésios",
+  PHP: "Filipenses",  COL: "Colossenses", "1TH": "1 Tessalonicenses","2TH": "2 Tessalonicenses",
+  "1TI": "1 Timóteo", "2TI": "2 Timóteo", TIT: "Tito",       PHM: "Filemom",    HEB: "Hebreus",
+  JAS: "Tiago",       "1PE": "1 Pedro",   "2PE": "2 Pedro",
+  "1JN": "1 João",    "2JN": "2 João",    "3JN": "3 João",
+  JUD: "Judas",       REV: "Apocalipse",
 }
+
+// Internal versions stored in the cache (keyed by what the Bible reader uses)
+const KNOWN_VERSIONS = ["nvi", "nvt", "naa", "nvi_yv", "nbvp"]
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
   const q       = (searchParams.get("q") ?? "").trim()
   const version = searchParams.get("version") ?? "nvi"
 
-  if (!q) return NextResponse.json({ results: [] })
-
-  if (!SEARCHABLE.has(version)) {
-    return NextResponse.json({
-      error: "Busca disponível apenas para NVI e NAA",
-      results: [],
-    })
-  }
-
-  const token    = process.env.BIBLE_API_TOKEN
-  const hasToken = Boolean(token && token.length > 10 && token !== "COLE_AQUI_SEU_TOKEN")
-
-  // AbibliaDigital: POST /api/verses/search with {version, search}
-  const url = "https://www.abibliadigital.com.br/api/verses/search"
-
-  const headers: HeadersInit = {
-    "Accept":       "application/json",
-    "Content-Type": "application/json",
-    ...(hasToken && { "Authorization": `Bearer ${token}` }),
-  }
+  if (!q) return NextResponse.json({ results: [], total: 0 })
 
   try {
-    const res = await fetch(url, {
-      method: "POST",
-      headers,
-      body:  JSON.stringify({ version, search: q }),
-      cache: "no-store",
+    const rows = await db.bibleVerse.findMany({
+      where: {
+        version,
+        text: { contains: q },
+      },
+      orderBy: [{ book: "asc" }, { chapter: "asc" }, { verse: "asc" }],
+      take: 60,
     })
 
-    if (res.status === 429) {
-      return NextResponse.json({ error: "Limite de requisições atingido. Aguarde e tente novamente.", results: [] }, { status: 429 })
-    }
-    if (res.status === 401 || res.status === 403) {
-      return NextResponse.json({ error: "Busca requer autenticação. Verifique BIBLE_API_TOKEN no Vercel.", results: [] }, { status: 401 })
-    }
-    if (!res.ok) {
-      const body = await res.text().catch(() => "")
-      console.error("[busca] HTTP %d body=%s", res.status, body.slice(0, 300))
-      return NextResponse.json({ error: `Erro ${res.status} da API.`, results: [] }, { status: res.status })
-    }
+    const results = rows.map(r => ({
+      bookName: BOOK_NAMES[r.book] ?? r.book,
+      bookId:   r.book,
+      chapter:  r.chapter,
+      verse:    r.verse,
+      text:     r.text,
+    }))
 
-    const data = await res.json()
+    // Count total matches (without the limit)
+    const total = await db.bibleVerse.count({
+      where: { version, text: { contains: q } },
+    })
 
-    const results = (data.verses ?? []).slice(0, 60).map((v: {
-      book: { name: string; abbrev: { pt: string } }
-      chapter: number
-      number:  number
-      text:    string
-    }) => ({
-      bookName: v.book.name,
-      bookId:   ABBR_TO_ID[v.book.abbrev.pt] ?? "",
-      chapter:  v.chapter,
-      verse:    v.number,
-      text:     v.text,
-    })).filter((r: { bookId: string }) => r.bookId !== "")
-
-    return NextResponse.json({ results, total: data.occurrence ?? results.length })
-  } catch {
-    return NextResponse.json({ error: "NETWORK_ERROR", results: [] }, { status: 502 })
+    return NextResponse.json({ results, total })
+  } catch (err) {
+    console.error("[busca/internal] DB error:", err)
+    return NextResponse.json({ error: "Erro ao buscar versículos.", results: [] }, { status: 500 })
   }
 }
