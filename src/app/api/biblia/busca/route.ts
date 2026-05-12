@@ -37,26 +37,34 @@ export async function GET(req: Request) {
 
   const token    = process.env.BIBLE_API_TOKEN
   const hasToken = Boolean(token && token.length > 10 && token !== "COLE_AQUI_SEU_TOKEN")
-  const url      = `https://www.abibliadigital.com.br/api/search/${version}/${encodeURIComponent(q)}`
+
+  // AbibliaDigital search is a POST endpoint
+  const url = "https://www.abibliadigital.com.br/api/search"
 
   const headers: HeadersInit = {
-    "Accept": "application/json",
+    "Accept":       "application/json",
+    "Content-Type": "application/json",
     ...(hasToken && { "Authorization": `Bearer ${token}` }),
   }
 
   try {
-    const res = await fetch(url, { headers, cache: "no-store" })
+    const res = await fetch(url, {
+      method: "POST",
+      headers,
+      body:  JSON.stringify({ version, search: q }),
+      cache: "no-store",
+    })
 
     if (res.status === 429) {
       return NextResponse.json({ error: "Limite de requisições atingido. Aguarde e tente novamente.", results: [] }, { status: 429 })
     }
     if (res.status === 401 || res.status === 403) {
-      return NextResponse.json({ error: "Busca requer autenticação. Verifique se BIBLE_API_TOKEN está configurado no Vercel.", results: [] }, { status: 401 })
+      return NextResponse.json({ error: "Busca requer autenticação. Verifique BIBLE_API_TOKEN no Vercel.", results: [] }, { status: 401 })
     }
     if (!res.ok) {
       const body = await res.text().catch(() => "")
-      console.error("[busca] HTTP %d url=%s body=%s", res.status, url, body.slice(0, 300))
-      return NextResponse.json({ error: `Erro ${res.status} da API. ${body.slice(0, 80) || ""}`.trim(), results: [] }, { status: res.status })
+      console.error("[busca] HTTP %d body=%s", res.status, body.slice(0, 300))
+      return NextResponse.json({ error: `Erro ${res.status} da API.`, results: [] }, { status: res.status })
     }
 
     const data = await res.json()
