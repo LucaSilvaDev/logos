@@ -109,8 +109,13 @@ export default function BuscaBibliaPage() {
                 {v.label}
               </button>
             ))}
+            <span
+              title="NVT é lida por outro serviço que não oferece busca"
+              className="px-3 py-1.5 text-[10px] font-medium tracking-wider rounded-full border border-transparent text-[#2e2b42] cursor-not-allowed select-none"
+            >
+              NVT
+            </span>
           </div>
-          <p className="text-[10px] text-[#3d3a55] hidden sm:block">NVT: busca indisponível</p>
           <div className="flex-1" />
           <button
             type="submit"
