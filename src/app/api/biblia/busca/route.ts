@@ -47,8 +47,17 @@ export async function GET(req: Request) {
   try {
     const res = await fetch(url, { headers, cache: "no-store" })
 
-    if (res.status === 429) return NextResponse.json({ error: "RATE_LIMIT", results: [] }, { status: 429 })
-    if (!res.ok)            return NextResponse.json({ error: "API_ERROR",  results: [] }, { status: res.status })
+    if (res.status === 429) {
+      return NextResponse.json({ error: "Limite de requisições atingido. Aguarde e tente novamente.", results: [] }, { status: 429 })
+    }
+    if (res.status === 401 || res.status === 403) {
+      return NextResponse.json({ error: "Busca requer autenticação. Verifique se BIBLE_API_TOKEN está configurado no Vercel.", results: [] }, { status: 401 })
+    }
+    if (!res.ok) {
+      const body = await res.text().catch(() => "")
+      console.error("[busca] HTTP %d url=%s body=%s", res.status, url, body.slice(0, 300))
+      return NextResponse.json({ error: `Erro ${res.status} da API. ${body.slice(0, 80) || ""}`.trim(), results: [] }, { status: res.status })
+    }
 
     const data = await res.json()
 
