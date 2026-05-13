@@ -91,7 +91,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                 )} />
                 <span className={cn("font-serif", active && "font-medium")}>{label}</span>
                 {active && (
-                  <span className="ml-auto w-1 h-1 rounded-full bg-[#c9a654] opacity-60 shrink-0" />
+                  <span className="ml-auto w-1 h-1 rounded-full bg-[#c9a654] shrink-0 brasa-pulse" />
                 )}
               </Link>
             )

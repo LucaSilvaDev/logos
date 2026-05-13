@@ -55,6 +55,32 @@ export default async function DashboardPage() {
   return (
     <div className="max-w-4xl mx-auto px-2 py-8 space-y-10">
 
+      {/*
+        VARIANTE FRAMER MOTION — apenas para comparação (lib não instalada)
+
+        Se usássemos Motion (npm install motion), o stagger ficaria assim:
+
+          import { motion } from "motion/react"
+
+          const item = {
+            hidden:  { opacity: 0, y: 14 },
+            visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } },
+          }
+          const container = {
+            visible: { transition: { staggerChildren: 0.18 } },
+          }
+
+          <motion.div variants={container} initial="hidden" animate="visible">
+            <motion.p variants={item}>{date}</motion.p>
+            <motion.h1 variants={item}>{greeting}</motion.h1>
+            <motion.div variants={item} className="h-px ..." />
+          </motion.div>
+
+        Vantagem do Motion: stagger declarativo via staggerChildren, fácil de ajustar.
+        Vantagem do CSS puro (escolha atual): zero bundle extra, funciona em
+        Server Components sem precisar de "use client".
+      */}
+
       {/* Saudação — ordem ritualística: data primeiro, nome depois, linha por último */}
       <div className="space-y-1">
         {/* Elemento 1: data — entra primeiro, discreta, prepara o contexto */}
