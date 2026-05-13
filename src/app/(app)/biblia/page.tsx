@@ -658,7 +658,9 @@ export default function BibliaPage() {
                     className={cn(
                       "cursor-pointer transition-colors rounded-sm",
                       hlCls,
-                      !hlEntry && "hover:bg-[#c9a65408]"
+                      hlPopover?.key === key
+                        ? "bg-[#c9a65418] underline decoration-[#c9a654]/35 decoration-1 underline-offset-2"
+                        : !hlEntry && "hover:bg-[#c9a65408]"
                     )}>
                     <sup className="verse-number">{v.number}</sup>
                     <span>{v.text}</span>
