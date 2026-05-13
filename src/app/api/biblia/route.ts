@@ -12,7 +12,7 @@ function cacheVerses(book: string, chapter: number, version: string, verses: { n
     text:    v.text,
   }))
   // fire-and-forget — never blocks the response
-  db.bibleVerse.createMany({ data, skipDuplicates: true }).catch(() => {})
+  db.bibleVerse.createMany({ data }).catch(() => {})
 }
 
 // YouVersion Platform — platform.youversion.com

@@ -555,3 +555,30 @@ body {
   color: #c9a654;
   letter-spacing: 0.05em;
 }
+
+/* ─── LINKS BIDIRECIONAIS ─────────────────────────────────────────────────── */
+.bible-link {
+  color: #c9a654;
+  border-bottom: 1px solid rgba(201,166,84,0.3);
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.bible-link:hover { opacity: 0.75; }
+.note-link {
+  color: #6b9cca;
+  border-bottom: 1px solid rgba(107,156,202,0.3);
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.note-link:hover { opacity: 0.75; }
+
+/* ─── IMPRESSÃO / PDF ────────────────────────────────────────────────────── */
+@media print {
+  .sidebar, .topbar, header nav, footer,
+  a[href="/devocional"], button { display: none !important; }
+  body { background: #fff !important; color: #1a1a1a !important; }
+  .card-soft { background: #fff !important; border: none !important; box-shadow: none !important; }
+  .prose-devotional { color: #1a1a1a !important; font-size: 12pt; line-height: 1.8; }
+  h1 { font-size: 18pt; margin-bottom: 6pt; }
+  @page { margin: 2cm; }
+}

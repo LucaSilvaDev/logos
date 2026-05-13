@@ -5,6 +5,7 @@ import Link from "next/link"
 import { ArrowLeft, BookOpen, Pencil, Calendar } from "lucide-react"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
+import { BiblicalContent } from "@/components/BiblicalContent"
 
 const NOTE_TYPE_LABELS: Record<string, string> = {
   exegesis:    "Exegese",
@@ -54,10 +55,9 @@ export default async function StudyNoteDetailPage({ params }: { params: Promise<
       </div>
 
       <div className="card-soft px-6 py-6">
-        <div
+        <BiblicalContent
+          html={note.content}
           className="prose-devotional text-[#8a8375] leading-relaxed"
-          dangerouslySetInnerHTML={{ __html: note.content }}
-          style={{ lineHeight: 1.8 }}
         />
       </div>
 

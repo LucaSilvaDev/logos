@@ -3,6 +3,7 @@
 import { signOut } from "next-auth/react"
 import { usePathname } from "next/navigation"
 import { LogOut, User, Menu, Sun, Moon } from "lucide-react"
+import Link from "next/link"
 
 const PAGE_TITLES: Record<string, string> = {
   "/dashboard":   "Início",
@@ -14,6 +15,7 @@ const PAGE_TITLES: Record<string, string> = {
   "/historia":    "História",
   "/escatologia": "Escatologia",
   "/biblioteca":  "Biblioteca",
+  "/perfil":      "Perfil",
 }
 
 function getTitle(pathname: string): string {
@@ -70,14 +72,16 @@ export function Topbar({ userName, userImage, theme, onToggleSidebar, onToggleTh
 
         <div className="w-px h-4 bg-[#2e2b42]" />
 
-        {userImage ? (
-          <img src={userImage} alt="" className="w-7 h-7 rounded-full ring-1 ring-[#2e2b42]" />
-        ) : (
-          <div className="w-7 h-7 rounded-full bg-[#211f31] border border-[#2e2b42] flex items-center justify-center">
-            <User className="w-3.5 h-3.5 text-[#55524a]" />
-          </div>
-        )}
-        <span className="text-[13px] text-[#55524a] font-serif hidden sm:block">{userName}</span>
+        <Link href="/perfil" title="Perfil" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+          {userImage ? (
+            <img src={userImage} alt="" className="w-7 h-7 rounded-full ring-1 ring-[#2e2b42]" />
+          ) : (
+            <div className="w-7 h-7 rounded-full bg-[#211f31] border border-[#2e2b42] flex items-center justify-center">
+              <User className="w-3.5 h-3.5 text-[#55524a]" />
+            </div>
+          )}
+          <span className="text-[13px] text-[#55524a] font-serif hidden sm:block">{userName}</span>
+        </Link>
 
         <div className="w-px h-4 bg-[#2e2b42]" />
 

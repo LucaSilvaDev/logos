@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import {
   BookOpen, LayoutDashboard, NotebookPen, Search,
-  Clock, Church, Flame, Library, Heart, X
+  Clock, Church, Flame, Library, Heart, X, UserCircle
 } from "lucide-react"
 
 const navItems = [
@@ -18,6 +18,7 @@ const navItems = [
   { href: "/historia",    icon: Church,           label: "História" },
   { href: "/escatologia", icon: Flame,            label: "Escatologia" },
   { href: "/biblioteca",  icon: Library,          label: "Biblioteca" },
+  { href: "/perfil",      icon: UserCircle,       label: "Perfil" },
 ]
 
 interface SidebarProps {

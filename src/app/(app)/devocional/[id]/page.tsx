@@ -5,6 +5,8 @@ import Link from "next/link"
 import { ArrowLeft, BookOpen, Tag, Calendar, Pencil } from "lucide-react"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
+import { PrintButton } from "@/components/PrintButton"
+import { BiblicalContent } from "@/components/BiblicalContent"
 
 export default async function DevocionalDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -24,10 +26,13 @@ export default async function DevocionalDetailPage({ params }: { params: Promise
           className="flex items-center gap-1.5 text-[#55524a] hover:text-[#8a8375] text-sm transition-colors font-serif">
           <ArrowLeft className="w-4 h-4" /> Devocionais
         </Link>
-        <Link href={`/devocional/${id}/editar`}
-          className="flex items-center gap-1.5 text-xs text-[#55524a] hover:text-[#8a8375] transition-colors font-serif">
-          <Pencil className="w-3.5 h-3.5" /> Editar
-        </Link>
+        <div className="flex items-center gap-3">
+          <PrintButton />
+          <Link href={`/devocional/${id}/editar`}
+            className="flex items-center gap-1.5 text-xs text-[#55524a] hover:text-[#8a8375] transition-colors font-serif">
+            <Pencil className="w-3.5 h-3.5" /> Editar
+          </Link>
+        </div>
       </div>
 
       <div>
@@ -55,10 +60,9 @@ export default async function DevocionalDetailPage({ params }: { params: Promise
       </div>
 
       <div className="card-soft px-6 py-6">
-        <div
+        <BiblicalContent
+          html={devotional.content}
           className="prose-devotional text-[#8a8375] leading-relaxed"
-          dangerouslySetInnerHTML={{ __html: devotional.content }}
-          style={{ lineHeight: 1.8 }}
         />
       </div>
 

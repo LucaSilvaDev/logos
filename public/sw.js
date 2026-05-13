@@ -1,9 +1,8 @@
-const BIBLE_CACHE = "selah-bible-v1"
+const BIBLE_CACHE = "selah-bible-v2"
 
 self.addEventListener("install", () => self.skipWaiting())
 
 self.addEventListener("activate", (e) => {
-  // Remove old cache versions on activation
   e.waitUntil(
     caches.keys().then(keys =>
       Promise.all(keys.filter(k => k !== BIBLE_CACHE).map(k => caches.delete(k)))
@@ -37,4 +36,32 @@ self.addEventListener("fetch", (e) => {
 
   // All other requests pass through
   e.respondWith(fetch(e.request))
+})
+
+// ─── Push Notifications ───────────────────────────────────────────────────────
+
+self.addEventListener("push", (e) => {
+  let data = { title: "Selah", body: "Sua leitura diária está esperando.", url: "/plano" }
+  try { data = e.data.json() } catch { /* ignore */ }
+
+  e.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      icon: "/icon-192.png",
+      badge: "/icon-192.png",
+      data: { url: data.url },
+    })
+  )
+})
+
+self.addEventListener("notificationclick", (e) => {
+  e.notification.close()
+  const url = e.notification.data?.url ?? "/"
+  e.waitUntil(
+    clients.matchAll({ type: "window", includeUncontrolled: true }).then(clientList => {
+      const existing = clientList.find(c => c.url.includes(self.location.origin))
+      if (existing) return existing.focus()
+      return clients.openWindow(url)
+    })
+  )
 })

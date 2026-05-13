@@ -29,6 +29,7 @@ model User {
   studyNotes           StudyNote[]
   readingPlanProgress  ReadingPlanProgress[]
   eschatologyNotes     EschatologyNote[]
+  pushSubs             PushSub[]
 }
 
 model Account {
@@ -247,6 +248,21 @@ model EschatologyNote {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, book, chapter])
+}
+
+// ─── NOTIFICAÇÕES PUSH ────────────────────────────────────────────────────────
+
+model PushSub {
+  id        String   @id @default(cuid())
+  userId    String
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 // ─── CACHE DE VERSÍCULOS BÍBLICOS ─────────────────────────────────────────────
