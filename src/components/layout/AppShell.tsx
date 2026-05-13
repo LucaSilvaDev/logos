@@ -52,7 +52,8 @@ export function AppShell({ children, userName, userImage }: AppShellProps) {
         />
 
         <main className="flex-1 overflow-y-auto pb-16 md:pb-0">
-          <div key={pathname} className="animate-page-in h-full">
+          {/* Dashboard tem stagger próprio (candle-enter); todas as outras páginas usam animate-page-in */}
+          <div key={pathname} className={cn("h-full", pathname !== "/dashboard" && "animate-page-in")}>
             {children}
           </div>
         </main>
