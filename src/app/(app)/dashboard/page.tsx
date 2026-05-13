@@ -53,11 +53,6 @@ export default async function DashboardPage() {
   ]
 
   return (
-    {/*
-      animate-fade-in removido daqui: ele animava o bloco inteiro como um,
-      o que conflitaria com o stagger individual dos elementos abaixo.
-      Cada filho agora tem sua própria entrada com candle-enter + candle-delay-N.
-    */}
     <div className="max-w-4xl mx-auto px-2 py-8 space-y-10">
 
       {/* Saudação — ordem ritualística: data primeiro, nome depois, linha por último */}
