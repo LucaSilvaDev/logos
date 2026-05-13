@@ -41,9 +41,9 @@ body {
 
 /* ─── SIDEBAR ────────────────────────────────────────────────────────────── */
 .sidebar {
-  background: rgba(14, 13, 25, 0.97);
-  backdrop-filter: blur(24px);
-  box-shadow: 6px 0 40px rgba(0, 0, 0, 0.6), 1px 0 0 rgba(61, 58, 85, 0.25);
+  background: rgba(14, 13, 25, 0.88);
+  backdrop-filter: blur(40px) saturate(1.4);
+  box-shadow: 8px 0 48px rgba(0, 0, 0, 0.45);
 }
 
 /* Nav item — golden glow hover (not background change) */
@@ -62,30 +62,33 @@ body {
 
 /* ─── TOPBAR ─────────────────────────────────────────────────────────────── */
 .topbar {
-  background: rgba(14, 13, 25, 0.96);
-  backdrop-filter: blur(12px);
-  box-shadow: 0 1px 0 rgba(46, 43, 66, 0.5), 0 2px 16px rgba(0, 0, 0, 0.25);
+  background: rgba(14, 13, 25, 0.82);
+  backdrop-filter: blur(28px) saturate(1.5);
+  box-shadow: 0 6px 32px rgba(0, 0, 0, 0.2);
 }
 
 /* ─── SUPERFÍCIES / CARDS ────────────────────────────────────────────────── */
 .surface {
-  background: #1a1928;
-  border: 1px solid #2e2b42;
-  border-radius: 16px;
+  background: linear-gradient(160deg, rgba(30,28,46,0.8), rgba(22,21,36,0.7));
+  border-radius: 20px;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.04);
 }
 .surface-raised {
-  background: #211f31;
-  border: 1px solid #3d3a55;
-  border-radius: 16px;
+  background: linear-gradient(160deg, rgba(38,36,56,0.85), rgba(28,27,44,0.75));
+  border-radius: 20px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
 }
-/* Card suave para listas contemplativas */
+/* Card suave para listas contemplativas — sem borda, profundidade por sombra */
 .card-soft {
-  background: rgba(26, 25, 40, 0.7);
-  border: 1px solid rgba(46, 43, 66, 0.8);
-  border-radius: 16px;
-  transition: border-color 0.2s, background 0.2s;
+  background: linear-gradient(160deg, rgba(28,26,43,0.65), rgba(20,19,33,0.55));
+  border-radius: 18px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.035);
+  transition: background 0.25s, box-shadow 0.25s;
 }
-.card-soft:hover { border-color: #3d3a55; background: rgba(33, 31, 49, 0.8); }
+.card-soft:hover {
+  background: linear-gradient(160deg, rgba(36,34,54,0.75), rgba(26,25,42,0.65));
+  box-shadow: 0 4px 24px rgba(0,0,0,0.25), inset 0 1px 0 rgba(201,166,84,0.06);
+}
 
 /* ─── BOTÕES ─────────────────────────────────────────────────────────────── */
 .btn-gold {
@@ -136,11 +139,95 @@ body {
 .badge-red   { background: #251510; border: 1px solid #4a2515; color: #c96b5a; }
 
 /* ─── ANIMAÇÕES ──────────────────────────────────────────────────────────── */
+
+@keyframes bookmarkPop {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(1.7); filter: brightness(1.4); }
+  60%  { transform: scale(0.85); }
+  80%  { transform: scale(1.2); }
+  100% { transform: scale(1); filter: brightness(1); }
+}
+.bookmark-pop { animation: bookmarkPop 0.45s cubic-bezier(0.36, 0.07, 0.19, 0.97); }
+
+.reading-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #c9a654, #e8c87a, #c9a654);
+  z-index: 999;
+  pointer-events: none;
+  border-radius: 0 99px 99px 0;
+  transition: width 0.08s linear, opacity 0.3s;
+}
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(5px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 .animate-fade-in { animation: fadeIn 0.3s ease-out; }
+
+/* ── VELA DO SELAH — Staggered entrance ──────────────────────────────────── */
+/*
+  Conceito: "staggered entrance" (entrada escalonada)
+  Analogia: como um coral que entra em cânone — cada voz começa depois da anterior,
+  criando profundidade em vez de tudo surgir ao mesmo tempo.
+
+  Por que cubic-bezier(0.22, 1, 0.36, 1) em vez de ease-out padrão?
+  O ease-out nativo desacelera de forma matemática e uniforme.
+  Esse bezier específico imita a desaceleração orgânica de uma chama acendendo:
+  arranca rápido, termina com quase zero velocidade — como fumaça que se dissipa.
+*/
+@keyframes candleEnter {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+    /*
+      Alternativa rejeitada: animar filter: blur(4px) → blur(0) junto.
+      Motivo: blur é recalculado em software quadro a quadro quando combinado
+      com opacity/transform, derrubando FPS em mobile. Opacity + translateY
+      são compostos inteiramente na GPU (Compositor Thread) — sem custo de repaint.
+    */
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/*
+  animation-fill-mode: forwards → mantém o estado final (opacity: 1)
+  após a animação terminar. Sem isso, o elemento voltaria a opacity: 0
+  porque o keyframe from define opacity: 0 e o browser "reseta" ao fim.
+*/
+.candle-enter {
+  opacity: 0; /* começa invisível antes da animação disparar */
+  animation: candleEnter 700ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Delays escalonados — cada nível é um "batimento" do ritmo litúrgico:
+   data → saudação → linha → versículo → testemunhas → contadores       */
+.candle-delay-0 { animation-delay:   0ms; }
+.candle-delay-1 { animation-delay: 180ms; }
+.candle-delay-2 { animation-delay: 320ms; }
+.candle-delay-3 { animation-delay: 480ms; }
+.candle-delay-4 { animation-delay: 680ms; }
+.candle-delay-5 { animation-delay: 900ms; }
+
+/*
+  Acessibilidade obrigatória: prefers-reduced-motion.
+  Cobre usuários com epilepsia fotossensível, vertigem vestibular
+  ou qualquer sensibilidade a movimento na tela.
+  Não removemos o elemento — apenas pulamos a animação.
+  O elemento já aparece no estado final (opacity: 1) diretamente.
+*/
+@media (prefers-reduced-motion: reduce) {
+  .candle-enter {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
 
 @keyframes modalSlideUp {
   from { opacity: 0; transform: translateY(16px) scale(0.98); }
@@ -236,28 +323,30 @@ body {
 [data-theme="light"] .bg-raised      { background: #e8d4ba; }
 
 [data-theme="light"] .sidebar {
-  background: rgba(228, 210, 183, 0.97);
-  box-shadow: 6px 0 40px rgba(0,0,0,0.12), 1px 0 0 rgba(139,100,40,0.15);
+  background: rgba(228, 210, 183, 0.82);
+  backdrop-filter: blur(40px) saturate(1.6);
+  box-shadow: 8px 0 40px rgba(110,75,20,0.1);
 }
 [data-theme="light"] .topbar {
-  background: rgba(236, 220, 196, 0.96);
-  box-shadow: 0 1px 0 rgba(139,100,40,0.2), 0 2px 16px rgba(0,0,0,0.06);
+  background: rgba(236, 220, 196, 0.80);
+  backdrop-filter: blur(28px) saturate(1.6);
+  box-shadow: 0 6px 32px rgba(110,75,20,0.07);
 }
 [data-theme="light"] .card-soft {
-  background: rgba(228, 210, 183, 0.6);
-  border-color: rgba(163, 128, 80, 0.25);
+  background: linear-gradient(160deg, rgba(232,212,186,0.75), rgba(218,196,168,0.65));
+  box-shadow: 0 2px 14px rgba(110,75,20,0.08), inset 0 1px 0 rgba(255,255,255,0.45);
 }
 [data-theme="light"] .card-soft:hover {
-  background: rgba(215, 195, 165, 0.75);
-  border-color: rgba(163, 128, 80, 0.4);
+  background: linear-gradient(160deg, rgba(222,202,174,0.85), rgba(208,184,156,0.75));
+  box-shadow: 0 4px 22px rgba(110,75,20,0.12), inset 0 1px 0 rgba(255,255,255,0.55);
 }
 [data-theme="light"] .surface {
-  background: #eddbc4;
-  border-color: rgba(163, 128, 80, 0.25);
+  background: linear-gradient(160deg, rgba(237,219,196,0.9), rgba(228,208,182,0.8));
+  box-shadow: 0 2px 20px rgba(110,75,20,0.07), inset 0 1px 0 rgba(255,255,255,0.4);
 }
 [data-theme="light"] .surface-raised {
-  background: #e8d4ba;
-  border-color: rgba(163, 128, 80, 0.35);
+  background: linear-gradient(160deg, rgba(230,210,184,0.95), rgba(218,196,168,0.85));
+  box-shadow: 0 4px 24px rgba(110,75,20,0.09), inset 0 1px 0 rgba(255,255,255,0.45);
 }
 [data-theme="light"] .glass-card {
   background: #eddbc4;
@@ -436,16 +525,129 @@ body {
 
 /* ─── BOTTOM NAV ─────────────────────────────────────────────────────────── */
 .bottom-nav {
-  background: rgba(14, 13, 25, 0.97);
-  backdrop-filter: blur(24px);
-  box-shadow: 0 -1px 0 rgba(46, 43, 66, 0.5), 0 -4px 20px rgba(0, 0, 0, 0.3);
-  border-top: 1px solid rgba(46, 43, 66, 0.4);
+  background: rgba(14, 13, 25, 0.88);
+  backdrop-filter: blur(36px) saturate(1.4);
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.25);
 }
 
 [data-theme="light"] .bottom-nav {
-  background: rgba(228, 210, 183, 0.97);
-  box-shadow: 0 -1px 0 rgba(163, 128, 80, 0.2), 0 -4px 20px rgba(0, 0, 0, 0.06);
-  border-top-color: rgba(163, 128, 80, 0.2);
+  background: rgba(228, 210, 183, 0.82);
+  backdrop-filter: blur(36px) saturate(1.6);
+  box-shadow: 0 -8px 32px rgba(110,75,20,0.08);
+  border-top: none;
+}
+
+/* ─── LIQUID GLASS ORBS ──────────────────────────────────────────────────── */
+@keyframes liquidDrift1 {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+    border-radius: 62% 38% 46% 54% / 60% 44% 56% 40%;
+  }
+  20% {
+    transform: translate(45px, -35px) scale(1.06);
+    border-radius: 40% 60% 54% 46% / 48% 62% 38% 52%;
+  }
+  45% {
+    transform: translate(-30px, 50px) scale(0.96);
+    border-radius: 55% 45% 38% 62% / 52% 38% 62% 48%;
+  }
+  70% {
+    transform: translate(38px, 22px) scale(1.03);
+    border-radius: 48% 52% 62% 38% / 40% 56% 44% 60%;
+  }
+}
+@keyframes liquidDrift2 {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+    border-radius: 44% 56% 62% 38% / 52% 40% 60% 48%;
+  }
+  30% {
+    transform: translate(-42px, 28px) scale(1.07);
+    border-radius: 60% 40% 44% 56% / 38% 60% 40% 62%;
+  }
+  65% {
+    transform: translate(25px, -45px) scale(0.94);
+    border-radius: 38% 62% 56% 44% / 60% 44% 56% 40%;
+  }
+}
+@keyframes liquidDrift3 {
+  0%, 100% {
+    transform: translate(0px, 0px) scale(1);
+    border-radius: 54% 46% 38% 62% / 44% 58% 42% 56%;
+  }
+  35% {
+    transform: translate(55px, 38px) scale(0.95);
+    border-radius: 38% 62% 54% 46% / 58% 42% 62% 38%;
+  }
+  68% {
+    transform: translate(-32px, -22px) scale(1.04);
+    border-radius: 62% 38% 46% 54% / 40% 60% 40% 60%;
+  }
+}
+
+.liquid-orb-1 {
+  position: fixed;
+  width: 600px;
+  height: 600px;
+  top: -160px;
+  right: -120px;
+  background: radial-gradient(ellipse at 40% 40%,
+    rgba(201, 166, 84, 0.13) 0%,
+    rgba(201, 166, 84, 0.05) 45%,
+    transparent 70%);
+  filter: blur(48px);
+  pointer-events: none;
+  z-index: 0;
+  animation: liquidDrift1 24s ease-in-out infinite;
+}
+.liquid-orb-2 {
+  position: fixed;
+  width: 480px;
+  height: 480px;
+  bottom: 5%;
+  left: -80px;
+  background: radial-gradient(ellipse at 55% 60%,
+    rgba(107, 156, 202, 0.09) 0%,
+    rgba(107, 156, 202, 0.03) 50%,
+    transparent 72%);
+  filter: blur(60px);
+  pointer-events: none;
+  z-index: 0;
+  animation: liquidDrift2 30s ease-in-out infinite;
+  animation-delay: -9s;
+}
+.liquid-orb-3 {
+  position: fixed;
+  width: 420px;
+  height: 420px;
+  top: 38%;
+  left: 35%;
+  background: radial-gradient(ellipse at 50% 50%,
+    rgba(201, 166, 84, 0.07) 0%,
+    transparent 65%);
+  filter: blur(70px);
+  pointer-events: none;
+  z-index: 0;
+  animation: liquidDrift3 36s ease-in-out infinite;
+  animation-delay: -18s;
+}
+
+[data-theme="light"] .liquid-orb-1 {
+  background: radial-gradient(ellipse at 40% 40%,
+    rgba(180, 130, 40, 0.10) 0%,
+    rgba(180, 130, 40, 0.04) 45%,
+    transparent 70%);
+}
+[data-theme="light"] .liquid-orb-2 {
+  background: radial-gradient(ellipse at 55% 60%,
+    rgba(80, 130, 180, 0.07) 0%,
+    rgba(80, 130, 180, 0.02) 50%,
+    transparent 72%);
+}
+[data-theme="light"] .liquid-orb-3 {
+  background: radial-gradient(ellipse at 50% 50%,
+    rgba(180, 130, 40, 0.05) 0%,
+    transparent 65%);
 }
 
 /* ─── LANDING PAGE ───────────────────────────────────────────────────────── */

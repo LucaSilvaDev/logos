@@ -46,6 +46,15 @@ export default function BuscaBibliaPage() {
   const [loading, setLoading] = useState(false)
   const [error,   setError]   = useState("")
   const [searched, setSearched] = useState(false)
+  const [indexedCount, setIndexedCount] = useState<number | null>(null)
+
+  // Load indexed count on mount
+  useState(() => {
+    fetch(`/api/biblia/busca?q=&version=${version}`)
+      .then(r => r.json())
+      .then(d => setIndexedCount(d.indexedCount ?? null))
+      .catch(() => {})
+  })
 
   async function handleSearch(e: React.FormEvent) {
     e.preventDefault()
@@ -138,6 +147,19 @@ export default function BuscaBibliaPage() {
         </div>
       )}
 
+      {/* Indexed count hint — before any search */}
+      {!searched && indexedCount !== null && (
+        <div className="flex items-center gap-2 text-xs text-[#3d3a55]">
+          <Database className="w-3.5 h-3.5 flex-shrink-0" />
+          <span>
+            {indexedCount > 0
+              ? `${indexedCount.toLocaleString("pt-BR")} versículos indexados em ${VERSIONS.find(v => v.id === version)?.label} — leia mais capítulos para expandir.`
+              : `Nenhum versículo indexado ainda em ${VERSIONS.find(v => v.id === version)?.label}. Leia alguns capítulos na Bíblia para começar.`
+            }
+          </span>
+        </div>
+      )}
+
       {/* Empty state */}
       {!loading && searched && results.length === 0 && !error && (
         <div className="space-y-2">
@@ -147,7 +169,7 @@ export default function BuscaBibliaPage() {
           <div className="flex items-start gap-2 text-xs text-[#3d3a55]">
             <Database className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
             <span>
-              A busca usa versículos já lidos. Acesse capítulos na versão{" "}
+              A busca usa versículos já lidos. Acesse mais capítulos na versão{" "}
               {VERSIONS.find(v => v.id === version)?.label} para indexá-los.
             </span>
           </div>
@@ -160,23 +182,25 @@ export default function BuscaBibliaPage() {
           <p className="text-[10px] text-[#3d3a55] uppercase tracking-[0.2em]">
             {total > results.length ? `${results.length} de ${total}` : results.length} resultado{results.length !== 1 ? "s" : ""}
           </p>
-          {results.map((r, i) => (
-            <button key={i}
-              onClick={() => goToBible(r.bookId, r.chapter)}
-              className="w-full card-soft flex items-start gap-4 px-5 py-4 group text-left"
-            >
-              <BookOpen className="w-3.5 h-3.5 text-[#3d3a55] mt-0.5 flex-shrink-0 group-hover:text-[#c9a654] transition-colors" />
-              <div className="flex-1 min-w-0">
-                <p className="text-[10px] text-[#c9a654] font-medium tracking-wider uppercase mb-1">
-                  {r.bookName} {r.chapter}:{r.verse}
-                </p>
-                <p className="font-serif text-[#8a8375] text-sm leading-relaxed group-hover:text-[#c9c0a8] transition-colors">
-                  <TextWithHighlight text={r.text} query={query} />
-                </p>
-              </div>
-              <ChevronRight className="w-3.5 h-3.5 text-[#3d3a55] mt-0.5 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
-            </button>
-          ))}
+          <div className="divide-y divide-[#1a1928]">
+            {results.map((r, i) => (
+              <button key={i}
+                onClick={() => goToBible(r.bookId, r.chapter)}
+                className="w-full group flex items-start gap-4 px-2 py-4 text-left hover:bg-[linear-gradient(90deg,rgba(201,166,84,0.05),transparent)] rounded-xl transition-all duration-300"
+              >
+                <BookOpen className="w-3.5 h-3.5 text-[#2e2b42] mt-0.5 flex-shrink-0 group-hover:text-[#c9a654] transition-colors" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-[10px] text-[#c9a654] font-medium tracking-wider uppercase mb-1.5 opacity-70 group-hover:opacity-100 transition-opacity">
+                    {r.bookName} {r.chapter}:{r.verse}
+                  </p>
+                  <p className="font-serif text-[#55524a] text-sm leading-relaxed group-hover:text-[#c9c0a8] transition-colors">
+                    <TextWithHighlight text={r.text} query={query} />
+                  </p>
+                </div>
+                <ChevronRight className="w-3.5 h-3.5 text-[#3d3a55] mt-0.5 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
+              </button>
+            ))}
+          </div>
         </div>
       )}
     </div>

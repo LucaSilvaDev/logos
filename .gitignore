@@ -49,3 +49,5 @@ next-env.d.ts
 *.db-shm
 dev.log
 dev.err
+
+.vercel

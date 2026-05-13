@@ -1,12 +1,15 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
+import { useRouter } from "next/navigation"
 import {
   ChevronLeft, ChevronRight, Search, Bookmark,
-  Highlighter, X, Loader2, AlertCircle, BookOpen, ChevronDown
+  X, Loader2, AlertCircle, BookOpen, ChevronDown,
+  Maximize2, Minimize2, Trash2, PenLine, Share2, Copy, Check
 } from "lucide-react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
+import { BOOK_ID_NAMES } from "@/lib/reading-plan"
 
 const BOOKS = [
   { id: "GEN",  name: "Gênesis",           chapters: 50,  testament: "AT" },
@@ -90,10 +93,48 @@ const HL_COLORS = [
   { id: "red",    style: "#c96b5a" },
 ]
 
+const BOOK_CATEGORIES: Record<string, { color: string; label: string }> = {
+  law:             { color: "#c9a654", label: "Lei" },
+  history_at:      { color: "#6b8fa8", label: "História" },
+  poetry:          { color: "#a87b9c", label: "Poesia" },
+  major_prophets:  { color: "#4a7a5a", label: "Grandes Profetas" },
+  minor_prophets:  { color: "#7aaa82", label: "Profetas Menores" },
+  gospels:         { color: "#7a6aaa", label: "Evangelhos" },
+  history_nt:      { color: "#6b8fa8", label: "Hist. da Igreja" },
+  letters:         { color: "#aa7a5a", label: "Cartas" },
+  prison_letters:  { color: "#aa7a5a", label: "Cartas de Prisão" },
+  pastoral_letters:{ color: "#aa7a5a", label: "Cartas Pastorais" },
+  general_letters: { color: "#aa7a5a", label: "Cartas Gerais" },
+  prophecy:        { color: "#c9a654", label: "Profecia" },
+}
+
+const AT_GROUPS = [
+  { category: "law",            label: "Lei",              ids: ["GEN","EXO","LEV","NUM","DEU"] },
+  { category: "history_at",     label: "História",         ids: ["JOS","JDG","RUT","1SA","2SA","1KI","2KI","1CH","2CH","EZR","NEH","EST"] },
+  { category: "poetry",         label: "Poesia",           ids: ["JOB","PSA","PRO","ECC","SNG"] },
+  { category: "major_prophets", label: "Grandes Profetas", ids: ["ISA","JER","LAM","EZK","DAN"] },
+  { category: "minor_prophets", label: "Profetas Menores", ids: ["HOS","JOL","AMO","OBA","JON","MIC","NAH","HAB","ZEP","HAG","ZEC","MAL"] },
+]
+
+const NT_GROUPS = [
+  { category: "gospels",           label: "Evangelhos",       ids: ["MAT","MRK","LUK","JHN"] },
+  { category: "history_nt",        label: "Hist. da Igreja",  ids: ["ACT"] },
+  { category: "letters",           label: "Cartas",           ids: ["ROM","1CO","2CO","GAL"] },
+  { category: "prison_letters",    label: "Cartas de Prisão", ids: ["EPH","PHP","COL","PHM"] },
+  { category: "pastoral_letters",  label: "Cartas Pastorais", ids: ["1TI","2TI","TIT"] },
+  { category: "general_letters",   label: "Cartas Gerais",    ids: ["HEB","JAS","1PE","2PE","1JN","2JN","3JN","JUD"] },
+  { category: "prophecy",          label: "Profecia",         ids: ["REV"] },
+]
+
+const BOOK_MAP = Object.fromEntries(BOOKS.map(b => [b.id, b]))
+
+function getBookCategory(bookId: string) {
+  return [...AT_GROUPS, ...NT_GROUPS].find(g => g.ids.includes(bookId)) ?? null
+}
+
 interface Verse { number: number; text: string }
 interface HlEntry { id: string; color: string }
-
-// --- localStorage helpers ---
+interface HlPopover { x: number; y: number; key: string; verse: number }
 
 function readSavedPos() {
   try {
@@ -117,8 +158,74 @@ function readSavedFont(): "sm" | "md" | "lg" {
   } catch { return "md" }
 }
 
+interface SharePopover { x: number; y: number; text: string; ref: string }
+
+function wrapText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, maxWidth: number, lineHeight: number) {
+  const words = text.split(" ")
+  let line = ""
+  let curY = y
+  for (const word of words) {
+    const test = line ? `${line} ${word}` : word
+    if (ctx.measureText(test).width > maxWidth && line) {
+      ctx.fillText(line, x, curY)
+      line = word
+      curY += lineHeight
+    } else { line = test }
+  }
+  ctx.fillText(line, x, curY)
+  return curY
+}
+
+function generateVerseImage(verseText: string, verseRef: string): string {
+  const S = 1080
+  const canvas = document.createElement("canvas")
+  canvas.width = S; canvas.height = S
+  const ctx = canvas.getContext("2d")!
+
+  // Background
+  const bg = ctx.createLinearGradient(0, 0, S, S)
+  bg.addColorStop(0, "#16152a"); bg.addColorStop(1, "#0d0c1c")
+  ctx.fillStyle = bg; ctx.fillRect(0, 0, S, S)
+
+  // Subtle radial glow
+  const glow = ctx.createRadialGradient(S/2, S/2, 0, S/2, S/2, S*0.6)
+  glow.addColorStop(0, "rgba(201,166,84,0.07)"); glow.addColorStop(1, "transparent")
+  ctx.fillStyle = glow; ctx.fillRect(0, 0, S, S)
+
+  // Gold lines
+  const lineGrad = ctx.createLinearGradient(80, 0, S-80, 0)
+  lineGrad.addColorStop(0, "transparent")
+  lineGrad.addColorStop(0.3, "rgba(201,166,84,0.5)")
+  lineGrad.addColorStop(0.7, "rgba(201,166,84,0.5)")
+  lineGrad.addColorStop(1, "transparent")
+  ctx.fillStyle = lineGrad
+  ctx.fillRect(80, 240, S-160, 1)
+  ctx.fillRect(80, S-240, S-160, 1)
+
+  // App name top
+  ctx.fillStyle = "rgba(201,166,84,0.35)"
+  ctx.font = "500 22px 'Georgia', serif"
+  ctx.textAlign = "center"
+  ctx.letterSpacing = "8px"
+  ctx.fillText("SELAH", S/2, 185)
+
+  // Verse text
+  ctx.fillStyle = "#c9c0a8"
+  ctx.font = `italic 44px 'Georgia', serif`
+  ctx.textAlign = "center"
+  const endY = wrapText(ctx, `"${verseText}"`, S/2, 340, S-200, 68)
+
+  // Reference
+  ctx.fillStyle = "#c9a654"
+  ctx.font = "500 30px 'Georgia', serif"
+  ctx.fillText(verseRef, S/2, Math.max(endY + 80, 740))
+
+  return canvas.toDataURL("image/png")
+}
+
 export default function BibliaPage() {
   const pos0 = readSavedPos()
+  const router = useRouter()
 
   const [book,    setBook]    = useState(() => pos0?.book    ?? BOOKS[0])
   const [chapter, setChapter] = useState(() => pos0?.chapter ?? 1)
@@ -127,12 +234,9 @@ export default function BibliaPage() {
 
   const [tab,    setTab]    = useState<"AT" | "NT">("AT")
   const [filter, setFilter] = useState("")
-  const [hlColor, setHlColor] = useState<string | null>(null)
 
-  // highlights: verseKey → { id, color }
   const [highlighted, setHighlighted] = useState<Record<string, HlEntry>>({})
-  // bookmarks: verseKey → bookmarkId
-  const [bookmarked, setBookmarked] = useState<Record<string, string>>({})
+  const [bookmarked,  setBookmarked]  = useState<Record<string, string>>({})
 
   const [verses,    setVerses]    = useState<Verse[]>([])
   const [loading,   setLoading]   = useState(false)
@@ -140,7 +244,75 @@ export default function BibliaPage() {
   const [apiDetail, setApiDetail] = useState("")
   const [direction, setDirection] = useState<"next" | "prev">("next")
   const [animKey,   setAnimKey]   = useState(0)
-  const [showBookModal, setShowBookModal] = useState(false)
+  const [showBookModal,    setShowBookModal]    = useState(false)
+  const [showChapterModal, setShowChapterModal] = useState(false)
+
+  // Focus (fullscreen reading) mode
+  const [focusMode, setFocusMode] = useState(false)
+
+  // Floating highlight color picker
+  const [hlPopover, setHlPopover] = useState<HlPopover | null>(null)
+  const popoverRef = useRef<HTMLDivElement>(null)
+
+  // Share popover
+  const [sharePopover, setSharePopover] = useState<SharePopover | null>(null)
+  const shareRef = useRef<HTMLDivElement>(null)
+  const [copied, setCopied] = useState(false)
+
+  // Bookmark animation
+  const [bookmarkAnim, setBookmarkAnim] = useState<Set<string>>(new Set())
+
+  // Reading progress bar
+  const [scrollProgress, setScrollProgress] = useState(0)
+
+  useEffect(() => {
+    const el = document.querySelector("main") as HTMLElement | null
+    if (!el) return
+    function onScroll() {
+      const { scrollTop, scrollHeight, clientHeight } = el!
+      const p = scrollHeight <= clientHeight ? 0 : scrollTop / (scrollHeight - clientHeight)
+      setScrollProgress(p)
+    }
+    el.addEventListener("scroll", onScroll, { passive: true })
+    return () => el.removeEventListener("scroll", onScroll)
+  }, [])
+
+  // ESC exits focus mode, click outside closes popover
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") {
+        if (hlPopover)        { setHlPopover(null);        return }
+        if (sharePopover)     { setSharePopover(null);     return }
+        if (showChapterModal) { setShowChapterModal(false); return }
+        if (showBookModal)    { setShowBookModal(false);    return }
+        if (focusMode) setFocusMode(false)
+      }
+    }
+    document.addEventListener("keydown", onKey)
+    return () => document.removeEventListener("keydown", onKey)
+  }, [focusMode, hlPopover, sharePopover, showChapterModal, showBookModal])
+
+  useEffect(() => {
+    if (!hlPopover) return
+    function onDown(e: MouseEvent) {
+      if (popoverRef.current && !popoverRef.current.contains(e.target as Node)) {
+        setHlPopover(null)
+      }
+    }
+    document.addEventListener("mousedown", onDown)
+    return () => document.removeEventListener("mousedown", onDown)
+  }, [hlPopover])
+
+  useEffect(() => {
+    if (!sharePopover) return
+    function onDown(e: MouseEvent) {
+      if (shareRef.current && !shareRef.current.contains(e.target as Node)) {
+        setSharePopover(null)
+      }
+    }
+    document.addEventListener("mousedown", onDown)
+    return () => document.removeEventListener("mousedown", onDown)
+  }, [sharePopover])
 
   // Persist reading position
   useEffect(() => {
@@ -149,12 +321,11 @@ export default function BibliaPage() {
     } catch { /* ignore */ }
   }, [book, chapter, version])
 
-  // Persist font size
   useEffect(() => {
     try { localStorage.setItem("selah-bible-font", fontSize) } catch { /* ignore */ }
   }, [fontSize])
 
-  // Load highlights from API
+  // Load highlights
   useEffect(() => {
     let active = true
     async function load() {
@@ -176,7 +347,7 @@ export default function BibliaPage() {
     return () => { active = false }
   }, [book, chapter, version])
 
-  // Load bookmarks from API
+  // Load bookmarks
   useEffect(() => {
     let active = true
     async function load() {
@@ -199,6 +370,8 @@ export default function BibliaPage() {
   const filteredBooks = BOOKS.filter(b =>
     b.testament === tab && b.name.toLowerCase().includes(filter.toLowerCase())
   )
+
+  const chapterCols = book.chapters <= 9 ? 3 : book.chapters <= 30 ? 5 : book.chapters <= 60 ? 6 : 8
 
   const fetchVerses = useCallback(async () => {
     setLoading(true)
@@ -227,22 +400,15 @@ export default function BibliaPage() {
   function goChapter(delta: number) {
     const next    = chapter + delta
     const bookIdx = BOOKS.findIndex(b => b.id === book.id)
-
     if (next < 1) {
       if (bookIdx <= 0) return
       const prev = BOOKS[bookIdx - 1]
-      setBook(prev)
-      setChapter(prev.chapters)
-      setDirection("prev")
-      setAnimKey(k => k + 1)
+      setBook(prev); setChapter(prev.chapters); setDirection("prev"); setAnimKey(k => k + 1)
       return
     }
     if (next > book.chapters) {
       if (bookIdx >= BOOKS.length - 1) return
-      setBook(BOOKS[bookIdx + 1])
-      setChapter(1)
-      setDirection("next")
-      setAnimKey(k => k + 1)
+      setBook(BOOKS[bookIdx + 1]); setChapter(1); setDirection("next"); setAnimKey(k => k + 1)
       return
     }
     setDirection(delta > 0 ? "next" : "prev")
@@ -251,59 +417,114 @@ export default function BibliaPage() {
   }
 
   function changeBook(b: typeof BOOKS[0]) {
-    setBook(b)
-    setChapter(1)
-    setDirection("next")
-    setAnimKey(k => k + 1)
+    setBook(b); setChapter(1); setDirection("next"); setAnimKey(k => k + 1)
   }
 
-  async function toggleVerse(key: string, verseNumber: number) {
-    if (!hlColor) return
+  function openStudyNote(e: React.MouseEvent, verseNumber: number) {
+    e.stopPropagation()
+    const bookName = BOOK_ID_NAMES[book.id] ?? book.name
+    router.push(`/estudo/nova?book=${encodeURIComponent(bookName)}&chapter=${chapter}&verse=${verseNumber}`)
+  }
+
+  function handleShareClick(e: React.MouseEvent, verseText: string, verseNumber: number) {
+    e.stopPropagation()
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
+    const bookName = BOOK_ID_NAMES[book.id] ?? book.name
+    const verseRef = `${bookName} ${chapter}:${verseNumber}`
+    setSharePopover({
+      x: Math.min(Math.max(e.clientX, 100), window.innerWidth - 100),
+      y: rect.top + window.scrollY,
+      text: verseText,
+      ref: verseRef,
+    })
+  }
+
+  async function copyVerse() {
+    if (!sharePopover) return
+    await navigator.clipboard.writeText(`"${sharePopover.text}" — ${sharePopover.ref}`)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  async function shareVerse() {
+    if (!sharePopover) return
+    const shareText = `"${sharePopover.text}"\n\n— ${sharePopover.ref}\n\nSelah`
+    if (navigator.share) {
+      await navigator.share({ text: shareText }).catch(() => {})
+    }
+    setSharePopover(null)
+  }
+
+  function downloadVerseImage() {
+    if (!sharePopover) return
+    const dataUrl = generateVerseImage(sharePopover.text, sharePopover.ref)
+    const a = document.createElement("a")
+    a.href = dataUrl
+    a.download = `${sharePopover.ref.replace(/\s/g, "_")}.png`
+    a.click()
+    setSharePopover(null)
+  }
+
+  // Show floating color picker when verse is clicked
+  function handleVerseClick(e: React.MouseEvent, key: string, verseNumber: number) {
+    e.stopPropagation()
+    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
+    const popX = Math.min(Math.max(e.clientX, 80), window.innerWidth - 80)
+    const popY = rect.top + window.scrollY
+    setHlPopover({ x: popX, y: popY, key, verse: verseNumber })
+  }
+
+  async function applyHighlightColor(color: string) {
+    if (!hlPopover) return
+    const { key, verse } = hlPopover
+    setHlPopover(null)
     const existing = highlighted[key]
 
     if (existing) {
-      if (existing.color === hlColor) {
-        // Remove
+      if (existing.color === color) {
         setHighlighted(prev => { const n = { ...prev }; delete n[key]; return n })
         fetch("/api/biblia/highlights", {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ id: existing.id }),
         }).catch(() => {})
-      } else {
-        // Change color — optimistic update then re-create
-        setHighlighted(prev => ({ ...prev, [key]: { id: existing.id, color: hlColor } }))
-        await fetch("/api/biblia/highlights", {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id: existing.id }),
-        }).catch(() => {})
-        const res  = await fetch("/api/biblia/highlights", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ book: book.id, chapter, verseStart: verseNumber, verseEnd: verseNumber, version, color: hlColor }),
-        }).catch(() => null)
-        const data = res ? await res.json().catch(() => null) : null
-        if (data?.id) setHighlighted(prev => ({ ...prev, [key]: { id: data.id, color: hlColor } }))
+        return
       }
-    } else {
-      // Add — optimistic
-      const color = hlColor
-      setHighlighted(prev => ({ ...prev, [key]: { id: "pending", color } }))
-      const res  = await fetch("/api/biblia/highlights", {
-        method: "POST",
+      setHighlighted(prev => ({ ...prev, [key]: { id: existing.id, color } }))
+      await fetch("/api/biblia/highlights", {
+        method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ book: book.id, chapter, verseStart: verseNumber, verseEnd: verseNumber, version, color }),
-      }).catch(() => null)
-      const data = res ? await res.json().catch(() => null) : null
-      if (data?.id) setHighlighted(prev => ({ ...prev, [key]: { id: data.id, color } }))
+        body: JSON.stringify({ id: existing.id }),
+      }).catch(() => {})
+    } else {
+      setHighlighted(prev => ({ ...prev, [key]: { id: "pending", color } }))
     }
+    const res  = await fetch("/api/biblia/highlights", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ book: book.id, chapter, verseStart: verse, verseEnd: verse, version, color }),
+    }).catch(() => null)
+    const data = res ? await res.json().catch(() => null) : null
+    if (data?.id) setHighlighted(prev => ({ ...prev, [key]: { id: data.id, color } }))
+  }
+
+  async function removeHighlightFromPopover() {
+    if (!hlPopover) return
+    const { key } = hlPopover
+    setHlPopover(null)
+    const existing = highlighted[key]
+    if (!existing) return
+    setHighlighted(prev => { const n = { ...prev }; delete n[key]; return n })
+    fetch("/api/biblia/highlights", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: existing.id }),
+    }).catch(() => {})
   }
 
   async function toggleBookmark(key: string, verseNumber: number) {
     const existingId = bookmarked[key]
     if (existingId) {
-      // Remove — optimistic
       setBookmarked(prev => { const n = { ...prev }; delete n[key]; return n })
       fetch("/api/biblia/bookmarks", {
         method: "DELETE",
@@ -311,7 +532,8 @@ export default function BibliaPage() {
         body: JSON.stringify({ id: existingId }),
       }).catch(() => {})
     } else {
-      // Add — optimistic
+      setBookmarkAnim(prev => new Set(prev).add(key))
+      setTimeout(() => setBookmarkAnim(prev => { const n = new Set(prev); n.delete(key); return n }), 500)
       setBookmarked(prev => ({ ...prev, [key]: "pending" }))
       const res  = await fetch("/api/biblia/bookmarks", {
         method: "POST",
@@ -323,246 +545,426 @@ export default function BibliaPage() {
     }
   }
 
-  const chapterArr     = Array.from({ length: book.chapters }, (_, i) => i + 1)
   const isFirstInBible = book.id === "GEN" && chapter === 1
   const isLastInBible  = book.id === "REV" && chapter === book.chapters
 
-  return (
-    <div className="relative">
+  const bookCat = getBookCategory(book.id)
 
-      {/* Controls bar */}
-      <div className="sticky top-0 z-10 flex flex-wrap items-center gap-3 px-6 py-3 bg-[#12111e]/95 backdrop-blur-md"
-        style={{ boxShadow: "0 1px 0 rgba(46,43,66,0.4)" }}>
+  const controlsBar = (
+    <div className="sticky top-0 z-10 flex flex-wrap items-center gap-3 px-6 py-3 bg-[#12111e]/90 backdrop-blur-xl">
 
-        {/* Book selector */}
+      {/* Book selector */}
+      <button
+        onClick={() => setShowBookModal(true)}
+        className="flex items-center gap-2 text-[#c9c0a8] hover:text-[#e2d9c5] transition-colors duration-200 group"
+      >
+        <BookOpen className="w-3.5 h-3.5 text-[#c9a654] opacity-60" />
+        {bookCat && (
+          <div className="w-1.5 h-1.5 rounded-full flex-shrink-0"
+            style={{ background: BOOK_CATEGORIES[bookCat.category].color }} />
+        )}
+        <span className="font-serif text-sm">{book.name}</span>
+        <ChevronDown className="w-3 h-3 text-[#3d3a55] group-hover:text-[#55524a] transition-colors" />
+      </button>
+
+      {/* Chapter navigation */}
+      <div className="flex items-center gap-1">
+        <button onClick={() => goChapter(-1)}
+          className="w-6 h-6 flex items-center justify-center text-[#3d3a55] hover:text-[#c9a654] transition-colors duration-200 rounded-lg hover:bg-[#1a1928]">
+          <ChevronLeft className="w-3.5 h-3.5" />
+        </button>
         <button
-          onClick={() => setShowBookModal(true)}
-          className="flex items-center gap-2 text-[#c9c0a8] hover:text-[#e2d9c5] transition-colors duration-200 group"
+          onClick={() => setShowChapterModal(true)}
+          className="flex items-center gap-1 text-[#8a8375] hover:text-[#c9c0a8] transition-colors px-1 group"
         >
-          <BookOpen className="w-3.5 h-3.5 text-[#c9a654] opacity-60" />
-          <span className="font-serif text-sm">{book.name}</span>
+          <span className="font-serif text-xs">Cap. {chapter}</span>
           <ChevronDown className="w-3 h-3 text-[#3d3a55] group-hover:text-[#55524a] transition-colors" />
         </button>
-
-        {/* Chapter navigation */}
-        <div className="flex items-center gap-1">
-          <button onClick={() => goChapter(-1)}
-            className="w-6 h-6 flex items-center justify-center text-[#3d3a55] hover:text-[#c9a654] transition-colors duration-200 rounded-lg hover:bg-[#1a1928]">
-            <ChevronLeft className="w-3.5 h-3.5" />
-          </button>
-          <select
-            value={chapter}
-            onChange={e => { setDirection("next"); setAnimKey(k => k + 1); setChapter(Number(e.target.value)) }}
-            className="bg-transparent text-[#8a8375] text-xs outline-none cursor-pointer hover:text-[#c9c0a8] transition-colors px-1 font-serif"
-          >
-            {chapterArr.map(n => (
-              <option key={n} value={n} className="bg-[#1a1928]">Cap. {n}</option>
-            ))}
-          </select>
-          <button onClick={() => goChapter(1)}
-            className="w-6 h-6 flex items-center justify-center text-[#3d3a55] hover:text-[#c9a654] transition-colors duration-200 rounded-lg hover:bg-[#1a1928]">
-            <ChevronRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
-
-        <div className="w-px h-3.5 bg-[#2e2b42]" />
-
-        {/* Version pills */}
-        <div className="flex items-center gap-1">
-          {VERSIONS.map(v => (
-            <button key={v.id}
-              onClick={() => { setDirection("next"); setAnimKey(k => k + 1); setVersion(v.id) }}
-              title={v.desc}
-              className={cn(
-                "px-2.5 py-0.5 text-[10px] font-medium tracking-wider transition-all duration-200 rounded-full border",
-                version === v.id
-                  ? "bg-[#c9a65415] text-[#c9a654] border-[#c9a65440]"
-                  : "text-[#3d3a55] border-transparent hover:text-[#55524a] hover:border-[#2e2b42]"
-              )}>
-              {v.label}
-            </button>
-          ))}
-        </div>
-
-        <div className="flex-1" />
-
-        {/* Font size */}
-        <div className="flex items-center gap-0.5">
-          {(["sm", "md", "lg"] as const).map((s, i) => (
-            <button key={s}
-              onClick={() => setFontSize(s)}
-              className={cn(
-                "w-6 h-5 flex items-center justify-center rounded transition-colors",
-                fontSize === s ? "text-[#c9a654]" : "text-[#3d3a55] hover:text-[#55524a]",
-                s === "sm" && "text-[9px]",
-                s === "md" && "text-[11px]",
-                s === "lg" && "text-[13px]",
-              )}
-              title={["Texto menor", "Texto médio", "Texto maior"][i]}
-            >
-              A
-            </button>
-          ))}
-        </div>
-
-        <div className="w-px h-3.5 bg-[#2e2b42]" />
-
-        {/* Search link */}
-        <Link href="/biblia/busca"
-          className="text-[#3d3a55] hover:text-[#c9a654] transition-colors duration-200"
-          title="Buscar versículos">
-          <Search className="w-3.5 h-3.5" />
-        </Link>
-
-        <div className="w-px h-3.5 bg-[#2e2b42]" />
-
-        {/* Highlight tools */}
-        <div className="flex items-center gap-1.5">
-          <Highlighter className="w-3 h-3 text-[#3d3a55]" />
-          {HL_COLORS.map(c => (
-            <button key={c.id}
-              onClick={() => setHlColor(prev => prev === c.id ? null : c.id)}
-              className={cn(
-                "w-3.5 h-3.5 rounded-full transition-all duration-200",
-                hlColor === c.id ? "ring-1 ring-offset-1 ring-offset-[#12111e] scale-110" : "opacity-40 hover:opacity-70"
-              )}
-              style={{ background: c.style }} />
-          ))}
-          {hlColor && (
-            <button onClick={() => setHlColor(null)} className="text-[#3d3a55] hover:text-[#55524a] ml-0.5 transition-colors">
-              <X className="w-3 h-3" />
-            </button>
-          )}
-        </div>
+        <button onClick={() => goChapter(1)}
+          className="w-6 h-6 flex items-center justify-center text-[#3d3a55] hover:text-[#c9a654] transition-colors duration-200 rounded-lg hover:bg-[#1a1928]">
+          <ChevronRight className="w-3.5 h-3.5" />
+        </button>
       </div>
 
-      {/* Side chapter navigation */}
-      {!loading && !apiError && verses.length > 0 && !isFirstInBible && (
-        <button onClick={() => goChapter(-1)} className="chapter-side-nav left-0" aria-label="Capítulo anterior">
-          <span className="chapter-side-chevron chapter-side-chevron-left" />
-        </button>
-      )}
-      {!loading && !apiError && verses.length > 0 && !isLastInBible && (
-        <button onClick={() => goChapter(1)} className="chapter-side-nav right-0" aria-label="Próximo capítulo">
-          <span className="chapter-side-chevron chapter-side-chevron-right" />
-        </button>
-      )}
+      <div className="w-px h-3.5 bg-[#2e2b42]" />
 
-      {/* Reading area */}
-      <div className="overflow-x-hidden">
-        <div className="max-w-2xl mx-auto px-8 py-12">
+      {/* Version pills */}
+      <div className="flex items-center gap-1">
+        {VERSIONS.map(v => (
+          <button key={v.id}
+            onClick={() => { setDirection("next"); setAnimKey(k => k + 1); setVersion(v.id) }}
+            title={v.desc}
+            className={cn(
+              "px-2.5 py-0.5 text-[10px] font-medium tracking-wider transition-all duration-200 rounded-full border",
+              version === v.id
+                ? "bg-[#c9a65415] text-[#c9a654] border-[#c9a65440]"
+                : "text-[#3d3a55] border-transparent hover:text-[#55524a] hover:border-[#2e2b42]"
+            )}>
+            {v.label}
+          </button>
+        ))}
+      </div>
 
-          {apiError === "AUTH_REQUIRED" && (
-            <div className="text-center py-16 space-y-3">
-              <AlertCircle className="w-6 h-6 text-[#c9a654] opacity-40 mx-auto" />
-              <p className="font-serif text-[#c9c0a8] text-base">Token não carregado</p>
-              <p className="text-[#55524a] text-sm leading-relaxed max-w-sm mx-auto">
-                Reinicie o servidor: <code className="text-[#8a8375] font-mono text-xs">Ctrl+C → npm run dev</code>
+      <div className="flex-1" />
+
+      {/* Font size */}
+      <div className="flex items-center gap-0.5">
+        {(["sm", "md", "lg"] as const).map((s, i) => (
+          <button key={s}
+            onClick={() => setFontSize(s)}
+            className={cn(
+              "w-6 h-5 flex items-center justify-center rounded transition-colors",
+              fontSize === s ? "text-[#c9a654]" : "text-[#3d3a55] hover:text-[#55524a]",
+              s === "sm" && "text-[9px]",
+              s === "md" && "text-[11px]",
+              s === "lg" && "text-[13px]",
+            )}
+            title={["Texto menor", "Texto médio", "Texto maior"][i]}
+          >
+            A
+          </button>
+        ))}
+      </div>
+
+      <div className="w-px h-3.5 bg-[#2e2b42]" />
+
+      {/* Search link */}
+      <Link href="/biblia/busca"
+        className="text-[#3d3a55] hover:text-[#c9a654] transition-colors duration-200"
+        title="Buscar versículos">
+        <Search className="w-3.5 h-3.5" />
+      </Link>
+
+      <div className="w-px h-3.5 bg-[#2e2b42]" />
+
+      {/* Focus mode toggle */}
+      <button
+        onClick={() => setFocusMode(f => !f)}
+        title={focusMode ? "Sair da leitura focada (Esc)" : "Leitura focada — tela cheia"}
+        className="text-[#3d3a55] hover:text-[#c9a654] transition-colors duration-200"
+      >
+        {focusMode
+          ? <Minimize2 className="w-3.5 h-3.5" />
+          : <Maximize2 className="w-3.5 h-3.5" />
+        }
+      </button>
+    </div>
+  )
+
+  const readingArea = (
+    <div className="overflow-x-hidden">
+      <div className="max-w-2xl mx-auto px-8 py-12">
+
+        {apiError === "AUTH_REQUIRED" && (
+          <div className="text-center py-16 space-y-3">
+            <AlertCircle className="w-6 h-6 text-[#c9a654] opacity-40 mx-auto" />
+            <p className="font-serif text-[#c9c0a8] text-base">Token não carregado</p>
+            <p className="text-[#55524a] text-sm leading-relaxed max-w-sm mx-auto">
+              Reinicie o servidor: <code className="text-[#8a8375] font-mono text-xs">Ctrl+C → npm run dev</code>
+            </p>
+          </div>
+        )}
+
+        {apiError === "RATE_LIMIT" && (
+          <div className="relative pl-6 py-4 max-w-sm">
+            <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-[#c9a654] opacity-40" />
+            <p className="font-serif text-[#c9a654] text-sm mb-1">Limite de requisições atingido</p>
+            <p className="text-[#55524a] text-xs">Aguarde alguns minutos e tente novamente.</p>
+          </div>
+        )}
+
+        {apiError === "ERROR" && (
+          <div className="text-center py-16 space-y-2">
+            <AlertCircle className="w-6 h-6 text-[#3d3a55] mx-auto mb-3" />
+            <p className="font-serif text-[#55524a] text-sm">Não foi possível carregar os versículos.</p>
+            {apiDetail && <p className="font-mono text-[10px] text-[#3d3a55]">{apiDetail}</p>}
+            <button onClick={fetchVerses} className="text-xs text-[#c9a654] hover:opacity-80 transition-opacity mt-2 block mx-auto">
+              Tentar novamente
+            </button>
+          </div>
+        )}
+
+        {loading && (
+          <div className="flex items-center justify-center py-20">
+            <Loader2 className="w-4 h-4 text-[#3d3a55] animate-spin" />
+          </div>
+        )}
+
+        {!loading && !apiError && verses.length > 0 && (
+          <div key={animKey} className={direction === "next" ? "page-turn-next" : "page-turn-prev"}>
+
+            <div className="text-center mb-12 relative">
+              {/* Chapter number watermark */}
+              <div className="pointer-events-none select-none absolute inset-0 flex items-center justify-center overflow-hidden">
+                <span className="font-display font-bold leading-none"
+                  style={{ fontSize: "clamp(7rem, 35vw, 16rem)", opacity: 0.022, color: bookCat ? BOOK_CATEGORIES[bookCat.category].color : "white" }}>
+                  {chapter}
+                </span>
+              </div>
+              <h1 className="chapter-heading text-base mb-1">{book.name}</h1>
+              <p className="font-sans text-[9px] text-[#3d3a55] tracking-[0.25em] uppercase">
+                Capítulo {chapter}
               </p>
+              <div className="w-12 h-px mx-auto mt-4" style={{ background: bookCat ? BOOK_CATEGORIES[bookCat.category].color : "#c9a654", opacity: 0.4 }} />
             </div>
-          )}
 
-          {apiError === "RATE_LIMIT" && (
-            <div className="relative pl-6 py-4 max-w-sm">
-              <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-[#c9a654] opacity-40" />
-              <p className="font-serif text-[#c9a654] text-sm mb-1">Limite de requisições atingido</p>
-              <p className="text-[#55524a] text-xs">Aguarde alguns minutos e tente novamente.</p>
+            <div className={cn(
+              "bible-text leading-[2.2]",
+              fontSize === "sm" && "bible-text-sm",
+              fontSize === "lg" && "bible-text-lg",
+            )}>
+              {verses.map(v => {
+                const key         = `${book.id}-${chapter}-${v.number}`
+                const hlEntry     = highlighted[key]
+                const hlCls       = hlEntry ? `hl-${hlEntry.color}` : ""
+                const isBookmarked = key in bookmarked
+                return (
+                  <span key={v.number}
+                    onClick={e => handleVerseClick(e, key, v.number)}
+                    className={cn(
+                      "group relative cursor-pointer transition-colors rounded-sm",
+                      hlCls,
+                      !hlEntry && "hover:bg-[#c9a65408]"
+                    )}>
+                    <sup className="verse-number">{v.number}</sup>
+                    <span>{v.text}</span>
+                    {" "}
+                    <span className="inline-flex items-center gap-1 align-middle opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button onClick={e => { e.stopPropagation(); toggleBookmark(key, v.number) }} title="Marcador">
+                        <Bookmark className={cn("w-2.5 h-2.5", isBookmarked ? "text-[#c9a654] fill-[#c9a654]" : "text-[#3d3a55] hover:text-[#55524a]", bookmarkAnim.has(key) && "bookmark-pop")} />
+                      </button>
+                      <button onClick={e => openStudyNote(e, v.number)} title="Nova nota de estudo">
+                        <PenLine className="w-2.5 h-2.5 text-[#3d3a55] hover:text-[#c9a654]" />
+                      </button>
+                      <button onClick={e => handleShareClick(e, v.text, v.number)} title="Compartilhar versículo">
+                        <Share2 className="w-2.5 h-2.5 text-[#3d3a55] hover:text-[#c9a654]" />
+                      </button>
+                    </span>
+                    {" "}
+                  </span>
+                )
+              })}
             </div>
-          )}
 
-          {apiError === "ERROR" && (
-            <div className="text-center py-16 space-y-2">
-              <AlertCircle className="w-6 h-6 text-[#3d3a55] mx-auto mb-3" />
-              <p className="font-serif text-[#55524a] text-sm">Não foi possível carregar os versículos.</p>
-              {apiDetail && <p className="font-mono text-[10px] text-[#3d3a55]">{apiDetail}</p>}
-              <button onClick={fetchVerses} className="text-xs text-[#c9a654] hover:opacity-80 transition-opacity mt-2 block mx-auto">
-                Tentar novamente
+            <div className="flex justify-between mt-16 pt-6 border-t border-[#2e2b42]/40">
+              <button onClick={() => goChapter(-1)} disabled={isFirstInBible}
+                className="flex items-center gap-1.5 text-sm font-serif text-[#55524a] hover:text-[#c9a654] disabled:opacity-20 transition-colors duration-200">
+                <ChevronLeft className="w-4 h-4" />
+                {chapter === 1 ? "Livro anterior" : "Capítulo anterior"}
+              </button>
+              <button onClick={() => goChapter(1)} disabled={isLastInBible}
+                className="flex items-center gap-1.5 text-sm font-serif text-[#55524a] hover:text-[#c9a654] disabled:opacity-20 transition-colors duration-200">
+                {chapter === book.chapters ? "Próximo livro" : "Próximo capítulo"}
+                <ChevronRight className="w-4 h-4" />
               </button>
             </div>
-          )}
+          </div>
+        )}
+      </div>
+    </div>
+  )
 
-          {loading && (
-            <div className="flex items-center justify-center py-20">
-              <Loader2 className="w-4 h-4 text-[#3d3a55] animate-spin" />
-            </div>
-          )}
+  return (
+    <>
+      {/* Reading progress bar */}
+      <div
+        className="reading-progress-bar"
+        style={{ width: `${scrollProgress * 100}%`, opacity: scrollProgress > 0.01 ? 1 : 0 }}
+      />
 
-          {!loading && !apiError && verses.length > 0 && (
-            <div key={animKey} className={direction === "next" ? "page-turn-next" : "page-turn-prev"}>
+      {/* Main layout — switches between normal and focus overlay */}
+      <div className={cn(
+        focusMode
+          ? "fixed inset-0 z-50 bg-[#12111e] overflow-y-auto"
+          : "relative"
+      )}>
+        {/* Side chapter nav */}
+        {!loading && !apiError && verses.length > 0 && !isFirstInBible && (
+          <button onClick={() => goChapter(-1)} className="chapter-side-nav left-0" aria-label="Capítulo anterior">
+            <span className="chapter-side-chevron chapter-side-chevron-left" />
+          </button>
+        )}
+        {!loading && !apiError && verses.length > 0 && !isLastInBible && (
+          <button onClick={() => goChapter(1)} className="chapter-side-nav right-0" aria-label="Próximo capítulo">
+            <span className="chapter-side-chevron chapter-side-chevron-right" />
+          </button>
+        )}
 
-              {/* Chapter heading */}
-              <div className="text-center mb-12">
-                <h1 className="chapter-heading text-base mb-1">{book.name}</h1>
-                <p className="font-sans text-[9px] text-[#3d3a55] tracking-[0.25em] uppercase">
-                  Capítulo {chapter}
-                </p>
-                <div className="w-12 h-px bg-[#c9a654] opacity-30 mx-auto mt-4" />
-              </div>
+        {controlsBar}
+        {readingArea}
+      </div>
 
-              {/* Flowing Bible text */}
-              <div className={cn(
-                "bible-text leading-[2.2]",
-                fontSize === "sm" && "bible-text-sm",
-                fontSize === "lg" && "bible-text-lg",
-              )}>
-                {verses.map(v => {
-                  const key   = `${book.id}-${chapter}-${v.number}`
-                  const hlEntry = highlighted[key]
-                  const hlCls   = hlEntry ? `hl-${hlEntry.color}` : ""
-                  const isBookmarked = key in bookmarked
-                  return (
-                    <span key={v.number}
-                      onClick={() => toggleVerse(key, v.number)}
-                      className={cn("group relative transition-colors", hlColor && "cursor-pointer", hlCls)}>
-                      <sup className="verse-number">{v.number}</sup>
-                      <span>{v.text}</span>
-                      {" "}
-                      <button
-                        onClick={e => { e.stopPropagation(); toggleBookmark(key, v.number) }}
-                        className={cn("inline-flex opacity-0 group-hover:opacity-100 transition-opacity align-middle", isBookmarked && "opacity-100")}>
-                        <Bookmark className={cn("w-2.5 h-2.5", isBookmarked ? "text-[#c9a654] fill-[#c9a654]" : "text-[#3d3a55]")} />
-                      </button>
-                      {" "}
-                    </span>
-                  )
-                })}
-              </div>
+      {/* Floating highlight color picker */}
+      {hlPopover && (
+        <div
+          ref={popoverRef}
+          className="fixed z-[200] flex items-center gap-2 px-3 py-2.5 rounded-2xl shadow-2xl animate-fade-in"
+          style={{
+            left: hlPopover.x,
+            top: hlPopover.y,
+            transform: "translate(-50%, calc(-100% - 10px))",
+            background: "rgba(22, 21, 36, 0.96)",
+            backdropFilter: "blur(20px)",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06)",
+          }}
+        >
+          {/* Small caret */}
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full w-0 h-0"
+            style={{ borderLeft: "6px solid transparent", borderRight: "6px solid transparent", borderTop: "6px solid rgba(22,21,36,0.96)" }} />
 
-              {/* Chapter navigation footer */}
-              <div className="flex justify-between mt-16 pt-6" style={{ borderTop: "1px solid rgba(46,43,66,0.4)" }}>
-                <button onClick={() => goChapter(-1)} disabled={isFirstInBible}
-                  className="flex items-center gap-1.5 text-sm font-serif text-[#55524a] hover:text-[#c9a654] disabled:opacity-20 transition-colors duration-200">
-                  <ChevronLeft className="w-4 h-4" />
-                  {chapter === 1 ? "Livro anterior" : "Capítulo anterior"}
-                </button>
-                <button onClick={() => goChapter(1)} disabled={isLastInBible}
-                  className="flex items-center gap-1.5 text-sm font-serif text-[#55524a] hover:text-[#c9a654] disabled:opacity-20 transition-colors duration-200">
-                  {chapter === book.chapters ? "Próximo livro" : "Próximo capítulo"}
-                  <ChevronRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
+          {HL_COLORS.map(c => (
+            <button
+              key={c.id}
+              onClick={() => applyHighlightColor(c.id)}
+              title={c.id}
+              className={cn(
+                "w-5 h-5 rounded-full transition-all duration-150 hover:scale-110 active:scale-95",
+                highlighted[hlPopover.key]?.color === c.id && "ring-2 ring-white/40 ring-offset-1 ring-offset-[#16152400] scale-110"
+              )}
+              style={{ background: c.style }}
+            />
+          ))}
+
+          {highlighted[hlPopover.key] && (
+            <>
+              <div className="w-px h-4 bg-white/10" />
+              <button
+                onClick={removeHighlightFromPopover}
+                title="Remover grifo"
+                className="text-[#55524a] hover:text-[#c96b5a] transition-colors"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            </>
           )}
         </div>
-      </div>
+      )}
+
+      {/* Chapter picker modal */}
+      {showChapterModal && (
+        <div className="fixed inset-0 z-[100] flex items-start justify-center pt-20 px-4">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowChapterModal(false)} />
+          <div className="relative z-10 w-full max-w-sm overflow-hidden flex flex-col modal-enter"
+            style={{
+              background: "rgba(14, 13, 25, 0.88)",
+              backdropFilter: "blur(48px) saturate(1.6)",
+              boxShadow: "0 24px 64px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.05), inset 0 1px 0 rgba(255,255,255,0.07)",
+              borderRadius: "24px",
+              maxHeight: "calc(100vh - 120px)",
+            }}>
+            <div className="flex items-center justify-between px-6 py-4">
+              <div>
+                <p className="font-display text-[9px] text-[#c9a654] uppercase tracking-[0.25em] opacity-70">Capítulo</p>
+                <p className="font-serif text-[#c9c0a8] text-sm mt-0.5">{book.name}</p>
+              </div>
+              <button onClick={() => setShowChapterModal(false)} className="text-[#3d3a55] hover:text-[#8a8375] transition-colors">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="overflow-y-auto px-4 pb-5">
+              <div className="grid gap-1.5" style={{ gridTemplateColumns: `repeat(${chapterCols}, minmax(0, 1fr))` }}>
+                {Array.from({ length: book.chapters }, (_, i) => i + 1).map(n => (
+                  <button key={n}
+                    onClick={() => {
+                      setDirection(n > chapter ? "next" : "prev")
+                      setAnimKey(k => k + 1)
+                      setChapter(n)
+                      setShowChapterModal(false)
+                    }}
+                    className={cn(
+                      "py-2 text-xs font-serif rounded-xl transition-all duration-200",
+                      n === chapter
+                        ? "bg-[#c9a65420] text-[#c9a654]"
+                        : "text-[#55524a] hover:text-[#c9c0a8] hover:bg-[#ffffff08]"
+                    )}>
+                    {n}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Share verse popover */}
+      {sharePopover && (
+        <div
+          ref={shareRef}
+          className="fixed z-[200] flex flex-col gap-2.5 p-4 rounded-2xl shadow-2xl animate-fade-in w-72"
+          style={{
+            left: sharePopover.x,
+            top: sharePopover.y,
+            transform: "translate(-50%, calc(-100% - 12px))",
+            background: "rgba(22, 21, 36, 0.96)",
+            backdropFilter: "blur(20px)",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06)",
+          }}
+        >
+          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full w-0 h-0"
+            style={{ borderLeft: "6px solid transparent", borderRight: "6px solid transparent", borderTop: "6px solid rgba(22,21,36,0.96)" }} />
+
+          {/* Verse preview */}
+          <div className="border-b border-white/5 pb-2.5">
+            <p className="font-serif text-[#8a8375] text-xs italic leading-relaxed line-clamp-3">
+              &ldquo;{sharePopover.text}&rdquo;
+            </p>
+            <p className="text-[#c9a654] text-[10px] mt-1.5 font-medium">{sharePopover.ref}</p>
+          </div>
+
+          {/* Actions */}
+          <div className="flex flex-col gap-1">
+            <button
+              onClick={copyVerse}
+              className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[#8a8375] hover:text-[#c9c0a8] hover:bg-white/5 transition-all text-left"
+            >
+              {copied ? <Check className="w-3.5 h-3.5 text-[#5a9e72]" /> : <Copy className="w-3.5 h-3.5" />}
+              {copied ? "Copiado!" : "Copiar versículo"}
+            </button>
+
+            {typeof navigator !== "undefined" && "share" in navigator && (
+              <button
+                onClick={shareVerse}
+                className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[#8a8375] hover:text-[#c9c0a8] hover:bg-white/5 transition-all text-left"
+              >
+                <Share2 className="w-3.5 h-3.5" />
+                Compartilhar
+              </button>
+            )}
+
+            <button
+              onClick={downloadVerseImage}
+              className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[#8a8375] hover:text-[#c9c0a8] hover:bg-white/5 transition-all text-left"
+            >
+              <span className="w-3.5 h-3.5 flex items-center justify-center text-[10px]">⬇</span>
+              Baixar imagem
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Book selector modal */}
       {showBookModal && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 px-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowBookModal(false)} />
-          <div className="relative z-10 w-full max-w-2xl card-soft overflow-hidden flex flex-col modal-enter"
-            style={{ maxHeight: "calc(100vh - 96px)" }}>
+        <div className="fixed inset-0 z-[100] flex items-start justify-center pt-16 px-4">
+          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowBookModal(false)} />
+          <div className="relative z-10 w-full max-w-2xl overflow-hidden flex flex-col modal-enter"
+            style={{
+              background: "rgba(14, 13, 25, 0.88)",
+              backdropFilter: "blur(48px) saturate(1.6)",
+              boxShadow: "0 24px 64px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.05), inset 0 1px 0 rgba(255,255,255,0.07)",
+              borderRadius: "24px",
+              maxHeight: "calc(100vh - 96px)",
+            }}>
 
-            {/* Modal header */}
-            <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: "1px solid rgba(46,43,66,0.5)" }}>
+            <div className="flex items-center justify-between px-6 py-4">
               <div className="flex gap-2">
                 {(["AT", "NT"] as const).map(t => (
                   <button key={t} onClick={() => setTab(t)}
                     className={cn(
                       "font-sans text-[10px] uppercase tracking-[0.2em] transition-all duration-200 px-3 py-1.5 rounded-full border",
                       tab === t
-                        ? "bg-[#c9a65415] text-[#c9a654] border-[#c9a65440]"
-                        : "text-[#3d3a55] border-transparent hover:text-[#55524a] hover:border-[#2e2b42]"
+                        ? "bg-[#c9a65420] text-[#c9a654] border-[#c9a65440]"
+                        : "text-[#3d3a55] border-[#ffffff08] hover:text-[#55524a]"
                     )}>
                     {t === "AT" ? "Antigo Testamento" : "Novo Testamento"}
                   </button>
@@ -573,8 +975,7 @@ export default function BibliaPage() {
               </button>
             </div>
 
-            {/* Search */}
-            <div className="px-6 py-3" style={{ borderBottom: "1px solid rgba(46,43,66,0.5)" }}>
+            <div className="px-6 pb-3">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#3d3a55]" />
                 <input
@@ -582,31 +983,72 @@ export default function BibliaPage() {
                   onChange={e => setFilter(e.target.value)}
                   placeholder="Buscar livro..."
                   autoFocus
-                  className="w-full pl-9 pr-4 py-2 text-sm bg-[#1a1928] border border-[#2e2b42] rounded-xl text-[#8a8375] placeholder:text-[#3d3a55] outline-none focus:border-[#c9a654] transition-colors duration-200 font-serif"
+                  className="w-full pl-9 pr-4 py-2 text-sm rounded-xl text-[#8a8375] placeholder:text-[#3d3a55] outline-none font-serif transition-colors duration-200"
+                  style={{
+                    background: "rgba(255,255,255,0.04)",
+                    border: "1px solid rgba(255,255,255,0.07)",
+                  }}
+                  onFocus={e => (e.target.style.borderColor = "rgba(201,166,84,0.4)")}
+                  onBlur={e => (e.target.style.borderColor = "rgba(255,255,255,0.07)")}
                 />
               </div>
             </div>
 
-            {/* Book grid */}
-            <div className="overflow-y-auto p-4">
-              <div className="grid grid-cols-3 sm:grid-cols-4 gap-1.5">
-                {filteredBooks.map(b => (
-                  <button key={b.id}
-                    onClick={() => { changeBook(b); setShowBookModal(false); setFilter("") }}
-                    className={cn(
-                      "px-3 py-2 text-left text-sm font-serif rounded-xl transition-all duration-200",
-                      book.id === b.id
-                        ? "bg-[#c9a65415] text-[#c9a654] border border-[#c9a65440]"
-                        : "text-[#55524a] hover:text-[#c9c0a8] hover:bg-[#1a1928] border border-transparent"
-                    )}>
-                    {b.name}
-                  </button>
-                ))}
-              </div>
+            <div className="overflow-y-auto p-4 pt-2">
+              {filter.trim() ? (
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-1">
+                  {filteredBooks.map(b => {
+                    const cat = getBookCategory(b.id)
+                    return (
+                      <button key={b.id}
+                        onClick={() => { changeBook(b); setShowBookModal(false); setFilter("") }}
+                        className={cn(
+                          "px-3 py-2.5 text-left text-sm font-serif rounded-xl transition-all duration-200 border-l-2",
+                          book.id === b.id ? "text-[#c9a654] bg-[#c9a65418]" : "text-[#55524a] hover:text-[#c9c0a8] hover:bg-[#ffffff06]"
+                        )}
+                        style={{ borderLeftColor: cat ? BOOK_CATEGORIES[cat.category].color : "transparent" }}>
+                        {b.name}
+                      </button>
+                    )
+                  })}
+                </div>
+              ) : (
+                <div className="space-y-5">
+                  {(tab === "AT" ? AT_GROUPS : NT_GROUPS).map(group => {
+                    const groupBooks = group.ids.map(id => BOOK_MAP[id]).filter(Boolean)
+                    const cat = BOOK_CATEGORIES[group.category]
+                    return (
+                      <div key={group.category}>
+                        <div className="flex items-center gap-2 px-1 mb-2">
+                          <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: cat.color }} />
+                          <span className="font-display text-[8px] uppercase tracking-[0.28em]"
+                            style={{ color: cat.color, opacity: 0.85 }}>
+                            {cat.label}
+                          </span>
+                          <div className="flex-1 h-px" style={{ background: cat.color, opacity: 0.12 }} />
+                        </div>
+                        <div className="grid grid-cols-3 sm:grid-cols-4 gap-1">
+                          {groupBooks.map(b => (
+                            <button key={b.id}
+                              onClick={() => { changeBook(b); setShowBookModal(false); setFilter("") }}
+                              className={cn(
+                                "px-3 py-2.5 text-left text-sm font-serif rounded-xl transition-all duration-200 border-l-2",
+                                book.id === b.id ? "text-[#c9c0a8] bg-[#ffffff08]" : "text-[#55524a] hover:text-[#c9c0a8] hover:bg-[#ffffff06]"
+                              )}
+                              style={{ borderLeftColor: book.id === b.id ? cat.color : "transparent" }}>
+                              {b.name}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              )}
             </div>
           </div>
         </div>
       )}
-    </div>
+    </>
   )
 }

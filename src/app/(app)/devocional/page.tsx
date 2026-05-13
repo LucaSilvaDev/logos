@@ -43,36 +43,36 @@ export default async function DevocionalPage() {
           </Link>
         </div>
       ) : (
-        <div className="space-y-2.5">
+        <div className="divide-y divide-[#1a1928]">
           {devotionals.map((d: { id: string; title: string; bibleRef: string | null; tags: string | null; createdAt: Date; content: string }) => {
             const tags = d.tags ? d.tags.split(",").filter(Boolean) : []
             const preview = d.content.replace(/<[^>]*>/g, "").slice(0, 140)
             return (
               <Link key={d.id} href={`/devocional/${d.id}`}
-                className="card-soft block px-5 py-4 group">
+                className="group block px-2 py-5 hover:bg-[linear-gradient(90deg,rgba(201,166,84,0.05),transparent)] transition-all duration-300 rounded-xl">
                 <div className="flex items-start justify-between gap-6">
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <div className="w-1 h-1 rounded-full bg-[#c9a654] opacity-40 flex-shrink-0 mt-0.5" />
-                      <h3 className="font-serif text-[#c9c0a8] text-base group-hover:text-[#e2d9c5] transition-colors">
+                    <div className="flex items-center gap-2.5 mb-1.5">
+                      <div className="w-0.5 h-4 bg-gradient-to-b from-[#c9a654] to-transparent opacity-50 rounded-full flex-shrink-0" />
+                      <h3 className="font-serif text-[#8a8375] text-base group-hover:text-[#c9c0a8] transition-colors">
                         {d.title}
                       </h3>
                     </div>
                     {d.bibleRef && (
-                      <p className="text-[#55524a] text-xs italic font-serif ml-3 mb-2">{d.bibleRef}</p>
+                      <p className="text-[#3d3a55] text-xs italic font-serif ml-3 mb-2">{d.bibleRef}</p>
                     )}
                     {preview && (
-                      <p className="text-[#55524a] text-xs leading-relaxed ml-3 line-clamp-2">{preview}</p>
+                      <p className="text-[#3d3a55] text-xs leading-relaxed ml-3 line-clamp-2">{preview}</p>
                     )}
                     {tags.length > 0 && (
-                      <div className="flex gap-1.5 mt-2 ml-3 flex-wrap">
+                      <div className="flex gap-2 mt-2 ml-3 flex-wrap">
                         {tags.map(t => (
-                          <span key={t} className="text-[10px] text-[#3d3a55]">#{t}</span>
+                          <span key={t} className="text-[10px] text-[#2e2b42]">#{t}</span>
                         ))}
                       </div>
                     )}
                   </div>
-                  <span className="text-xs text-[#3d3a55] flex-shrink-0 font-serif">
+                  <span className="text-[10px] text-[#2e2b42] flex-shrink-0 font-serif mt-0.5">
                     {format(new Date(d.createdAt), "d MMM yyyy", { locale: ptBR })}
                   </span>
                 </div>

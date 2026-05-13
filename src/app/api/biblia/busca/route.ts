@@ -28,7 +28,10 @@ export async function GET(req: Request) {
   const q       = (searchParams.get("q") ?? "").trim()
   const version = searchParams.get("version") ?? "nvi"
 
-  if (!q) return NextResponse.json({ results: [], total: 0 })
+  if (!q) {
+    const indexedCount = await db.bibleVerse.count({ where: { version } }).catch(() => 0)
+    return NextResponse.json({ results: [], total: 0, indexedCount })
+  }
 
   try {
     const rows = await db.bibleVerse.findMany({

@@ -23,12 +23,14 @@ const NOTE_TYPES = [
 export default function NovaNotaPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const defaultBook = searchParams.get("book") ?? "Romanos"
+  const defaultBook    = searchParams.get("book")    ?? "Romanos"
+  const defaultChapter = searchParams.get("chapter") ?? ""
+  const defaultVerse   = searchParams.get("verse")   ?? ""
 
   const [title, setTitle] = useState("")
   const [book, setBook] = useState(defaultBook)
-  const [chapter, setChapter] = useState("")
-  const [verse, setVerse] = useState("")
+  const [chapter, setChapter] = useState(defaultChapter)
+  const [verse, setVerse] = useState(defaultVerse)
   const [type, setType] = useState("exegesis")
   const [tags, setTags] = useState("")
   const [saving, setSaving] = useState(false)

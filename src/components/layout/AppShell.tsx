@@ -34,10 +34,15 @@ export function AppShell({ children, userName, userImage }: AppShellProps) {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-glass-base">
+    <div className="flex h-screen overflow-hidden bg-glass-base relative">
+      {/* Liquid glass ambient orbs */}
+      <div className="liquid-orb-1" />
+      <div className="liquid-orb-2" />
+      <div className="liquid-orb-3" />
+
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      <div className="flex flex-col flex-1 min-w-0">
+      <div className="flex flex-col flex-1 min-w-0 relative z-10">
         <Topbar
           userName={userName}
           userImage={userImage}
