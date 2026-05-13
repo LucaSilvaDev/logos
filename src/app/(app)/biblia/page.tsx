@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback, useRef } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import {
   ChevronLeft, ChevronRight, Search, Bookmark,
@@ -98,7 +98,6 @@ const BOOK_MAP = Object.fromEntries(BOOKS.map(b => [b.id, b]))
 
 interface Verse { number: number; text: string }
 interface HlEntry { id: string; color: string }
-interface HlPopover { x: number; y: number; key: string; verse: number; text: string }
 
 function readSavedPos() {
   try {
@@ -212,10 +211,7 @@ export default function BibliaPage() {
   // Focus (fullscreen reading) mode
   const [focusMode, setFocusMode] = useState(false)
 
-  // Floating highlight color picker
-  const [hlPopover, setHlPopover] = useState<HlPopover | null>(null)
-  const popoverRef = useRef<HTMLDivElement>(null)
-
+  const [selectedVerses, setSelectedVerses] = useState<Set<number>>(new Set())
   const [copied, setCopied] = useState(false)
 
 
@@ -234,11 +230,11 @@ export default function BibliaPage() {
     return () => el.removeEventListener("scroll", onScroll)
   }, [])
 
-  // ESC exits focus mode, click outside closes popover
+  // ESC exits focus mode or clears verse selection
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") {
-        if (hlPopover)        { setHlPopover(null);        return }
+        if (selectedVerses.size > 0) { setSelectedVerses(new Set()); return }
         if (showChapterModal) { setShowChapterModal(false); return }
         if (showBookModal)    { setShowBookModal(false);    return }
         if (focusMode) setFocusMode(false)
@@ -246,18 +242,7 @@ export default function BibliaPage() {
     }
     document.addEventListener("keydown", onKey)
     return () => document.removeEventListener("keydown", onKey)
-  }, [focusMode, hlPopover, showChapterModal, showBookModal])
-
-  useEffect(() => {
-    if (!hlPopover) return
-    function onDown(e: MouseEvent) {
-      if (popoverRef.current && !popoverRef.current.contains(e.target as Node)) {
-        setHlPopover(null)
-      }
-    }
-    document.addEventListener("mousedown", onDown)
-    return () => document.removeEventListener("mousedown", onDown)
-  }, [hlPopover])
+  }, [focusMode, selectedVerses, showChapterModal, showBookModal])
 
   // Persist reading position
   useEffect(() => {
@@ -370,93 +355,110 @@ export default function BibliaPage() {
     router.push(`/estudo/nova?book=${encodeURIComponent(bookName)}&chapter=${chapter}&verse=${verseNumber}`)
   }
 
-  async function copyVerse() {
-    if (!hlPopover) return
+  function selectionRef() {
     const bookName = BOOK_ID_NAMES[book.id] ?? book.name
-    const verseRef = `${bookName} ${chapter}:${hlPopover.verse}`
-    await navigator.clipboard.writeText(`"${hlPopover.text}" — ${verseRef}`)
+    const nums = [...selectedVerses].sort((a, b) => a - b)
+    if (nums.length === 0) return ""
+    if (nums.length === 1) return `${bookName} ${chapter}:${nums[0]}`
+    const contiguous = nums.every((n, i) => i === 0 || n === nums[i - 1] + 1)
+    if (contiguous) return `${bookName} ${chapter}:${nums[0]}–${nums[nums.length - 1]}`
+    return `${bookName} ${chapter}:${nums.join(", ")}`
+  }
+
+  function selectionText() {
+    return verses
+      .filter(v => selectedVerses.has(v.number))
+      .sort((a, b) => a.number - b.number)
+      .map(v => `${v.number} ${v.text}`)
+      .join(" ")
+  }
+
+  async function copyVerse() {
+    if (selectedVerses.size === 0) return
+    await navigator.clipboard.writeText(`${selectionText()}\n— ${selectionRef()}`)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
 
   async function shareVerse() {
-    if (!hlPopover) return
-    const bookName = BOOK_ID_NAMES[book.id] ?? book.name
-    const verseRef = `${bookName} ${chapter}:${hlPopover.verse}`
-    const shareText = `"${hlPopover.text}"\n\n— ${verseRef}\n\nSelah`
-    if (navigator.share) {
-      await navigator.share({ text: shareText }).catch(() => {})
-    }
-    setHlPopover(null)
+    if (selectedVerses.size === 0) return
+    const shareText = `${selectionText()}\n\n— ${selectionRef()}\n\nSelah`
+    if (navigator.share) await navigator.share({ text: shareText }).catch(() => {})
+    setSelectedVerses(new Set())
   }
 
   function downloadVerseImage() {
-    if (!hlPopover) return
-    const bookName = BOOK_ID_NAMES[book.id] ?? book.name
-    const verseRef = `${bookName} ${chapter}:${hlPopover.verse}`
-    const dataUrl = generateVerseImage(hlPopover.text, verseRef)
+    if (selectedVerses.size === 0) return
+    const text = verses
+      .filter(v => selectedVerses.has(v.number))
+      .sort((a, b) => a.number - b.number)
+      .map(v => v.text)
+      .join(" ")
+    const dataUrl = generateVerseImage(text, selectionRef())
     const a = document.createElement("a")
     a.href = dataUrl
-    a.download = `${verseRef.replace(/\s/g, "_")}.png`
+    a.download = `${selectionRef().replace(/\s/g, "_")}.png`
     a.click()
-    setHlPopover(null)
+    setSelectedVerses(new Set())
   }
 
-  // Show unified actions popover when verse is clicked
-  function handleVerseClick(e: React.MouseEvent, key: string, verseNumber: number, verseText: string) {
+  // Toggle verse selection on click
+  function handleVerseClick(e: React.MouseEvent, verseNumber: number) {
     e.stopPropagation()
-    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
-    const popX = Math.min(Math.max(e.clientX, 80), window.innerWidth - 80)
-    const popY = rect.top + window.scrollY
-    setHlPopover({ x: popX, y: popY, key, verse: verseNumber, text: verseText })
+    setSelectedVerses(prev => {
+      const next = new Set(prev)
+      if (next.has(verseNumber)) next.delete(verseNumber)
+      else next.add(verseNumber)
+      return next
+    })
   }
 
   async function applyHighlightColor(color: string) {
-    if (!hlPopover) return
-    const { key, verse } = hlPopover
-    setHlPopover(null)
-    const existing = highlighted[key]
+    const sortedNums = [...selectedVerses].sort((a, b) => a - b)
+    if (sortedNums.length === 0) return
 
-    if (existing) {
-      if (existing.color === color) {
-        setHighlighted(prev => { const n = { ...prev }; delete n[key]; return n })
-        fetch("/api/biblia/highlights", {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id: existing.id }),
-        }).catch(() => {})
-        return
+    // Snapshot existing highlights before any state update
+    const snapshot: Record<number, HlEntry | undefined> = {}
+    for (const vn of sortedNums) snapshot[vn] = highlighted[`${book.id}-${chapter}-${vn}`]
+
+    const allSameColor = sortedNums.every(vn => snapshot[vn]?.color === color)
+
+    // Optimistic UI
+    setHighlighted(prev => {
+      const n = { ...prev }
+      for (const vn of sortedNums) {
+        const k = `${book.id}-${chapter}-${vn}`
+        if (allSameColor) delete n[k]
+        else n[k] = { id: snapshot[vn]?.id ?? "pending", color }
       }
-      setHighlighted(prev => ({ ...prev, [key]: { id: existing.id, color } }))
-      await fetch("/api/biblia/highlights", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: existing.id }),
-      }).catch(() => {})
-    } else {
-      setHighlighted(prev => ({ ...prev, [key]: { id: "pending", color } }))
+      return n
+    })
+    setSelectedVerses(new Set())
+
+    // API
+    for (const vn of sortedNums) {
+      const k = `${book.id}-${chapter}-${vn}`
+      const existing = snapshot[vn]
+      if (allSameColor) {
+        if (existing) fetch("/api/biblia/highlights", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: existing.id }) }).catch(() => {})
+      } else {
+        if (existing) await fetch("/api/biblia/highlights", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: existing.id }) }).catch(() => {})
+        const res = await fetch("/api/biblia/highlights", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ book: book.id, chapter, verseStart: vn, verseEnd: vn, version, color }) }).catch(() => null)
+        const data = res ? await res.json().catch(() => null) : null
+        if (data?.id) setHighlighted(prev => ({ ...prev, [k]: { id: data.id, color } }))
+      }
     }
-    const res  = await fetch("/api/biblia/highlights", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ book: book.id, chapter, verseStart: verse, verseEnd: verse, version, color }),
-    }).catch(() => null)
-    const data = res ? await res.json().catch(() => null) : null
-    if (data?.id) setHighlighted(prev => ({ ...prev, [key]: { id: data.id, color } }))
   }
 
-  async function removeHighlightFromPopover() {
-    if (!hlPopover) return
-    const { key } = hlPopover
-    setHlPopover(null)
-    const existing = highlighted[key]
-    if (!existing) return
-    setHighlighted(prev => { const n = { ...prev }; delete n[key]; return n })
-    fetch("/api/biblia/highlights", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: existing.id }),
-    }).catch(() => {})
+  function removeHighlightSelection() {
+    const toDelete = [...selectedVerses]
+      .map(vn => ({ vn, k: `${book.id}-${chapter}-${vn}`, entry: highlighted[`${book.id}-${chapter}-${vn}`] }))
+      .filter(x => !!x.entry)
+    setHighlighted(prev => { const n = { ...prev }; for (const { k } of toDelete) delete n[k]; return n })
+    setSelectedVerses(new Set())
+    for (const { entry } of toDelete) {
+      fetch("/api/biblia/highlights", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: entry!.id }) }).catch(() => {})
+    }
   }
 
   async function toggleBookmark(key: string, verseNumber: number) {
@@ -654,11 +656,11 @@ export default function BibliaPage() {
                 const hlCls   = hlEntry ? `hl-${hlEntry.color}` : ""
                 return (
                   <span key={v.number}
-                    onClick={e => handleVerseClick(e, key, v.number, v.text)}
+                    onClick={e => handleVerseClick(e, v.number)}
                     className={cn(
                       "cursor-pointer transition-colors rounded-sm",
                       hlCls,
-                      hlPopover?.key === key
+                      selectedVerses.has(v.number)
                         ? "bg-[#c9a65418] underline decoration-[#c9a654]/35 decoration-1 underline-offset-2"
                         : !hlEntry && "hover:bg-[#c9a65408]"
                     )}>
@@ -718,94 +720,85 @@ export default function BibliaPage() {
         {readingArea}
       </div>
 
-      {/* Bottom verse action bar — liquid glass */}
-      {hlPopover && (
-        <div
-          ref={popoverRef}
-          className="fixed bottom-0 left-0 right-0 z-[200] animate-slide-up flex items-center gap-1.5 px-4 py-2 overflow-x-auto"
-          style={{
-            background: "rgba(255,255,255,0.04)",
-            backdropFilter: "blur(48px) saturate(1.8)",
-            WebkitBackdropFilter: "blur(48px) saturate(1.8)",
-            borderTop: "1px solid rgba(255,255,255,0.09)",
-            boxShadow: "0 -8px 32px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.06)",
-          }}
-        >
-          {/* Reference */}
-          <span className="text-[#c9a654] text-[11px] font-serif font-medium shrink-0 mr-1">
-            {BOOK_ID_NAMES[book.id] ?? book.name} {chapter}:{hlPopover.verse}
-          </span>
+      {/* Bottom verse action bar — liquid glass, multi-select */}
+      {selectedVerses.size > 0 && (() => {
+        const sortedNums = [...selectedVerses].sort((a, b) => a - b)
+        const anyHighlighted = sortedNums.some(vn => !!highlighted[`${book.id}-${chapter}-${vn}`])
+        const allSameColor = (color: string) => sortedNums.every(vn => highlighted[`${book.id}-${chapter}-${vn}`]?.color === color)
+        const anyBookmarked = sortedNums.some(vn => `${book.id}-${chapter}-${vn}` in bookmarked)
+        return (
+          <div
+            className="fixed bottom-0 left-0 right-0 z-[200] animate-slide-up flex items-center gap-1.5 px-4 py-2 overflow-x-auto"
+            style={{
+              background: "rgba(255,255,255,0.04)",
+              backdropFilter: "blur(48px) saturate(1.8)",
+              WebkitBackdropFilter: "blur(48px) saturate(1.8)",
+              borderTop: "1px solid rgba(255,255,255,0.09)",
+              boxShadow: "0 -8px 32px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.06)",
+            }}
+          >
+            {/* Reference */}
+            <span className="text-[#c9a654] text-[11px] font-serif font-medium shrink-0 mr-1">
+              {selectionRef()}
+            </span>
 
-          <div className="w-px h-4 bg-white/10 shrink-0 mx-1" />
+            <div className="w-px h-4 bg-white/10 shrink-0 mx-1" />
 
-          {/* Highlight swatches */}
-          {HL_COLORS.map(c => (
+            {/* Highlight swatches */}
+            {HL_COLORS.map(c => (
+              <button key={c.id} onClick={() => applyHighlightColor(c.id)} title={c.id}
+                className={cn("w-5 h-5 rounded-full shrink-0 transition-all duration-150 hover:scale-110 active:scale-95",
+                  allSameColor(c.id) && "ring-2 ring-white/50 scale-110")}
+                style={{ background: c.style }} />
+            ))}
+            {anyHighlighted && (
+              <button onClick={removeHighlightSelection} title="Remover grifo"
+                className="text-[#55524a] hover:text-[#c96b5a] transition-colors shrink-0">
+                <Trash2 className="w-3 h-3" />
+              </button>
+            )}
+
+            <div className="w-px h-4 bg-white/10 shrink-0 mx-1" />
+
+            {/* Actions */}
             <button
-              key={c.id}
-              onClick={() => applyHighlightColor(c.id)}
-              title={c.id}
-              className={cn(
-                "w-5 h-5 rounded-full shrink-0 transition-all duration-150 hover:scale-110 active:scale-95",
-                highlighted[hlPopover.key]?.color === c.id && "ring-2 ring-white/50 scale-110"
-              )}
-              style={{ background: c.style }}
-            />
-          ))}
-          {highlighted[hlPopover.key] && (
-            <button onClick={removeHighlightFromPopover} title="Remover grifo"
-              className="text-[#55524a] hover:text-[#c96b5a] transition-colors shrink-0">
-              <Trash2 className="w-3 h-3" />
-            </button>
-          )}
-
-          <div className="w-px h-4 bg-white/10 shrink-0 mx-1" />
-
-          {/* Actions */}
-          <button
-            onClick={() => { toggleBookmark(hlPopover.key, hlPopover.verse); setHlPopover(null) }}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] text-[#8a8375] hover:text-[#c9c0a8] hover:bg-white/5 transition-all shrink-0"
-          >
-            <Bookmark className={cn("w-3 h-3 shrink-0", (hlPopover.key in bookmarked) ? "text-[#c9a654] fill-[#c9a654]" : "")} />
-            {hlPopover.key in bookmarked ? "Remover" : "Marcador"}
-          </button>
-          <button
-            onClick={copyVerse}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] text-[#8a8375] hover:text-[#c9c0a8] hover:bg-white/5 transition-all shrink-0"
-          >
-            {copied ? <Check className="w-3 h-3 text-[#5a9e72]" /> : <Copy className="w-3 h-3" />}
-            {copied ? "Copiado!" : "Copiar"}
-          </button>
-          <button
-            onClick={() => { openStudyNote(hlPopover.verse); setHlPopover(null) }}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] text-[#8a8375] hover:text-[#c9c0a8] hover:bg-white/5 transition-all shrink-0"
-          >
-            <PenLine className="w-3 h-3" />
-            Nota
-          </button>
-          {typeof navigator !== "undefined" && "share" in navigator && (
-            <button
-              onClick={shareVerse}
+              onClick={() => { sortedNums.forEach(vn => toggleBookmark(`${book.id}-${chapter}-${vn}`, vn)); setSelectedVerses(new Set()) }}
               className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] text-[#8a8375] hover:text-[#c9c0a8] hover:bg-white/5 transition-all shrink-0"
             >
-              <Share2 className="w-3 h-3" />
-              Compartilhar
+              <Bookmark className={cn("w-3 h-3 shrink-0", anyBookmarked && "text-[#c9a654] fill-[#c9a654]")} />
+              Marcador
             </button>
-          )}
-          <button
-            onClick={downloadVerseImage}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] text-[#8a8375] hover:text-[#c9c0a8] hover:bg-white/5 transition-all shrink-0"
-          >
-            <span className="w-3 h-3 flex items-center justify-center text-[9px]">⬇</span>
-            Imagem
-          </button>
+            <button onClick={copyVerse}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] text-[#8a8375] hover:text-[#c9c0a8] hover:bg-white/5 transition-all shrink-0">
+              {copied ? <Check className="w-3 h-3 text-[#5a9e72]" /> : <Copy className="w-3 h-3" />}
+              {copied ? "Copiado!" : "Copiar"}
+            </button>
+            <button onClick={() => { openStudyNote(sortedNums[0]); setSelectedVerses(new Set()) }}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] text-[#8a8375] hover:text-[#c9c0a8] hover:bg-white/5 transition-all shrink-0">
+              <PenLine className="w-3 h-3" />
+              Nota
+            </button>
+            {typeof navigator !== "undefined" && "share" in navigator && (
+              <button onClick={shareVerse}
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] text-[#8a8375] hover:text-[#c9c0a8] hover:bg-white/5 transition-all shrink-0">
+                <Share2 className="w-3 h-3" />
+                Compartilhar
+              </button>
+            )}
+            <button onClick={downloadVerseImage}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] text-[#8a8375] hover:text-[#c9c0a8] hover:bg-white/5 transition-all shrink-0">
+              <span className="w-3 h-3 flex items-center justify-center text-[9px]">⬇</span>
+              Imagem
+            </button>
 
-          <div className="flex-1" />
+            <div className="flex-1" />
 
-          <button onClick={() => setHlPopover(null)} className="text-[#3d3a55] hover:text-[#55524a] transition-colors shrink-0 ml-1">
-            <X className="w-3.5 h-3.5" />
-          </button>
-        </div>
-      )}
+            <button onClick={() => setSelectedVerses(new Set())} className="text-[#3d3a55] hover:text-[#55524a] transition-colors shrink-0 ml-1">
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )
+      })()}
 
       {/* Chapter picker modal */}
       {showChapterModal && (
