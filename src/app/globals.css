@@ -167,6 +167,15 @@ body {
 }
 .animate-fade-in { animation: fadeIn 0.3s ease-out; }
 
+@keyframes slideUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+.animate-slide-up { animation: slideUp 260ms cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+@media (prefers-reduced-motion: reduce) {
+  .animate-slide-up { animation: none; opacity: 1; transform: none; }
+}
+
 /* ── VELA DO SELAH — Staggered entrance ──────────────────────────────────── */
 /*
   Conceito: "staggered entrance" (entrada escalonada)
