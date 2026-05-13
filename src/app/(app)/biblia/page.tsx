@@ -10,6 +10,7 @@ import {
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 import { BOOK_ID_NAMES } from "@/lib/reading-plan"
+import { BOOK_CATEGORIES, AT_GROUPS, NT_GROUPS, getBookCategory } from "@/lib/bible-categories"
 
 const BOOKS = [
   { id: "GEN",  name: "Gênesis",           chapters: 50,  testament: "AT" },
@@ -93,44 +94,7 @@ const HL_COLORS = [
   { id: "red",    style: "#c96b5a" },
 ]
 
-const BOOK_CATEGORIES: Record<string, { color: string; label: string }> = {
-  law:             { color: "#c9a654", label: "Lei" },
-  history_at:      { color: "#6b8fa8", label: "História" },
-  poetry:          { color: "#a87b9c", label: "Poesia" },
-  major_prophets:  { color: "#4a7a5a", label: "Grandes Profetas" },
-  minor_prophets:  { color: "#7aaa82", label: "Profetas Menores" },
-  gospels:         { color: "#7a6aaa", label: "Evangelhos" },
-  history_nt:      { color: "#6b8fa8", label: "Hist. da Igreja" },
-  letters:         { color: "#aa7a5a", label: "Cartas" },
-  prison_letters:  { color: "#aa7a5a", label: "Cartas de Prisão" },
-  pastoral_letters:{ color: "#aa7a5a", label: "Cartas Pastorais" },
-  general_letters: { color: "#aa7a5a", label: "Cartas Gerais" },
-  prophecy:        { color: "#c9a654", label: "Profecia" },
-}
-
-const AT_GROUPS = [
-  { category: "law",            label: "Lei",              ids: ["GEN","EXO","LEV","NUM","DEU"] },
-  { category: "history_at",     label: "História",         ids: ["JOS","JDG","RUT","1SA","2SA","1KI","2KI","1CH","2CH","EZR","NEH","EST"] },
-  { category: "poetry",         label: "Poesia",           ids: ["JOB","PSA","PRO","ECC","SNG"] },
-  { category: "major_prophets", label: "Grandes Profetas", ids: ["ISA","JER","LAM","EZK","DAN"] },
-  { category: "minor_prophets", label: "Profetas Menores", ids: ["HOS","JOL","AMO","OBA","JON","MIC","NAH","HAB","ZEP","HAG","ZEC","MAL"] },
-]
-
-const NT_GROUPS = [
-  { category: "gospels",           label: "Evangelhos",       ids: ["MAT","MRK","LUK","JHN"] },
-  { category: "history_nt",        label: "Hist. da Igreja",  ids: ["ACT"] },
-  { category: "letters",           label: "Cartas",           ids: ["ROM","1CO","2CO","GAL"] },
-  { category: "prison_letters",    label: "Cartas de Prisão", ids: ["EPH","PHP","COL","PHM"] },
-  { category: "pastoral_letters",  label: "Cartas Pastorais", ids: ["1TI","2TI","TIT"] },
-  { category: "general_letters",   label: "Cartas Gerais",    ids: ["HEB","JAS","1PE","2PE","1JN","2JN","3JN","JUD"] },
-  { category: "prophecy",          label: "Profecia",         ids: ["REV"] },
-]
-
 const BOOK_MAP = Object.fromEntries(BOOKS.map(b => [b.id, b]))
-
-function getBookCategory(bookId: string) {
-  return [...AT_GROUPS, ...NT_GROUPS].find(g => g.ids.includes(bookId)) ?? null
-}
 
 interface Verse { number: number; text: string }
 interface HlEntry { id: string; color: string }

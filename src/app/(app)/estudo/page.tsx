@@ -4,6 +4,7 @@ import Link from "next/link"
 import { Plus, FileText, BookOpen } from "lucide-react"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
+import { AT_GROUPS, NT_GROUPS, BOOK_CATEGORIES } from "@/lib/bible-categories"
 
 const AT_BOOKS = [
   { id: "GEN", name: "Gênesis",       desc: "Criação, queda e aliança" },
@@ -101,8 +102,13 @@ export default async function EstudoPage() {
     return acc
   }, {})
 
+  // Lookup único: bookId → { name, desc }
+  const BOOK_META = Object.fromEntries(
+    [...AT_BOOKS, ...NT_BOOKS].map(b => [b.id, b])
+  )
+
   return (
-    <div className="max-w-3xl mx-auto px-2 py-8 space-y-8 animate-fade-in">
+    <div className="max-w-3xl mx-auto px-2 py-8 space-y-8 animate-page-in">
 
       <div className="flex items-end justify-between">
         <div>
@@ -118,54 +124,94 @@ export default async function EstudoPage() {
 
       <div className="h-px bg-[#2e2b42]" />
 
-      {/* Antigo Testamento */}
-      <section className="space-y-3">
-        <div className="flex items-baseline gap-3">
-          <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em]">Antigo Testamento</p>
-          <span className="text-[#3d3a55] text-[10px]">39 livros</span>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          {AT_BOOKS.map(b => (
-            <Link key={b.id} href={`/estudo/livro/${b.id}`}
-              className="group card-soft px-3 py-3 flex flex-col gap-1.5">
-              <div className="flex items-center justify-between">
-                <BookOpen className="w-3 h-3 text-[#3d3a55] group-hover:text-[#c9a654] transition-colors" />
-                {notesPerBook[b.id] ? (
-                  <span className="text-[9px] text-[#55524a] bg-[#c9a65415] px-1.5 py-0.5 rounded-full">
-                    {notesPerBook[b.id]}
-                  </span>
-                ) : null}
+      {/* Antigo Testamento — agrupado por gênero literário */}
+      <section className="space-y-6">
+        <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.28em]">Antigo Testamento</p>
+        {AT_GROUPS.map(group => {
+          const cat = BOOK_CATEGORIES[group.category]
+          return (
+            <div key={group.category} className="space-y-2">
+              <div className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: cat.color }} />
+                <span className="font-display text-[8px] uppercase tracking-[0.28em]"
+                  style={{ color: cat.color, opacity: 0.85 }}>
+                  {cat.label}
+                </span>
+                <div className="flex-1 h-px" style={{ background: cat.color, opacity: 0.12 }} />
               </div>
-              <p className="font-serif text-[#8a8375] text-xs group-hover:text-[#c9c0a8] transition-colors leading-tight">{b.name}</p>
-              <p className="text-[#3d3a55] text-[10px] leading-tight">{b.desc}</p>
-            </Link>
-          ))}
-        </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                {group.ids.map(id => {
+                  const b = BOOK_META[id]
+                  if (!b) return null
+                  return (
+                    <Link key={id} href={`/estudo/livro/${id}`}
+                      className="group card-soft px-3 py-3 flex flex-col gap-1.5 border-l-2 transition-all"
+                      style={{ borderLeftColor: cat.color + "55" }}>
+                      <div className="flex items-center justify-between">
+                        <BookOpen className="w-3 h-3 transition-colors"
+                          style={{ color: cat.color, opacity: 0.45 }} />
+                        {notesPerBook[id] ? (
+                          <span className="text-[9px] text-[#55524a] px-1.5 py-0.5 rounded-full"
+                            style={{ background: cat.color + "18" }}>
+                            {notesPerBook[id]}
+                          </span>
+                        ) : null}
+                      </div>
+                      <p className="font-serif text-[#8a8375] text-xs group-hover:text-[#c9c0a8] transition-colors leading-tight">{b.name}</p>
+                      <p className="text-[#3d3a55] text-[10px] leading-tight">{b.desc}</p>
+                    </Link>
+                  )
+                })}
+              </div>
+            </div>
+          )
+        })}
       </section>
 
-      {/* Novo Testamento */}
-      <section className="space-y-3">
-        <div className="flex items-baseline gap-3">
-          <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em]">Novo Testamento</p>
-          <span className="text-[#3d3a55] text-[10px]">27 livros</span>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          {NT_BOOKS.map(b => (
-            <Link key={b.id} href={`/estudo/livro/${b.id}`}
-              className="group card-soft px-3 py-3 flex flex-col gap-1.5">
-              <div className="flex items-center justify-between">
-                <BookOpen className="w-3 h-3 text-[#3d3a55] group-hover:text-[#c9a654] transition-colors" />
-                {notesPerBook[b.id] ? (
-                  <span className="text-[9px] text-[#55524a] bg-[#c9a65415] px-1.5 py-0.5 rounded-full">
-                    {notesPerBook[b.id]}
-                  </span>
-                ) : null}
+      <div className="h-px bg-[#2e2b42] opacity-50" />
+
+      {/* Novo Testamento — agrupado por gênero literário */}
+      <section className="space-y-6">
+        <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.28em]">Novo Testamento</p>
+        {NT_GROUPS.map(group => {
+          const cat = BOOK_CATEGORIES[group.category]
+          return (
+            <div key={group.category} className="space-y-2">
+              <div className="flex items-center gap-2">
+                <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: cat.color }} />
+                <span className="font-display text-[8px] uppercase tracking-[0.28em]"
+                  style={{ color: cat.color, opacity: 0.85 }}>
+                  {cat.label}
+                </span>
+                <div className="flex-1 h-px" style={{ background: cat.color, opacity: 0.12 }} />
               </div>
-              <p className="font-serif text-[#8a8375] text-xs group-hover:text-[#c9c0a8] transition-colors leading-tight">{b.name}</p>
-              <p className="text-[#3d3a55] text-[10px] leading-tight">{b.desc}</p>
-            </Link>
-          ))}
-        </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+                {group.ids.map(id => {
+                  const b = BOOK_META[id]
+                  if (!b) return null
+                  return (
+                    <Link key={id} href={`/estudo/livro/${id}`}
+                      className="group card-soft px-3 py-3 flex flex-col gap-1.5 border-l-2 transition-all"
+                      style={{ borderLeftColor: cat.color + "55" }}>
+                      <div className="flex items-center justify-between">
+                        <BookOpen className="w-3 h-3 transition-colors"
+                          style={{ color: cat.color, opacity: 0.45 }} />
+                        {notesPerBook[id] ? (
+                          <span className="text-[9px] text-[#55524a] px-1.5 py-0.5 rounded-full"
+                            style={{ background: cat.color + "18" }}>
+                            {notesPerBook[id]}
+                          </span>
+                        ) : null}
+                      </div>
+                      <p className="font-serif text-[#8a8375] text-xs group-hover:text-[#c9c0a8] transition-colors leading-tight">{b.name}</p>
+                      <p className="text-[#3d3a55] text-[10px] leading-tight">{b.desc}</p>
+                    </Link>
+                  )
+                })}
+              </div>
+            </div>
+          )
+        })}
       </section>
 
       {/* Notas recentes */}
