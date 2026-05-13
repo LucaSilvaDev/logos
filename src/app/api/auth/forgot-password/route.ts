@@ -3,9 +3,8 @@ import { db } from "@/lib/db"
 import { Resend } from "resend"
 import crypto from "crypto"
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 export async function POST(req: Request) {
+  const resend = new Resend(process.env.RESEND_API_KEY)
   const { email } = await req.json()
   if (!email) return NextResponse.json({ error: "Email obrigatório" }, { status: 400 })
 
