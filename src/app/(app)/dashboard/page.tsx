@@ -94,12 +94,12 @@ export default async function DashboardPage() {
         {quote.source && <p className="text-[#55524a] text-xs mt-0.5">{quote.source}</p>}
       </div>
 
-      {/* Estatísticas animadas */}
-      <div className="flex gap-8">
-        <StatCounter label="Devocionais" value={devotionalCount} icon={NotebookPen} />
-        <StatCounter label="Grifos"      value={highlightCount}  icon={BookMarked} />
-        <StatCounter label="Notas"       value={studyCount}       icon={Search} />
-        <StatCounter label="Orações"     value={prayerCount}      icon={Heart} />
+      {/* Estatísticas animadas — ícones renderizados no servidor (JSX é serializável, função não é) */}
+      <div className="candle-enter candle-delay-5 flex gap-8">
+        <StatCounter label="Devocionais" value={devotionalCount}><NotebookPen className="w-3.5 h-3.5 text-[#3d3a55]" /></StatCounter>
+        <StatCounter label="Grifos"      value={highlightCount}> <BookMarked  className="w-3.5 h-3.5 text-[#3d3a55]" /></StatCounter>
+        <StatCounter label="Notas"       value={studyCount}>     <Search      className="w-3.5 h-3.5 text-[#3d3a55]" /></StatCounter>
+        <StatCounter label="Orações"     value={prayerCount}>    <Heart       className="w-3.5 h-3.5 text-[#3d3a55]" /></StatCounter>
       </div>
 
       {/* Módulos */}
