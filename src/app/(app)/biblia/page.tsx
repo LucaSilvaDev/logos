@@ -98,7 +98,7 @@ const BOOK_MAP = Object.fromEntries(BOOKS.map(b => [b.id, b]))
 
 interface Verse { number: number; text: string }
 interface HlEntry { id: string; color: string }
-interface HlPopover { x: number; y: number; key: string; verse: number }
+interface HlPopover { x: number; y: number; key: string; verse: number; text: string }
 
 function readSavedPos() {
   try {
@@ -121,8 +121,6 @@ function readSavedFont(): "sm" | "md" | "lg" {
     return s === "sm" || s === "lg" ? s : "md"
   } catch { return "md" }
 }
-
-interface SharePopover { x: number; y: number; text: string; ref: string }
 
 function wrapText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, maxWidth: number, lineHeight: number) {
   const words = text.split(" ")
@@ -218,13 +216,8 @@ export default function BibliaPage() {
   const [hlPopover, setHlPopover] = useState<HlPopover | null>(null)
   const popoverRef = useRef<HTMLDivElement>(null)
 
-  // Share popover
-  const [sharePopover, setSharePopover] = useState<SharePopover | null>(null)
-  const shareRef = useRef<HTMLDivElement>(null)
   const [copied, setCopied] = useState(false)
 
-  // Bookmark animation
-  const [bookmarkAnim, setBookmarkAnim] = useState<Set<string>>(new Set())
 
   // Reading progress bar
   const [scrollProgress, setScrollProgress] = useState(0)
@@ -246,7 +239,6 @@ export default function BibliaPage() {
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") {
         if (hlPopover)        { setHlPopover(null);        return }
-        if (sharePopover)     { setSharePopover(null);     return }
         if (showChapterModal) { setShowChapterModal(false); return }
         if (showBookModal)    { setShowBookModal(false);    return }
         if (focusMode) setFocusMode(false)
@@ -254,7 +246,7 @@ export default function BibliaPage() {
     }
     document.addEventListener("keydown", onKey)
     return () => document.removeEventListener("keydown", onKey)
-  }, [focusMode, hlPopover, sharePopover, showChapterModal, showBookModal])
+  }, [focusMode, hlPopover, showChapterModal, showBookModal])
 
   useEffect(() => {
     if (!hlPopover) return
@@ -266,17 +258,6 @@ export default function BibliaPage() {
     document.addEventListener("mousedown", onDown)
     return () => document.removeEventListener("mousedown", onDown)
   }, [hlPopover])
-
-  useEffect(() => {
-    if (!sharePopover) return
-    function onDown(e: MouseEvent) {
-      if (shareRef.current && !shareRef.current.contains(e.target as Node)) {
-        setSharePopover(null)
-      }
-    }
-    document.addEventListener("mousedown", onDown)
-    return () => document.removeEventListener("mousedown", onDown)
-  }, [sharePopover])
 
   // Persist reading position
   useEffect(() => {
@@ -384,58 +365,50 @@ export default function BibliaPage() {
     setBook(b); setChapter(1); setDirection("next"); setAnimKey(k => k + 1)
   }
 
-  function openStudyNote(e: React.MouseEvent, verseNumber: number) {
-    e.stopPropagation()
+  function openStudyNote(verseNumber: number) {
     const bookName = BOOK_ID_NAMES[book.id] ?? book.name
     router.push(`/estudo/nova?book=${encodeURIComponent(bookName)}&chapter=${chapter}&verse=${verseNumber}`)
   }
 
-  function handleShareClick(e: React.MouseEvent, verseText: string, verseNumber: number) {
-    e.stopPropagation()
-    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
-    const bookName = BOOK_ID_NAMES[book.id] ?? book.name
-    const verseRef = `${bookName} ${chapter}:${verseNumber}`
-    setSharePopover({
-      x: Math.min(Math.max(e.clientX, 100), window.innerWidth - 100),
-      y: rect.top + window.scrollY,
-      text: verseText,
-      ref: verseRef,
-    })
-  }
-
   async function copyVerse() {
-    if (!sharePopover) return
-    await navigator.clipboard.writeText(`"${sharePopover.text}" — ${sharePopover.ref}`)
+    if (!hlPopover) return
+    const bookName = BOOK_ID_NAMES[book.id] ?? book.name
+    const verseRef = `${bookName} ${chapter}:${hlPopover.verse}`
+    await navigator.clipboard.writeText(`"${hlPopover.text}" — ${verseRef}`)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
 
   async function shareVerse() {
-    if (!sharePopover) return
-    const shareText = `"${sharePopover.text}"\n\n— ${sharePopover.ref}\n\nSelah`
+    if (!hlPopover) return
+    const bookName = BOOK_ID_NAMES[book.id] ?? book.name
+    const verseRef = `${bookName} ${chapter}:${hlPopover.verse}`
+    const shareText = `"${hlPopover.text}"\n\n— ${verseRef}\n\nSelah`
     if (navigator.share) {
       await navigator.share({ text: shareText }).catch(() => {})
     }
-    setSharePopover(null)
+    setHlPopover(null)
   }
 
   function downloadVerseImage() {
-    if (!sharePopover) return
-    const dataUrl = generateVerseImage(sharePopover.text, sharePopover.ref)
+    if (!hlPopover) return
+    const bookName = BOOK_ID_NAMES[book.id] ?? book.name
+    const verseRef = `${bookName} ${chapter}:${hlPopover.verse}`
+    const dataUrl = generateVerseImage(hlPopover.text, verseRef)
     const a = document.createElement("a")
     a.href = dataUrl
-    a.download = `${sharePopover.ref.replace(/\s/g, "_")}.png`
+    a.download = `${verseRef.replace(/\s/g, "_")}.png`
     a.click()
-    setSharePopover(null)
+    setHlPopover(null)
   }
 
-  // Show floating color picker when verse is clicked
-  function handleVerseClick(e: React.MouseEvent, key: string, verseNumber: number) {
+  // Show unified actions popover when verse is clicked
+  function handleVerseClick(e: React.MouseEvent, key: string, verseNumber: number, verseText: string) {
     e.stopPropagation()
     const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
     const popX = Math.min(Math.max(e.clientX, 80), window.innerWidth - 80)
     const popY = rect.top + window.scrollY
-    setHlPopover({ x: popX, y: popY, key, verse: verseNumber })
+    setHlPopover({ x: popX, y: popY, key, verse: verseNumber, text: verseText })
   }
 
   async function applyHighlightColor(color: string) {
@@ -496,8 +469,6 @@ export default function BibliaPage() {
         body: JSON.stringify({ id: existingId }),
       }).catch(() => {})
     } else {
-      setBookmarkAnim(prev => new Set(prev).add(key))
-      setTimeout(() => setBookmarkAnim(prev => { const n = new Set(prev); n.delete(key); return n }), 500)
       setBookmarked(prev => ({ ...prev, [key]: "pending" }))
       const res  = await fetch("/api/biblia/bookmarks", {
         method: "POST",
@@ -678,32 +649,19 @@ export default function BibliaPage() {
               fontSize === "lg" && "bible-text-lg",
             )}>
               {verses.map(v => {
-                const key         = `${book.id}-${chapter}-${v.number}`
-                const hlEntry     = highlighted[key]
-                const hlCls       = hlEntry ? `hl-${hlEntry.color}` : ""
-                const isBookmarked = key in bookmarked
+                const key     = `${book.id}-${chapter}-${v.number}`
+                const hlEntry = highlighted[key]
+                const hlCls   = hlEntry ? `hl-${hlEntry.color}` : ""
                 return (
                   <span key={v.number}
-                    onClick={e => handleVerseClick(e, key, v.number)}
+                    onClick={e => handleVerseClick(e, key, v.number, v.text)}
                     className={cn(
-                      "group relative cursor-pointer transition-colors rounded-sm",
+                      "cursor-pointer transition-colors rounded-sm",
                       hlCls,
                       !hlEntry && "hover:bg-[#c9a65408]"
                     )}>
                     <sup className="verse-number">{v.number}</sup>
                     <span>{v.text}</span>
-                    {" "}
-                    <span className="inline-flex items-center gap-1 align-middle opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button onClick={e => { e.stopPropagation(); toggleBookmark(key, v.number) }} title="Marcador">
-                        <Bookmark className={cn("w-2.5 h-2.5", isBookmarked ? "text-[#c9a654] fill-[#c9a654]" : "text-[#3d3a55] hover:text-[#55524a]", bookmarkAnim.has(key) && "bookmark-pop")} />
-                      </button>
-                      <button onClick={e => openStudyNote(e, v.number)} title="Nova nota de estudo">
-                        <PenLine className="w-2.5 h-2.5 text-[#3d3a55] hover:text-[#c9a654]" />
-                      </button>
-                      <button onClick={e => handleShareClick(e, v.text, v.number)} title="Compartilhar versículo">
-                        <Share2 className="w-2.5 h-2.5 text-[#3d3a55] hover:text-[#c9a654]" />
-                      </button>
-                    </span>
                     {" "}
                   </span>
                 )
@@ -758,49 +716,99 @@ export default function BibliaPage() {
         {readingArea}
       </div>
 
-      {/* Floating highlight color picker */}
+      {/* Unified verse actions popover */}
       {hlPopover && (
         <div
           ref={popoverRef}
-          className="fixed z-[200] flex items-center gap-2 px-3 py-2.5 rounded-2xl shadow-2xl animate-fade-in"
+          className="fixed z-[200] flex flex-col rounded-2xl shadow-2xl animate-fade-in w-72"
           style={{
             left: hlPopover.x,
             top: hlPopover.y,
-            transform: "translate(-50%, calc(-100% - 10px))",
+            transform: "translate(-50%, calc(-100% - 12px))",
             background: "rgba(22, 21, 36, 0.96)",
             backdropFilter: "blur(20px)",
-            boxShadow: "0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06)",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06)",
           }}
         >
-          {/* Small caret */}
           <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full w-0 h-0"
             style={{ borderLeft: "6px solid transparent", borderRight: "6px solid transparent", borderTop: "6px solid rgba(22,21,36,0.96)" }} />
 
-          {HL_COLORS.map(c => (
-            <button
-              key={c.id}
-              onClick={() => applyHighlightColor(c.id)}
-              title={c.id}
-              className={cn(
-                "w-5 h-5 rounded-full transition-all duration-150 hover:scale-110 active:scale-95",
-                highlighted[hlPopover.key]?.color === c.id && "ring-2 ring-white/40 ring-offset-1 ring-offset-[#16152400] scale-110"
-              )}
-              style={{ background: c.style }}
-            />
-          ))}
+          {/* Verse preview */}
+          <div className="px-4 pt-4 pb-3 border-b border-white/5">
+            <p className="font-serif text-[#8a8375] text-xs italic leading-relaxed line-clamp-2">
+              &ldquo;{hlPopover.text}&rdquo;
+            </p>
+            <p className="text-[#c9a654] text-[10px] mt-1.5 font-medium">
+              {BOOK_ID_NAMES[book.id] ?? book.name} {chapter}:{hlPopover.verse}
+            </p>
+          </div>
 
-          {highlighted[hlPopover.key] && (
-            <>
-              <div className="w-px h-4 bg-white/10" />
+          {/* Highlight colors */}
+          <div className="px-4 py-3 flex items-center gap-2 border-b border-white/5">
+            <span className="text-[9px] text-[#3d3a55] uppercase tracking-wider mr-1">Grifar</span>
+            {HL_COLORS.map(c => (
               <button
-                onClick={removeHighlightFromPopover}
-                title="Remover grifo"
-                className="text-[#55524a] hover:text-[#c96b5a] transition-colors"
+                key={c.id}
+                onClick={() => applyHighlightColor(c.id)}
+                title={c.id}
+                className={cn(
+                  "w-5 h-5 rounded-full transition-all duration-150 hover:scale-110 active:scale-95",
+                  highlighted[hlPopover.key]?.color === c.id && "ring-2 ring-white/40 ring-offset-1 ring-offset-[#16152400] scale-110"
+                )}
+                style={{ background: c.style }}
+              />
+            ))}
+            {highlighted[hlPopover.key] && (
+              <>
+                <div className="w-px h-4 bg-white/10 ml-1" />
+                <button onClick={removeHighlightFromPopover} title="Remover grifo"
+                  className="text-[#55524a] hover:text-[#c96b5a] transition-colors">
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </>
+            )}
+          </div>
+
+          {/* Actions */}
+          <div className="flex flex-col px-2 py-2">
+            <button
+              onClick={() => { toggleBookmark(hlPopover.key, hlPopover.verse); setHlPopover(null) }}
+              className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[#8a8375] hover:text-[#c9c0a8] hover:bg-white/5 transition-all text-left"
+            >
+              <Bookmark className={cn("w-3.5 h-3.5", (hlPopover.key in bookmarked) ? "text-[#c9a654] fill-[#c9a654]" : "")} />
+              {hlPopover.key in bookmarked ? "Remover marcador" : "Adicionar marcador"}
+            </button>
+            <button
+              onClick={copyVerse}
+              className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[#8a8375] hover:text-[#c9c0a8] hover:bg-white/5 transition-all text-left"
+            >
+              {copied ? <Check className="w-3.5 h-3.5 text-[#5a9e72]" /> : <Copy className="w-3.5 h-3.5" />}
+              {copied ? "Copiado!" : "Copiar versículo"}
+            </button>
+            <button
+              onClick={() => { openStudyNote(hlPopover.verse); setHlPopover(null) }}
+              className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[#8a8375] hover:text-[#c9c0a8] hover:bg-white/5 transition-all text-left"
+            >
+              <PenLine className="w-3.5 h-3.5" />
+              Nova nota de estudo
+            </button>
+            {typeof navigator !== "undefined" && "share" in navigator && (
+              <button
+                onClick={shareVerse}
+                className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[#8a8375] hover:text-[#c9c0a8] hover:bg-white/5 transition-all text-left"
               >
-                <Trash2 className="w-3.5 h-3.5" />
+                <Share2 className="w-3.5 h-3.5" />
+                Compartilhar
               </button>
-            </>
-          )}
+            )}
+            <button
+              onClick={downloadVerseImage}
+              className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[#8a8375] hover:text-[#c9c0a8] hover:bg-white/5 transition-all text-left"
+            >
+              <span className="w-3.5 h-3.5 flex items-center justify-center text-[10px]">⬇</span>
+              Baixar imagem
+            </button>
+          </div>
         </div>
       )}
 
@@ -847,62 +855,6 @@ export default function BibliaPage() {
                 ))}
               </div>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* Share verse popover */}
-      {sharePopover && (
-        <div
-          ref={shareRef}
-          className="fixed z-[200] flex flex-col gap-2.5 p-4 rounded-2xl shadow-2xl animate-fade-in w-72"
-          style={{
-            left: sharePopover.x,
-            top: sharePopover.y,
-            transform: "translate(-50%, calc(-100% - 12px))",
-            background: "rgba(22, 21, 36, 0.96)",
-            backdropFilter: "blur(20px)",
-            boxShadow: "0 8px 32px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06)",
-          }}
-        >
-          <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-full w-0 h-0"
-            style={{ borderLeft: "6px solid transparent", borderRight: "6px solid transparent", borderTop: "6px solid rgba(22,21,36,0.96)" }} />
-
-          {/* Verse preview */}
-          <div className="border-b border-white/5 pb-2.5">
-            <p className="font-serif text-[#8a8375] text-xs italic leading-relaxed line-clamp-3">
-              &ldquo;{sharePopover.text}&rdquo;
-            </p>
-            <p className="text-[#c9a654] text-[10px] mt-1.5 font-medium">{sharePopover.ref}</p>
-          </div>
-
-          {/* Actions */}
-          <div className="flex flex-col gap-1">
-            <button
-              onClick={copyVerse}
-              className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[#8a8375] hover:text-[#c9c0a8] hover:bg-white/5 transition-all text-left"
-            >
-              {copied ? <Check className="w-3.5 h-3.5 text-[#5a9e72]" /> : <Copy className="w-3.5 h-3.5" />}
-              {copied ? "Copiado!" : "Copiar versículo"}
-            </button>
-
-            {typeof navigator !== "undefined" && "share" in navigator && (
-              <button
-                onClick={shareVerse}
-                className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[#8a8375] hover:text-[#c9c0a8] hover:bg-white/5 transition-all text-left"
-              >
-                <Share2 className="w-3.5 h-3.5" />
-                Compartilhar
-              </button>
-            )}
-
-            <button
-              onClick={downloadVerseImage}
-              className="flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs text-[#8a8375] hover:text-[#c9c0a8] hover:bg-white/5 transition-all text-left"
-            >
-              <span className="w-3.5 h-3.5 flex items-center justify-center text-[10px]">⬇</span>
-              Baixar imagem
-            </button>
           </div>
         </div>
       )}
