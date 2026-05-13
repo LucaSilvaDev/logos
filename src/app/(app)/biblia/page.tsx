@@ -633,8 +633,8 @@ export default function BibliaPage() {
             <div className="text-center mb-12 relative">
               {/* Chapter number watermark */}
               <div className="pointer-events-none select-none absolute inset-0 flex items-center justify-center overflow-hidden">
-                <span className="font-display font-bold leading-none"
-                  style={{ fontSize: "clamp(7rem, 35vw, 16rem)", opacity: 0.022, color: bookCat ? BOOK_CATEGORIES[bookCat.category].color : "white" }}>
+                <span className="font-display font-bold leading-none chapter-watermark"
+                  style={{ fontSize: "clamp(7rem, 35vw, 16rem)", color: bookCat ? BOOK_CATEGORIES[bookCat.category].color : "#c9a654" }}>
                   {chapter}
                 </span>
               </div>
