@@ -107,6 +107,18 @@ export default async function EstudoPage() {
     [...AT_BOOKS, ...NT_BOOKS].map(b => [b.id, b])
   )
 
+  // Grupos únicos para a legenda (cartas unificadas em uma entrada)
+  const LEGEND = [
+    { color: "#c9a654", label: "Lei — Pentateuco",   desc: "Os 5 livros de Moisés: criação, aliança e a lei dada a Israel no Sinai." },
+    { color: "#6b8fa8", label: "História",            desc: "Do Josué ao Ester e Atos — a narrativa histórica do povo de Deus na terra." },
+    { color: "#a87b9c", label: "Poesia e Sabedoria",  desc: "Jó a Cânticos — adoração, sofrimento, sabedoria prática e amor contemplativo." },
+    { color: "#4a7a5a", label: "Grandes Profetas",    desc: "Isaías a Daniel — profecias extensas sobre julgamento e esperança messiânica." },
+    { color: "#7aaa82", label: "Profetas Menores",    desc: "Oséias a Malaquias — doze vozes proféticas, curtas, mas não menos importantes." },
+    { color: "#7a6aaa", label: "Evangelhos",          desc: "Mateus a João — a vida, morte e ressurreição de Jesus Cristo em quatro perspectivas." },
+    { color: "#c4783a", label: "Cartas",              desc: "Romanos a Judas — ensinos doutrinários e práticos enviados às igrejas e líderes." },
+    { color: "#c9a654", label: "Profecia",            desc: "Apocalipse — visões do fim dos tempos, juízo final e a vitória definitiva de Cristo." },
+  ]
+
   return (
     <div className="max-w-3xl mx-auto px-2 py-8 space-y-8 animate-page-in">
 
@@ -124,7 +136,27 @@ export default async function EstudoPage() {
 
       <div className="h-px bg-[#2e2b42]" />
 
-      {/* Antigo Testamento — agrupado por gênero literário */}
+      {/* Legenda de cores */}
+      <section className="card-soft px-5 py-4 space-y-3">
+        <p className="font-display text-[9px] text-[#55524a] uppercase tracking-[0.25em]">Guia de Cores — Gêneros Literários</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
+          {LEGEND.map((item, i) => (
+            <div key={i} className="flex items-start gap-3">
+              <div className="w-[3px] self-stretch rounded-full flex-shrink-0 mt-0.5"
+                style={{ background: item.color }} />
+              <div>
+                <p className="font-display text-[9px] uppercase tracking-[0.2em] mb-0.5"
+                  style={{ color: item.color }}>
+                  {item.label}
+                </p>
+                <p className="text-[#55524a] text-[10px] leading-relaxed">{item.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Antigo Testamento — agrupado por gênero */}
       <section className="space-y-6">
         <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.28em]">Antigo Testamento</p>
         {AT_GROUPS.map(group => {
@@ -132,12 +164,12 @@ export default async function EstudoPage() {
           return (
             <div key={group.category} className="space-y-2">
               <div className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: cat.color }} />
+                <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: cat.color }} />
                 <span className="font-display text-[8px] uppercase tracking-[0.28em]"
-                  style={{ color: cat.color, opacity: 0.85 }}>
+                  style={{ color: cat.color }}>
                   {cat.label}
                 </span>
-                <div className="flex-1 h-px" style={{ background: cat.color, opacity: 0.12 }} />
+                <div className="flex-1 h-px" style={{ background: cat.color, opacity: 0.15 }} />
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
                 {group.ids.map(id => {
@@ -145,19 +177,21 @@ export default async function EstudoPage() {
                   if (!b) return null
                   return (
                     <Link key={id} href={`/estudo/livro/${id}`}
-                      className="group card-soft px-3 py-3 flex flex-col gap-1.5 border-l-2 transition-all"
-                      style={{ borderLeftColor: cat.color + "55" }}>
+                      className="group card-soft px-3 py-3 flex flex-col gap-1.5 transition-all"
+                      style={{ borderLeft: `3px solid ${cat.color}` }}>
                       <div className="flex items-center justify-between">
-                        <BookOpen className="w-3 h-3 transition-colors"
-                          style={{ color: cat.color, opacity: 0.45 }} />
+                        <span className="font-display text-[7px] uppercase tracking-[0.18em]"
+                          style={{ color: cat.color }}>
+                          {cat.label}
+                        </span>
                         {notesPerBook[id] ? (
                           <span className="text-[9px] text-[#55524a] px-1.5 py-0.5 rounded-full"
-                            style={{ background: cat.color + "18" }}>
+                            style={{ background: cat.color + "22" }}>
                             {notesPerBook[id]}
                           </span>
                         ) : null}
                       </div>
-                      <p className="font-serif text-[#8a8375] text-xs group-hover:text-[#c9c0a8] transition-colors leading-tight">{b.name}</p>
+                      <p className="font-serif text-[#8a8375] text-sm group-hover:text-[#c9c0a8] transition-colors leading-tight">{b.name}</p>
                       <p className="text-[#3d3a55] text-[10px] leading-tight">{b.desc}</p>
                     </Link>
                   )
@@ -170,7 +204,7 @@ export default async function EstudoPage() {
 
       <div className="h-px bg-[#2e2b42] opacity-50" />
 
-      {/* Novo Testamento — agrupado por gênero literário */}
+      {/* Novo Testamento — agrupado por gênero */}
       <section className="space-y-6">
         <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.28em]">Novo Testamento</p>
         {NT_GROUPS.map(group => {
@@ -178,12 +212,12 @@ export default async function EstudoPage() {
           return (
             <div key={group.category} className="space-y-2">
               <div className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: cat.color }} />
+                <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: cat.color }} />
                 <span className="font-display text-[8px] uppercase tracking-[0.28em]"
-                  style={{ color: cat.color, opacity: 0.85 }}>
+                  style={{ color: cat.color }}>
                   {cat.label}
                 </span>
-                <div className="flex-1 h-px" style={{ background: cat.color, opacity: 0.12 }} />
+                <div className="flex-1 h-px" style={{ background: cat.color, opacity: 0.15 }} />
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
                 {group.ids.map(id => {
@@ -191,19 +225,21 @@ export default async function EstudoPage() {
                   if (!b) return null
                   return (
                     <Link key={id} href={`/estudo/livro/${id}`}
-                      className="group card-soft px-3 py-3 flex flex-col gap-1.5 border-l-2 transition-all"
-                      style={{ borderLeftColor: cat.color + "55" }}>
+                      className="group card-soft px-3 py-3 flex flex-col gap-1.5 transition-all"
+                      style={{ borderLeft: `3px solid ${cat.color}` }}>
                       <div className="flex items-center justify-between">
-                        <BookOpen className="w-3 h-3 transition-colors"
-                          style={{ color: cat.color, opacity: 0.45 }} />
+                        <span className="font-display text-[7px] uppercase tracking-[0.18em]"
+                          style={{ color: cat.color }}>
+                          {cat.label}
+                        </span>
                         {notesPerBook[id] ? (
                           <span className="text-[9px] text-[#55524a] px-1.5 py-0.5 rounded-full"
-                            style={{ background: cat.color + "18" }}>
+                            style={{ background: cat.color + "22" }}>
                             {notesPerBook[id]}
                           </span>
                         ) : null}
                       </div>
-                      <p className="font-serif text-[#8a8375] text-xs group-hover:text-[#c9c0a8] transition-colors leading-tight">{b.name}</p>
+                      <p className="font-serif text-[#8a8375] text-sm group-hover:text-[#c9c0a8] transition-colors leading-tight">{b.name}</p>
                       <p className="text-[#3d3a55] text-[10px] leading-tight">{b.desc}</p>
                     </Link>
                   )
