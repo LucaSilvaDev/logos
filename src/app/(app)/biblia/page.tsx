@@ -716,96 +716,92 @@ export default function BibliaPage() {
         {readingArea}
       </div>
 
-      {/* Bottom verse action bar */}
+      {/* Bottom verse action bar — liquid glass */}
       {hlPopover && (
         <div
           ref={popoverRef}
-          className="fixed bottom-0 left-0 right-0 z-[200] animate-slide-up"
+          className="fixed bottom-0 left-0 right-0 z-[200] animate-slide-up flex items-center gap-1.5 px-4 py-2 overflow-x-auto"
           style={{
-            background: "rgba(13, 12, 23, 0.98)",
-            backdropFilter: "blur(24px)",
-            boxShadow: "0 -1px 0 rgba(255,255,255,0.06), 0 -12px 40px rgba(0,0,0,0.5)",
+            background: "rgba(255,255,255,0.04)",
+            backdropFilter: "blur(48px) saturate(1.8)",
+            WebkitBackdropFilter: "blur(48px) saturate(1.8)",
+            borderTop: "1px solid rgba(255,255,255,0.09)",
+            boxShadow: "0 -8px 32px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.06)",
           }}
         >
-          {/* Reference row */}
-          <div className="flex items-center justify-between px-5 pt-3.5 pb-2.5 border-b border-white/5">
-            <div className="flex items-baseline gap-3 min-w-0">
-              <span className="text-[#c9a654] text-sm font-serif font-medium shrink-0">
-                {BOOK_ID_NAMES[book.id] ?? book.name} {chapter}:{hlPopover.verse}
-              </span>
-              <span className="text-[#3d3a55] text-xs font-serif italic truncate">
-                &ldquo;{hlPopover.text.length > 70 ? hlPopover.text.slice(0, 70) + "…" : hlPopover.text}&rdquo;
-              </span>
-            </div>
-            <button onClick={() => setHlPopover(null)} className="text-[#3d3a55] hover:text-[#8a8375] transition-colors ml-4 shrink-0">
-              <X className="w-4 h-4" />
-            </button>
-          </div>
+          {/* Reference */}
+          <span className="text-[#c9a654] text-[11px] font-serif font-medium shrink-0 mr-1">
+            {BOOK_ID_NAMES[book.id] ?? book.name} {chapter}:{hlPopover.verse}
+          </span>
 
-          {/* Actions row */}
-          <div className="flex items-center gap-1 px-4 py-2.5 overflow-x-auto">
-            {/* Highlight swatches */}
-            <span className="text-[9px] text-[#3d3a55] uppercase tracking-wider mr-1 shrink-0">Grifar</span>
-            {HL_COLORS.map(c => (
-              <button
-                key={c.id}
-                onClick={() => applyHighlightColor(c.id)}
-                title={c.id}
-                className={cn(
-                  "w-6 h-6 rounded-full shrink-0 transition-all duration-150 hover:scale-110 active:scale-95",
-                  highlighted[hlPopover.key]?.color === c.id && "ring-2 ring-white/40 scale-110"
-                )}
-                style={{ background: c.style }}
-              />
-            ))}
-            {highlighted[hlPopover.key] && (
-              <button onClick={removeHighlightFromPopover} title="Remover grifo"
-                className="text-[#55524a] hover:text-[#c96b5a] transition-colors ml-0.5 shrink-0">
-                <Trash2 className="w-3.5 h-3.5" />
-              </button>
-            )}
+          <div className="w-px h-4 bg-white/10 shrink-0 mx-1" />
 
-            <div className="w-px h-5 bg-white/10 mx-2 shrink-0" />
+          {/* Highlight swatches */}
+          {HL_COLORS.map(c => (
+            <button
+              key={c.id}
+              onClick={() => applyHighlightColor(c.id)}
+              title={c.id}
+              className={cn(
+                "w-5 h-5 rounded-full shrink-0 transition-all duration-150 hover:scale-110 active:scale-95",
+                highlighted[hlPopover.key]?.color === c.id && "ring-2 ring-white/50 scale-110"
+              )}
+              style={{ background: c.style }}
+            />
+          ))}
+          {highlighted[hlPopover.key] && (
+            <button onClick={removeHighlightFromPopover} title="Remover grifo"
+              className="text-[#55524a] hover:text-[#c96b5a] transition-colors shrink-0">
+              <Trash2 className="w-3 h-3" />
+            </button>
+          )}
 
-            {/* Action buttons */}
+          <div className="w-px h-4 bg-white/10 shrink-0 mx-1" />
+
+          {/* Actions */}
+          <button
+            onClick={() => { toggleBookmark(hlPopover.key, hlPopover.verse); setHlPopover(null) }}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] text-[#8a8375] hover:text-[#c9c0a8] hover:bg-white/5 transition-all shrink-0"
+          >
+            <Bookmark className={cn("w-3 h-3 shrink-0", (hlPopover.key in bookmarked) ? "text-[#c9a654] fill-[#c9a654]" : "")} />
+            {hlPopover.key in bookmarked ? "Remover" : "Marcador"}
+          </button>
+          <button
+            onClick={copyVerse}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] text-[#8a8375] hover:text-[#c9c0a8] hover:bg-white/5 transition-all shrink-0"
+          >
+            {copied ? <Check className="w-3 h-3 text-[#5a9e72]" /> : <Copy className="w-3 h-3" />}
+            {copied ? "Copiado!" : "Copiar"}
+          </button>
+          <button
+            onClick={() => { openStudyNote(hlPopover.verse); setHlPopover(null) }}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] text-[#8a8375] hover:text-[#c9c0a8] hover:bg-white/5 transition-all shrink-0"
+          >
+            <PenLine className="w-3 h-3" />
+            Nota
+          </button>
+          {typeof navigator !== "undefined" && "share" in navigator && (
             <button
-              onClick={() => { toggleBookmark(hlPopover.key, hlPopover.verse); setHlPopover(null) }}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs text-[#8a8375] hover:text-[#c9c0a8] hover:bg-white/5 transition-all shrink-0"
+              onClick={shareVerse}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] text-[#8a8375] hover:text-[#c9c0a8] hover:bg-white/5 transition-all shrink-0"
             >
-              <Bookmark className={cn("w-3.5 h-3.5 shrink-0", (hlPopover.key in bookmarked) ? "text-[#c9a654] fill-[#c9a654]" : "")} />
-              {hlPopover.key in bookmarked ? "Remover" : "Marcador"}
+              <Share2 className="w-3 h-3" />
+              Compartilhar
             </button>
-            <button
-              onClick={copyVerse}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs text-[#8a8375] hover:text-[#c9c0a8] hover:bg-white/5 transition-all shrink-0"
-            >
-              {copied ? <Check className="w-3.5 h-3.5 text-[#5a9e72]" /> : <Copy className="w-3.5 h-3.5" />}
-              {copied ? "Copiado!" : "Copiar"}
-            </button>
-            <button
-              onClick={() => { openStudyNote(hlPopover.verse); setHlPopover(null) }}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs text-[#8a8375] hover:text-[#c9c0a8] hover:bg-white/5 transition-all shrink-0"
-            >
-              <PenLine className="w-3.5 h-3.5" />
-              Nota
-            </button>
-            {typeof navigator !== "undefined" && "share" in navigator && (
-              <button
-                onClick={shareVerse}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs text-[#8a8375] hover:text-[#c9c0a8] hover:bg-white/5 transition-all shrink-0"
-              >
-                <Share2 className="w-3.5 h-3.5" />
-                Compartilhar
-              </button>
-            )}
-            <button
-              onClick={downloadVerseImage}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs text-[#8a8375] hover:text-[#c9c0a8] hover:bg-white/5 transition-all shrink-0"
-            >
-              <span className="w-3.5 h-3.5 flex items-center justify-center text-[10px]">⬇</span>
-              Imagem
-            </button>
-          </div>
+          )}
+          <button
+            onClick={downloadVerseImage}
+            className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] text-[#8a8375] hover:text-[#c9c0a8] hover:bg-white/5 transition-all shrink-0"
+          >
+            <span className="w-3 h-3 flex items-center justify-center text-[9px]">⬇</span>
+            Imagem
+          </button>
+
+          <div className="flex-1" />
+
+          <button onClick={() => setHlPopover(null)} className="text-[#3d3a55] hover:text-[#55524a] transition-colors shrink-0 ml-1">
+            <X className="w-3.5 h-3.5" />
+          </button>
         </div>
       )}
 
