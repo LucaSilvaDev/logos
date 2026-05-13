@@ -2,15 +2,12 @@ import { NextResponse } from "next/server"
 import webpush from "web-push"
 import { db } from "@/lib/db"
 
-webpush.setVapidDetails(
-  process.env.VAPID_EMAIL!,
-  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
-  process.env.VAPID_PRIVATE_KEY!,
-)
-
-// Vercel Cron calls this endpoint every hour via GET.
-// Authorization header is checked to prevent unauthorized calls.
 export async function GET(req: Request) {
+  webpush.setVapidDetails(
+    process.env.VAPID_EMAIL ?? "mailto:noreply@example.com",
+    process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? "",
+    process.env.VAPID_PRIVATE_KEY ?? "",
+  )
   const auth = req.headers.get("authorization") ?? ""
   const secret = process.env.CRON_SECRET
   if (secret && auth !== `Bearer ${secret}`) {
