@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { NextResponse } from "next/server"
 import { z } from "zod"
+import { sanitizeRichText, sanitizePlainText } from "@/lib/sanitize"
 
 const schema = z.object({
   title:    z.string().min(1).max(200).optional(),
@@ -16,7 +17,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   const session = await auth()
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const devotional = await db.devotional.findUnique({ where: { id, userId: session.user.id } })
+  const devotional = await db.devotional.findFirst({ where: { id, userId: session.user.id } })
   if (!devotional) return NextResponse.json({ error: "Not found" }, { status: 404 })
 
   return NextResponse.json(devotional)
@@ -31,9 +32,15 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   const parsed = schema.safeParse(body)
   if (!parsed.success) return NextResponse.json({ error: "Invalid data" }, { status: 400 })
 
-  const devotional = await db.devotional.updateMany({
+  const data = { ...parsed.data }
+  if (typeof data.content === "string")  data.content  = sanitizeRichText(data.content)
+  if (typeof data.title === "string")    data.title    = sanitizePlainText(data.title)
+  if (typeof data.bibleRef === "string") data.bibleRef = sanitizePlainText(data.bibleRef)
+  if (typeof data.tags === "string")     data.tags     = sanitizePlainText(data.tags)
+
+  await db.devotional.updateMany({
     where: { id, userId: session.user.id },
-    data: parsed.data,
+    data,
   })
 
   return NextResponse.json({ ok: true })

@@ -31,6 +31,8 @@ export async function GET(req: Request) {
   return NextResponse.json(highlights)
 }
 
+const MAX_HIGHLIGHTS_PER_USER = 5000
+
 export async function POST(req: Request) {
   const session = await auth()
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -38,6 +40,11 @@ export async function POST(req: Request) {
   const body = await req.json()
   const parsed = createSchema.safeParse(body)
   if (!parsed.success) return NextResponse.json({ error: "Invalid data" }, { status: 400 })
+
+  const total = await db.highlight.count({ where: { userId: session.user.id } })
+  if (total >= MAX_HIGHLIGHTS_PER_USER) {
+    return NextResponse.json({ error: "Limite de destaques atingido" }, { status: 429 })
+  }
 
   const { book, chapter, verseStart, verseEnd, version, color } = parsed.data
 

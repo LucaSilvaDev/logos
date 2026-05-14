@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
+import { auth } from "@/lib/auth"
 
 // Maps USFM book IDs to Portuguese full names
 const BOOK_NAMES: Record<string, string> = {
@@ -24,6 +25,9 @@ const BOOK_NAMES: Record<string, string> = {
 const KNOWN_VERSIONS = ["nvi", "nvt", "naa", "nvi_yv", "nbvp"]
 
 export async function GET(req: Request) {
+  const session = await auth()
+  if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
   const { searchParams } = new URL(req.url)
   const q       = (searchParams.get("q") ?? "").trim()
   const version = searchParams.get("version") ?? "nvi"

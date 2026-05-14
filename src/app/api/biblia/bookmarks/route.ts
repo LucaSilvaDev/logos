@@ -30,6 +30,8 @@ export async function GET(req: Request) {
   return NextResponse.json(bookmarks)
 }
 
+const MAX_BOOKMARKS_PER_USER = 5000
+
 export async function POST(req: Request) {
   const session = await auth()
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -37,6 +39,11 @@ export async function POST(req: Request) {
   const body = await req.json()
   const parsed = createSchema.safeParse(body)
   if (!parsed.success) return NextResponse.json({ error: "Invalid data" }, { status: 400 })
+
+  const total = await db.bookmark.count({ where: { userId: session.user.id } })
+  if (total >= MAX_BOOKMARKS_PER_USER) {
+    return NextResponse.json({ error: "Limite de marcadores atingido" }, { status: 429 })
+  }
 
   const { book, chapter, verse, version, label } = parsed.data
 

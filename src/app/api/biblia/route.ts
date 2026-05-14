@@ -66,7 +66,7 @@ async function fetchFromYouVersion(bookId: string, chapter: string, version: str
     const verses = parseYVHtml(content)
 
     if (verses.length === 0) {
-      console.error("[biblia/youversion] Empty verses for", usfm, "| raw:", content.slice(0, 400))
+      console.error("[biblia/youversion] Empty verses", { usfm, version, contentLength: content.length })
       return NextResponse.json({ error: "API_ERROR", detail: "Nenhum versículo retornado" }, { status: 502 })
     }
 
@@ -170,7 +170,7 @@ async function fetchFromBibliaOnline(bookId: string, chapter: string, version: s
     })
 
     if (!res.ok) {
-      console.error("[biblia/bibliaonline] HTTP %d %s", res.status, url)
+      console.error("[biblia/bibliaonline] upstream error", { status: res.status, version, book: bookId, chapter })
       return NextResponse.json({ error: "API_ERROR", detail: `HTTP ${res.status}` }, { status: res.status })
     }
 
@@ -178,8 +178,7 @@ async function fetchFromBibliaOnline(bookId: string, chapter: string, version: s
     const verses = parseBibliaOnlineHtml(html)
 
     if (verses.length === 0) {
-      console.error("[biblia/bibliaonline] No verses found — url=%s html_len=%d snippet=%s",
-        url, html.length, html.slice(0, 300))
+      console.error("[biblia/bibliaonline] No verses parsed", { version, book: bookId, chapter, htmlLength: html.length })
       return NextResponse.json({ error: "API_ERROR", detail: "Nenhum versículo encontrado no HTML" }, { status: 502 })
     }
 
@@ -248,8 +247,7 @@ export async function GET(req: Request) {
       return NextResponse.json({ error: "AUTH_REQUIRED", version }, { status: 401 })
     }
     if (!res.ok) {
-      const text = await res.text().catch(() => "")
-      console.error("[biblia] API error: status=%d url=%s body=%s", res.status, url, text.slice(0, 300))
+      console.error("[biblia] upstream error", { status: res.status, version, book: bookId, chapter })
       return NextResponse.json({ error: "API_ERROR", detail: `HTTP ${res.status}` }, { status: res.status })
     }
 

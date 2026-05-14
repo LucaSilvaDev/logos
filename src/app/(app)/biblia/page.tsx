@@ -272,7 +272,6 @@ export default function BibliaPage() {
         if (active) setHighlighted(map)
       } catch { /* non-critical */ }
     }
-    setHighlighted({})
     load()
     return () => { active = false }
   }, [book, chapter, version])
@@ -292,7 +291,6 @@ export default function BibliaPage() {
         if (active) setBookmarked(map)
       } catch { /* non-critical */ }
     }
-    setBookmarked({})
     load()
     return () => { active = false }
   }, [book, chapter, version])

@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { NextResponse } from "next/server"
 import { z } from "zod"
+import { sanitizeRichText, sanitizePlainText } from "@/lib/sanitize"
 
 const schema = z.object({
   title:    z.string().min(1).max(200),
@@ -23,11 +24,11 @@ export async function POST(req: Request) {
   const devotional = await db.devotional.create({
     data: {
       userId: session.user.id,
-      title,
-      content,
-      bibleRef: bibleRef ?? null,
-      tags: tags ?? "",
-      mood: mood ?? null,
+      title:    sanitizePlainText(title),
+      content:  sanitizeRichText(content),
+      bibleRef: bibleRef ? sanitizePlainText(bibleRef) : null,
+      tags:     tags ? sanitizePlainText(tags) : "",
+      mood:     mood ?? null,
     },
   })
 

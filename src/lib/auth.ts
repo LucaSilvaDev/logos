@@ -7,9 +7,14 @@ import { db } from "@/lib/db"
 import { authConfig } from "@/lib/auth.config"
 
 const credentialsSchema = z.object({
-  email: z.string().email(),
+  email: z.string().email().toLowerCase(),
   password: z.string().min(8),
 })
+
+// Pre-computed dummy hash used to keep bcrypt timing constant when the e-mail
+// does not exist — prevents user enumeration via response-time analysis.
+// Generated once for the literal "dummy-password-never-matches".
+const DUMMY_HASH = "$2b$12$Nc97nbCCAlXSfL9TtD7mie3WSFxGBUTw1zzl5JbZlQ6Lhm4rVYt3O"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
@@ -31,10 +36,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const user = await db.user.findUnique({
           where: { email: parsed.data.email },
         })
-        if (!user || !user.password) return null
 
-        const valid = await bcrypt.compare(parsed.data.password, user.password)
-        if (!valid) return null
+        // Always run bcrypt.compare to equalize timing — if the user does not
+        // exist we compare against a fixed dummy hash so the response time is
+        // indistinguishable from a wrong-password attempt on a real account.
+        const hash = user?.password ?? DUMMY_HASH
+        const valid = await bcrypt.compare(parsed.data.password, hash)
+        if (!user || !user.password || !valid) return null
 
         return { id: user.id, name: user.name, email: user.email, image: user.image }
       },
