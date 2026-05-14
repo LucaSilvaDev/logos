@@ -395,27 +395,27 @@ body {
   box-shadow: 0 6px 32px rgba(110,75,20,0.07);
 }
 [data-theme="light"] .card-soft {
-  background: linear-gradient(160deg, rgba(253,246,234,0.92), rgba(250,240,224,0.86));
-  border-color: rgba(180,142,88,0.18);
-  box-shadow: 0 3px 16px rgba(110,75,20,0.1), 0 1px 3px rgba(110,75,20,0.06), inset 0 1px 0 rgba(255,255,255,0.7);
+  background: linear-gradient(160deg, rgba(244,232,212,0.88), rgba(238,224,202,0.80));
+  border-color: rgba(180,142,88,0.2);
+  box-shadow: 0 3px 16px rgba(110,75,20,0.1), 0 1px 3px rgba(110,75,20,0.06), inset 0 1px 0 rgba(255,255,255,0.5);
 }
 [data-theme="light"] .card-soft:hover {
-  background: linear-gradient(160deg, rgba(255,250,240,0.96), rgba(253,244,228,0.92));
-  border-color: rgba(180,142,88,0.28);
-  box-shadow: 0 6px 24px rgba(110,75,20,0.14), 0 2px 6px rgba(110,75,20,0.08), inset 0 1px 0 rgba(255,255,255,0.85);
+  background: linear-gradient(160deg, rgba(248,237,218,0.92), rgba(242,228,208,0.86));
+  border-color: rgba(180,142,88,0.3);
+  box-shadow: 0 6px 24px rgba(110,75,20,0.14), 0 2px 6px rgba(110,75,20,0.08), inset 0 1px 0 rgba(255,255,255,0.6);
 }
 [data-theme="light"] .surface {
-  background: linear-gradient(160deg, rgba(252,244,230,0.94), rgba(248,238,218,0.88));
-  border-color: rgba(180,142,88,0.16);
-  box-shadow: 0 4px 22px rgba(110,75,20,0.09), inset 0 1px 0 rgba(255,255,255,0.65);
+  background: linear-gradient(160deg, rgba(246,234,214,0.92), rgba(240,226,206,0.85));
+  border-color: rgba(180,142,88,0.18);
+  box-shadow: 0 4px 22px rgba(110,75,20,0.09), inset 0 1px 0 rgba(255,255,255,0.45);
 }
 [data-theme="light"] .surface-raised {
-  background: linear-gradient(160deg, rgba(255,250,240,0.97), rgba(253,244,228,0.93));
-  border-color: rgba(180,142,88,0.2);
-  box-shadow: 0 6px 28px rgba(110,75,20,0.11), inset 0 1px 0 rgba(255,255,255,0.75);
+  background: linear-gradient(160deg, rgba(250,238,220,0.95), rgba(244,232,212,0.90));
+  border-color: rgba(180,142,88,0.22);
+  box-shadow: 0 6px 28px rgba(110,75,20,0.11), inset 0 1px 0 rgba(255,255,255,0.55);
 }
 [data-theme="light"] .glass-card {
-  background: #F5EDD8;
+  background: #EFE0C4;
   border-color: rgba(163, 128, 80, 0.22);
 }
 [data-theme="light"] .app-input {
