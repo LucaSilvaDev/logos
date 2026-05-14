@@ -1,11 +1,12 @@
-﻿"use client"
+"use client"
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import {
   BookOpen, LayoutDashboard, NotebookPen, Search,
-  Clock, Church, Flame, Library, Heart, X, UserCircle
+  Clock, Church, Flame, Library, Heart, X, UserCircle,
+  ChevronsLeft, ChevronsRight,
 } from "lucide-react"
 
 const navItems = [
@@ -24,9 +25,11 @@ const navItems = [
 interface SidebarProps {
   open: boolean
   onClose: () => void
+  collapsed: boolean
+  onToggleCollapse: () => void
 }
 
-export function Sidebar({ open, onClose }: SidebarProps) {
+export function Sidebar({ open, onClose, collapsed, onToggleCollapse }: SidebarProps) {
   const pathname = usePathname()
 
   return (
@@ -40,37 +43,43 @@ export function Sidebar({ open, onClose }: SidebarProps) {
       )}
 
       <aside className={cn(
-        "flex flex-col w-56 shrink-0 sidebar",
-        // Mobile: overlay deslizante
+        "flex flex-col shrink-0 sidebar overflow-hidden",
         "fixed inset-y-0 left-0 z-40",
-        "transition-transform duration-300 ease-out",
+        "transition-all duration-300 ease-out",
+        // Mobile: sempre largura completa, overlay
+        "w-56",
         open ? "translate-x-0" : "-translate-x-full",
-        // Desktop: sempre visível, parte do fluxo
-        "md:relative md:translate-x-0 md:z-auto md:flex"
+        // Desktop: visível, largura depende do estado
+        "md:relative md:translate-x-0 md:z-auto md:flex",
+        collapsed ? "md:w-[60px]" : "md:w-56",
       )}>
 
         {/* Cabeçalho */}
-        <div className="flex items-center justify-between h-16 px-5">
-          <div className="flex items-center gap-2.5">
-            <BookOpen className="w-4 h-4 text-[#c9a654] opacity-75" />
-            <div>
-              <p className="font-display text-[#e2d9c5] text-sm tracking-[0.25em] uppercase">Selah</p>
-              <p className="text-[#3d3a55] text-[8px] tracking-widest uppercase font-sans mt-0.5">Pausa · Medita · Contempla</p>
-            </div>
+        <div className={cn(
+          "flex items-center h-16 px-4 gap-2.5 shrink-0",
+          collapsed && "md:justify-center md:px-0"
+        )}>
+          <BookOpen className="w-4 h-4 text-[#c9a654] opacity-75 shrink-0" />
+          <div className={cn(
+            "transition-all duration-200 overflow-hidden",
+            collapsed ? "md:w-0 md:opacity-0" : "opacity-100"
+          )}>
+            <p className="font-display text-[#e2d9c5] text-sm tracking-[0.25em] uppercase whitespace-nowrap">Selah</p>
+            <p className="text-[#3d3a55] text-[8px] tracking-widest uppercase font-sans mt-0.5 whitespace-nowrap">Pausa · Medita · Contempla</p>
           </div>
           <button
             onClick={onClose}
-            className="md:hidden text-[#3d3a55] hover:text-[#8a8375] transition-colors"
+            className={cn("ml-auto text-[#3d3a55] hover:text-[#8a8375] transition-colors md:hidden", collapsed && "hidden")}
             aria-label="Fechar menu"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="mx-5 h-px bg-[#2e2b42] opacity-50" />
+        <div className="mx-4 h-px bg-[#2e2b42] opacity-50 shrink-0" />
 
         {/* Navegação */}
-        <nav className="flex-1 px-3 py-5 overflow-y-auto space-y-0.5">
+        <nav className="flex-1 px-2 py-4 overflow-y-auto space-y-0.5">
           {navItems.map(({ href, icon: Icon, label }) => {
             const active = href === "/dashboard"
               ? pathname === "/dashboard"
@@ -81,7 +90,8 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                 href={href}
                 onClick={onClose}
                 className={cn(
-                  "group flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] transition-all duration-200",
+                  "group relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] transition-all duration-200",
+                  collapsed && "md:justify-center md:px-0",
                   active ? "nav-glow-active" : "nav-glow text-[#55524a]"
                 )}
               >
@@ -89,23 +99,76 @@ export function Sidebar({ open, onClose }: SidebarProps) {
                   "w-4 h-4 shrink-0 transition-colors duration-200",
                   active ? "text-[#c9a654]" : "text-[#3d3a55] group-hover:text-[#8a8375]"
                 )} />
-                <span className={cn("font-serif", active && "font-medium")}>{label}</span>
+
+                <span className={cn(
+                  "font-serif whitespace-nowrap transition-all duration-200 overflow-hidden",
+                  active && "font-medium",
+                  collapsed ? "md:w-0 md:opacity-0" : "opacity-100"
+                )}>
+                  {label}
+                </span>
+
                 {active && (
-                  <span className="ml-auto w-1 h-1 rounded-full bg-[#c9a654] shrink-0 brasa-pulse" />
+                  <span className={cn(
+                    "w-1 h-1 rounded-full bg-[#c9a654] shrink-0 brasa-pulse transition-all duration-200",
+                    collapsed ? "md:hidden" : "ml-auto"
+                  )} />
                 )}
+
+                {/* Tooltip — só quando recolhido, desktop */}
+                <span className={cn(
+                  "pointer-events-none absolute left-full ml-3 top-1/2 -translate-y-1/2",
+                  "px-2.5 py-1.5 rounded-lg text-[11px] text-[#e2d9c5] whitespace-nowrap",
+                  "bg-[#211f31] border border-[#2e2b42] shadow-lg",
+                  "opacity-0 group-hover:opacity-100 transition-opacity duration-150 z-50",
+                  collapsed ? "hidden md:block" : "hidden"
+                )}>
+                  {label}
+                </span>
               </Link>
             )
           })}
         </nav>
 
         {/* Rodapé confessional */}
-        <div className="px-5 py-5">
-          <div className="h-px bg-[#2e2b42] opacity-40 mb-4" />
-          <p className="text-[#3d3a55] text-[8px] uppercase tracking-widest font-sans mb-1.5">Confissão</p>
-          <p className="text-[#55524a] text-[10px] leading-relaxed font-serif italic">
+        <div className={cn(
+          "px-4 pt-0 pb-3 transition-all duration-200 overflow-hidden shrink-0",
+          collapsed ? "md:h-0 md:opacity-0 md:pb-0" : "opacity-100"
+        )}>
+          <div className="h-px bg-[#2e2b42] opacity-40 mb-3" />
+          <p className="text-[#3d3a55] text-[8px] uppercase tracking-widest font-sans mb-1.5 whitespace-nowrap">Confissão</p>
+          <p className="text-[#55524a] text-[10px] leading-relaxed font-serif italic whitespace-nowrap">
             Reformado · TULIP<br />
             <span className="text-[#c9a654] opacity-40 not-italic">Pós-Trib · Pré-Mil Histórico</span>
           </p>
+        </div>
+
+        {/* Botão recolher — desktop only */}
+        <div className={cn(
+          "hidden md:flex px-2 pb-3 shrink-0",
+          collapsed && "justify-center"
+        )}>
+          <div className="h-px bg-[#2e2b42] opacity-30 mb-3 w-full" />
+        </div>
+        <div className={cn(
+          "hidden md:flex px-2 pb-4 shrink-0",
+          collapsed && "justify-center"
+        )}>
+          <button
+            onClick={onToggleCollapse}
+            className={cn(
+              "flex items-center gap-2 px-3 py-2 rounded-xl w-full",
+              "text-[#3d3a55] hover:text-[#8a8375] hover:bg-[#1a1928]",
+              "transition-all duration-200 text-[11px] font-sans",
+              collapsed && "justify-center px-2 w-auto"
+            )}
+            title={collapsed ? "Expandir menu" : "Recolher menu"}
+          >
+            {collapsed
+              ? <ChevronsRight className="w-3.5 h-3.5" />
+              : <><ChevronsLeft className="w-3.5 h-3.5 shrink-0" /><span>Recolher</span></>
+            }
+          </button>
         </div>
       </aside>
     </>

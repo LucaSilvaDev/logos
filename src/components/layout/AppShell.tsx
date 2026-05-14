@@ -15,13 +15,22 @@ interface AppShellProps {
 
 export function AppShell({ children, userName, userImage }: AppShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [theme, setTheme] = useState<"dark" | "light">("dark")
   const pathname = usePathname()
 
   useEffect(() => {
-    const saved = localStorage.getItem("selah-theme")
-    if (saved === "light") setTheme("light")
+    const savedTheme = localStorage.getItem("selah-theme")
+    if (savedTheme === "light") setTheme("light")
+    const savedCollapsed = localStorage.getItem("selah-sidebar-collapsed")
+    if (savedCollapsed === "1") setSidebarCollapsed(true)
   }, [])
+
+  function toggleCollapse() {
+    const next = !sidebarCollapsed
+    setSidebarCollapsed(next)
+    localStorage.setItem("selah-sidebar-collapsed", next ? "1" : "0")
+  }
 
   function toggleTheme() {
     const next = theme === "dark" ? "light" : "dark"
@@ -48,7 +57,12 @@ export function AppShell({ children, userName, userImage }: AppShellProps) {
       <div className="liquid-orb-2" />
       <div className="liquid-orb-3" />
 
-      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <Sidebar
+        open={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+        collapsed={sidebarCollapsed}
+        onToggleCollapse={toggleCollapse}
+      />
 
       <div className="flex flex-col flex-1 min-w-0 relative z-10">
         <Topbar
