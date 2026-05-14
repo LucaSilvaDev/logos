@@ -96,7 +96,7 @@ const HL_COLORS = [
 
 const BOOK_MAP = Object.fromEntries(BOOKS.map(b => [b.id, b]))
 
-interface Verse { number: number; text: string; endNumber?: number }
+interface Verse { number: number; text: string; endNumber?: number; heading?: string }
 interface HlEntry { id: string; color: string }
 
 function readSavedPos() {
@@ -317,7 +317,7 @@ export default function BibliaPage() {
         setApiError("ERROR")
         return
       }
-      setVerses((data.verses ?? []).map((v: Verse) => ({ number: v.number, text: v.text, endNumber: v.endNumber })))
+      setVerses((data.verses ?? []).map((v: Verse) => ({ number: v.number, text: v.text, endNumber: v.endNumber, heading: v.heading })))
     } catch {
       setApiError("ERROR")
     } finally {
@@ -657,21 +657,34 @@ export default function BibliaPage() {
                 // Stagger first 16 verses; remainder all enter at the same cap delay
                 const enterDelay = Math.min(index, 15) * 30
                 return (
-                  <span key={v.number}
-                    onClick={e => handleVerseClick(e, v.number)}
-                    style={{ animationDelay: `${enterDelay}ms` }}
-                    className={cn(
-                      "verse-enter cursor-pointer transition-colors duration-300 rounded-sm",
-                      hlCls,
-                      selectedVerses.has(v.number)
-                        ? "bg-[#c9a65418] underline decoration-[#c9a654]/35 decoration-1 underline-offset-2"
-                        : !hlEntry && "hover:bg-[#c9a65408]"
-                    )}>
-                    <sup className="verse-number">
-                      {v.endNumber && v.endNumber !== v.number ? `${v.number}–${v.endNumber}` : v.number}
-                    </sup>
-                    <span>{v.text}</span>
-                    {" "}
+                  <span key={v.number}>
+                    {v.heading && (
+                      <span
+                        className="verse-enter bible-section-heading"
+                        style={{
+                          animationDelay: `${enterDelay}ms`,
+                          marginTop: index === 0 ? "0.6em" : undefined,
+                        }}
+                      >
+                        {v.heading}
+                      </span>
+                    )}
+                    <span
+                      onClick={e => handleVerseClick(e, v.number)}
+                      style={{ animationDelay: `${enterDelay}ms` }}
+                      className={cn(
+                        "verse-enter cursor-pointer transition-colors duration-300 rounded-sm",
+                        hlCls,
+                        selectedVerses.has(v.number)
+                          ? "bg-[#c9a65418] underline decoration-[#c9a654]/35 decoration-1 underline-offset-2"
+                          : !hlEntry && "hover:bg-[#c9a65408]"
+                      )}>
+                      <sup className="verse-number">
+                        {v.endNumber && v.endNumber !== v.number ? `${v.number}–${v.endNumber}` : v.number}
+                      </sup>
+                      <span>{v.text}</span>
+                      {" "}
+                    </span>
                   </span>
                 )
               })}

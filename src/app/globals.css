@@ -319,6 +319,22 @@ body {
   .verse-enter { animation: none; opacity: 1; transform: none; }
 }
 
+/* ─── TÍTULO DE SEÇÃO BÍBLICA ───────────────────────────────────────────── */
+.bible-section-heading {
+  display: block;
+  font-family: 'Lora', Georgia, serif;
+  font-size: 0.7rem;
+  font-style: italic;
+  color: #55524a;
+  letter-spacing: 0.04em;
+  margin-top: 2.4em;
+  margin-bottom: 0.25em;
+  opacity: 0.85;
+  pointer-events: none;
+  user-select: none;
+}
+[data-theme="light"] .bible-section-heading { color: #8a6848; }
+
 /* ─── TEXTO BÍBLICO ──────────────────────────────────────────────────────── */
 .bible-text {
   font-family: 'EB Garamond', Georgia, serif;

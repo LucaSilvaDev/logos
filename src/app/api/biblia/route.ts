@@ -90,15 +90,29 @@ function decodeEntities(s: string): string {
     .replace(/&nbsp;/g, " ").replace(/&#(\d+);/g, (_, n) => String.fromCharCode(Number(n)))
 }
 
-function parseBibliaOnlineHtml(html: string): { number: number; text: string }[] {
+function parseBibliaOnlineHtml(html: string): { number: number; text: string; heading?: string }[] {
   // bibliaonline.com.br groups pericope verses into a single <p data-v=".1.2.3.4.">.
   // Inside each <p>, individual verse texts live in sibling spans:
   //   <span class="bv"></span>          ← bookmark anchor, marks verse start
   //   <span class="v">N</span>          ← verse number label
   //   <span class="t">verse text</span> ← actual text (may be multiple spans per verse)
-  // Strategy: match each <p>, split its content by bookmark spans (verse separators),
-  // extract verse number and text from each segment.
+  // Section headings: <div data-v=".N.M..." class="s l0"> or "s l1"
+  //   The first verse number in data-v is the verse the heading precedes.
 
+  // ── Step 1: Extract section headings ────────────────────────────────────
+  const headingMap = new Map<number, string>()
+  const hdRe = /<div\b[^>]*\bdata-v="([^"]+)"[^>]*\bclass="([^"]*)"[^>]*>([\s\S]*?)<\/div>/gi
+  let hm: RegExpExecArray | null
+  while ((hm = hdRe.exec(html)) !== null) {
+    const cls = hm[2]
+    if (!cls.split(/\s+/).includes("s")) continue
+    const nums = [...hm[1].matchAll(/(\d+)/g)].map(n => parseInt(n[1]))
+    if (nums.length === 0) continue
+    const text = decodeEntities(hm[3].replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim()
+    if (text) headingMap.set(nums[0], text)
+  }
+
+  // ── Step 2: Parse verse paragraphs ──────────────────────────────────────
   const verseMap = new Map<number, string[]>()
   const pRe = /<p\b[^>]*\bdata-v="([^"]+)"[^>]*>([\s\S]*?)<\/p>/gi
   let m: RegExpExecArray | null
@@ -129,8 +143,13 @@ function parseBibliaOnlineHtml(html: string): { number: number; text: string }[]
     }
   }
 
+  // ── Step 3: Build result, attaching headings to the first verse of each section
   return Array.from(verseMap.entries())
-    .map(([number, parts]) => ({ number, text: parts.join(" ") }))
+    .map(([number, parts]) => ({
+      number,
+      text: parts.join(" "),
+      ...(headingMap.has(number) ? { heading: headingMap.get(number) } : {}),
+    }))
     .sort((a, b) => a.number - b.number)
 }
 
