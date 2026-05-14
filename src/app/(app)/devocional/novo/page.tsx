@@ -75,18 +75,18 @@ export default function NovoDevocionaPage() {
         value={title}
         onChange={e => setTitle(e.target.value)}
         placeholder="Título do devocional..."
-        className="w-full bg-transparent font-serif text-[#e2d9c5] text-2xl placeholder:text-[#4a3826] outline-none border-b border-[#3a2b1c] pb-3 focus:border-[#c9a654] transition-colors"
+        className="w-full bg-transparent font-serif text-[#e2d9c5] text-2xl placeholder:text-[#3d3a55] outline-none border-b border-[#2e2b42] pb-3 focus:border-[#c9a654] transition-colors"
       />
 
       <div className="flex flex-wrap gap-3">
         <div className="flex items-center gap-2 flex-1 min-w-[160px]">
-          <BookOpen className="w-3.5 h-3.5 text-[#4a3826] flex-shrink-0" />
+          <BookOpen className="w-3.5 h-3.5 text-[#3d3a55] flex-shrink-0" />
           <input value={bibleRef} onChange={e => setBibleRef(e.target.value)}
             placeholder="Referência bíblica (ex: Sl 23:1)"
             className="app-input flex-1 px-3 py-1.5 text-sm" />
         </div>
         <div className="flex items-center gap-2 flex-1 min-w-[160px]">
-          <Tag className="w-3.5 h-3.5 text-[#4a3826] flex-shrink-0" />
+          <Tag className="w-3.5 h-3.5 text-[#3d3a55] flex-shrink-0" />
           <input value={tags} onChange={e => setTags(e.target.value)}
             placeholder="Tags (separadas por vírgula)"
             className="app-input flex-1 px-3 py-1.5 text-sm" />

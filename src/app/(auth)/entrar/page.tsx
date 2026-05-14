@@ -32,7 +32,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#1c1510] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#12111e] flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
 
         {/* Logotipo */}
@@ -46,7 +46,7 @@ export default function LoginPage() {
         <button
           onClick={handleGoogle}
           disabled={googleLoading}
-          className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-[#3a2b1c] text-[#8a8375] text-sm hover:border-[#4a3826] hover:text-[#c9c0a8] transition-colors disabled:opacity-50 mb-6 font-serif"
+          className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-[#2e2b42] text-[#8a8375] text-sm hover:border-[#3d3a55] hover:text-[#c9c0a8] transition-colors disabled:opacity-50 mb-6 font-serif"
         >
           {googleLoading ? (
             <Loader2 className="w-4 h-4 animate-spin" />
@@ -62,9 +62,9 @@ export default function LoginPage() {
         </button>
 
         <div className="flex items-center gap-4 mb-6">
-          <div className="flex-1 h-px bg-[#3a2b1c]" />
-          <span className="text-[10px] text-[#4a3826] uppercase tracking-wider font-display">ou email</span>
-          <div className="flex-1 h-px bg-[#3a2b1c]" />
+          <div className="flex-1 h-px bg-[#2e2b42]" />
+          <span className="text-[10px] text-[#3d3a55] uppercase tracking-wider font-display">ou email</span>
+          <div className="flex-1 h-px bg-[#2e2b42]" />
         </div>
 
         {/* Form */}
@@ -74,7 +74,7 @@ export default function LoginPage() {
           )}
 
           <div className="space-y-1">
-            <label className="text-[10px] text-[#4a3826] uppercase tracking-wider font-display">Email</label>
+            <label className="text-[10px] text-[#3d3a55] uppercase tracking-wider font-display">Email</label>
             <input
               type="email"
               value={email}
@@ -86,7 +86,7 @@ export default function LoginPage() {
           </div>
 
           <div className="space-y-1">
-            <label className="text-[10px] text-[#4a3826] uppercase tracking-wider font-display">Senha</label>
+            <label className="text-[10px] text-[#3d3a55] uppercase tracking-wider font-display">Senha</label>
             <div className="relative">
               <input
                 type={showPass ? "text" : "password"}
@@ -97,7 +97,7 @@ export default function LoginPage() {
                 className="app-input w-full px-3 py-2.5 pr-10 text-sm"
               />
               <button type="button" onClick={() => setShowPass(!showPass)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#4a3826] hover:text-[#55524a] transition-colors">
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#3d3a55] hover:text-[#55524a] transition-colors">
                 {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
@@ -112,21 +112,21 @@ export default function LoginPage() {
             Entrar
           </button>
 
-          <p className="text-center text-xs text-[#4a3826] mt-3">
+          <p className="text-center text-xs text-[#3d3a55] mt-3">
             <Link href="/esqueci-senha" className="text-[#55524a] hover:text-[#c9a654] transition-colors">
               Esqueci minha senha
             </Link>
           </p>
         </form>
 
-        <p className="text-center text-xs text-[#4a3826] mt-6">
+        <p className="text-center text-xs text-[#3d3a55] mt-6">
           Não tem conta?{" "}
           <Link href="/cadastro" className="text-[#c9a654] hover:opacity-80 transition-opacity">
             Criar conta
           </Link>
         </p>
 
-        <p className="text-center text-[10px] text-[#4a3826] mt-10 font-serif italic leading-relaxed">
+        <p className="text-center text-[10px] text-[#3d3a55] mt-10 font-serif italic leading-relaxed">
           &ldquo;A tua palavra é lâmpada que ilumina os meus passos&rdquo;<br />
           <span className="not-italic text-[#c9a654] opacity-40">Salmos 119:105</span>
         </p>

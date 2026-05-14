@@ -29,7 +29,7 @@ export default function EsqueciSenhaPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#1c1510] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#12111e] flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-10">
           <BookOpen className="w-8 h-8 text-[#c9a654] opacity-60 mx-auto mb-4" />
@@ -55,7 +55,7 @@ export default function EsqueciSenhaPage() {
             {error && <p className="text-[#c96b5a] text-xs text-center">{error}</p>}
 
             <div className="space-y-1">
-              <label className="text-[10px] text-[#4a3826] uppercase tracking-wider font-display">Email</label>
+              <label className="text-[10px] text-[#3d3a55] uppercase tracking-wider font-display">Email</label>
               <input
                 type="email"
                 value={email}
@@ -75,7 +75,7 @@ export default function EsqueciSenhaPage() {
               Enviar link de redefinição
             </button>
 
-            <p className="text-center text-xs text-[#4a3826] mt-4">
+            <p className="text-center text-xs text-[#3d3a55] mt-4">
               <Link href="/entrar" className="text-[#c9a654] hover:opacity-80 transition-opacity">
                 Voltar ao login
               </Link>

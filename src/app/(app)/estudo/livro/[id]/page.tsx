@@ -42,17 +42,17 @@ export default async function EstudoLivroPage({ params }: { params: Promise<{ id
 
       <div>
         <div className="flex items-center gap-2 mb-1">
-          <BookOpen className="w-4 h-4 text-[#4a3826]" />
+          <BookOpen className="w-4 h-4 text-[#3d3a55]" />
           <h1 className="font-serif text-2xl text-[#e2d9c5] font-normal">{bookName}</h1>
         </div>
         <p className="text-[#55524a] text-xs">{notes.length} nota{notes.length !== 1 ? "s" : ""}</p>
       </div>
 
-      <div className="h-px bg-[#3a2b1c]" />
+      <div className="h-px bg-[#2e2b42]" />
 
       {notes.length === 0 ? (
         <div className="text-center py-16">
-          <FileText className="w-5 h-5 text-[#3a2b1c] mx-auto mb-3" />
+          <FileText className="w-5 h-5 text-[#2e2b42] mx-auto mb-3" />
           <p className="font-serif text-[#55524a]">Nenhuma nota para {bookName}</p>
           <Link href={`/estudo/nova?book=${encodeURIComponent(bookName)}`}
             className="inline-flex items-center gap-1.5 mt-3 text-sm text-[#c9a654] hover:opacity-80 transition-opacity font-serif">
@@ -64,7 +64,7 @@ export default async function EstudoLivroPage({ params }: { params: Promise<{ id
           {notes.map((n: { id: string; title: string; chapter: number | null; verse: number | null; type: string; updatedAt: Date }) => (
             <Link key={n.id} href={`/estudo/${n.id}`}
               className="card-soft flex items-center gap-3 px-4 py-3 group">
-              <FileText className="w-3.5 h-3.5 text-[#4a3826] flex-shrink-0" />
+              <FileText className="w-3.5 h-3.5 text-[#3d3a55] flex-shrink-0" />
               <div className="flex-1 min-w-0">
                 <p className="font-serif text-[#c9c0a8] text-sm group-hover:text-[#e2d9c5] transition-colors">{n.title}</p>
                 {(n.chapter || n.verse) && (
@@ -73,10 +73,10 @@ export default async function EstudoLivroPage({ params }: { params: Promise<{ id
                   </p>
                 )}
               </div>
-              <span className="text-[10px] text-[#4a3826] flex-shrink-0">
+              <span className="text-[10px] text-[#3d3a55] flex-shrink-0">
                 {NOTE_TYPE_LABELS[n.type] ?? n.type}
               </span>
-              <span className="text-[10px] text-[#4a3826] flex-shrink-0">
+              <span className="text-[10px] text-[#3d3a55] flex-shrink-0">
                 {format(new Date(n.updatedAt), "d MMM", { locale: ptBR })}
               </span>
             </Link>

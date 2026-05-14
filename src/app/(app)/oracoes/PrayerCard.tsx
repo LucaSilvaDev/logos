@@ -48,33 +48,33 @@ export function PrayerCard({ prayer }: { prayer: Prayer }) {
             <h3 className="font-serif text-[#c9c0a8] text-sm group-hover:text-[#e2d9c5] transition-colors">
               {prayer.title}
             </h3>
-            <span className="text-[10px] text-[#4a3826] flex-shrink-0">
+            <span className="text-[10px] text-[#3d3a55] flex-shrink-0">
               {CATEGORY_LABELS[prayer.category] ?? prayer.category}
             </span>
           </div>
           {!expanded && prayer.content && (
             <p className="text-[#55524a] text-xs leading-relaxed line-clamp-1">{prayer.content}</p>
           )}
-          <p className="text-[#4a3826] text-[10px] mt-1">
+          <p className="text-[#3d3a55] text-[10px] mt-1">
             {format(new Date(prayer.createdAt), "d MMM yyyy", { locale: ptBR })}
           </p>
         </div>
         <ChevronDown className={cn(
-          "w-3.5 h-3.5 text-[#4a3826] flex-shrink-0 mt-0.5 transition-transform duration-200",
+          "w-3.5 h-3.5 text-[#3d3a55] flex-shrink-0 mt-0.5 transition-transform duration-200",
           expanded && "rotate-180"
         )} />
       </button>
 
       {/* Expandido */}
       {expanded && (
-        <div className="mt-3 pt-3 border-t border-[#231a12] space-y-3">
+        <div className="mt-3 pt-3 border-t border-[#1a1928] space-y-3">
           {prayer.content && (
             <p className="font-serif text-[#8a8375] text-sm leading-relaxed">{prayer.content}</p>
           )}
 
           {!confirming ? (
             <button onClick={() => setConfirming(true)}
-              className="flex items-center gap-1.5 text-[10px] text-[#4a3826] hover:text-[#5a9e72] transition-colors font-serif">
+              className="flex items-center gap-1.5 text-[10px] text-[#3d3a55] hover:text-[#5a9e72] transition-colors font-serif">
               <CheckCircle2 className="w-3 h-3" /> Marcar como respondida
             </button>
           ) : (
@@ -85,7 +85,7 @@ export function PrayerCard({ prayer }: { prayer: Prayer }) {
                 {marking ? "…" : "Sim, respondida"}
               </button>
               <button onClick={() => setConfirming(false)}
-                className="text-xs text-[#4a3826] hover:opacity-80 font-serif">
+                className="text-xs text-[#3d3a55] hover:opacity-80 font-serif">
                 Cancelar
               </button>
             </div>

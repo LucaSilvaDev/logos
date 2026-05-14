@@ -20,7 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           __html: `try{var t=localStorage.getItem('selah-theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');}catch(e){}
 if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js')}`
         }} />
-        <meta name="theme-color" content="#1c1510" />
+        <meta name="theme-color" content="#12111e" />
         <meta name="mobile-web-app-capable" content="yes" />
         <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />

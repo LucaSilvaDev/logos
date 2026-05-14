@@ -16,13 +16,13 @@ const ACTIONS = [
 export function EditorToolbar({ editor }: { editor: Editor | null }) {
   if (!editor) return null
   return (
-    <div className="flex items-center gap-0.5 px-3 py-2 border-b border-[#3a2b1c] flex-wrap">
+    <div className="flex items-center gap-0.5 px-3 py-2 border-b border-[#2e2b42] flex-wrap">
       {ACTIONS.map(({ key, icon: Icon, run }) => (
         <button key={key} type="button" onClick={() => run(editor)}
           className={cn("p-1.5 rounded-lg transition-colors",
             editor.isActive(key)
               ? "bg-[#c9a65420] text-[#c9a654]"
-              : "text-[#4a3826] hover:text-[#8a8375] hover:bg-[#231a12]"
+              : "text-[#3d3a55] hover:text-[#8a8375] hover:bg-[#1a1928]"
           )}>
           <Icon className="w-3.5 h-3.5" />
         </button>

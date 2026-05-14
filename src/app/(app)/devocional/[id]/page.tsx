@@ -51,9 +51,9 @@ export default async function DevocionalDetailPage({ params }: { params: Promise
         </div>
         {tags.length > 0 && (
           <div className="flex items-center gap-1.5 mt-2 flex-wrap">
-            <Tag className="w-3 h-3 text-[#4a3826]" />
+            <Tag className="w-3 h-3 text-[#3d3a55]" />
             {tags.map(t => (
-              <span key={t} className="text-[10px] text-[#4a3826]">#{t}</span>
+              <span key={t} className="text-[10px] text-[#3d3a55]">#{t}</span>
             ))}
           </div>
         )}

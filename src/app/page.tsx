@@ -3,7 +3,7 @@ import { BookOpen } from "lucide-react"
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-[#1c1510] flex flex-col items-center justify-center p-6 overflow-hidden relative">
+    <div className="min-h-screen bg-[#12111e] flex flex-col items-center justify-center p-6 overflow-hidden relative">
 
       {/* Atmospheric background glow */}
       <div className="absolute inset-0 pointer-events-none">
@@ -43,14 +43,14 @@ export default function LandingPage() {
           </Link>
           <Link
             href="/cadastro"
-            className="py-3 text-sm font-serif tracking-wide text-center text-[#55524a] border border-[#3a2b1c] rounded-lg hover:border-[#4a3826] hover:text-[#8a8375] transition-colors"
+            className="py-3 text-sm font-serif tracking-wide text-center text-[#55524a] border border-[#2e2b42] rounded-lg hover:border-[#3d3a55] hover:text-[#8a8375] transition-colors"
           >
             Criar conta
           </Link>
         </div>
 
         {/* Confessional footer */}
-        <p className="text-[#4a3826] text-[8px] uppercase tracking-widest font-sans mt-12">
+        <p className="text-[#3d3a55] text-[8px] uppercase tracking-widest font-sans mt-12">
           Reformado · TULIP · Pós-Trib
         </p>
       </div>

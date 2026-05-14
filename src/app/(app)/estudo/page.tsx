@@ -134,7 +134,7 @@ export default async function EstudoPage() {
         </Link>
       </div>
 
-      <div className="h-px bg-[#3a2b1c]" />
+      <div className="h-px bg-[#2e2b42]" />
 
       {/* Legenda de cores */}
       <section className="card-soft px-5 py-4 space-y-3">
@@ -158,7 +158,7 @@ export default async function EstudoPage() {
 
       {/* Antigo Testamento — agrupado por gênero */}
       <section className="space-y-6">
-        <p className="font-display text-[9px] text-[#4a3826] uppercase tracking-[0.28em]">Antigo Testamento</p>
+        <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.28em]">Antigo Testamento</p>
         {AT_GROUPS.map(group => {
           const cat = BOOK_CATEGORIES[group.category]
           return (
@@ -192,7 +192,7 @@ export default async function EstudoPage() {
                         ) : null}
                       </div>
                       <p className="font-serif text-[#8a8375] text-sm group-hover:text-[#c9c0a8] transition-colors leading-tight">{b.name}</p>
-                      <p className="text-[#4a3826] text-[10px] leading-tight">{b.desc}</p>
+                      <p className="text-[#3d3a55] text-[10px] leading-tight">{b.desc}</p>
                     </Link>
                   )
                 })}
@@ -202,11 +202,11 @@ export default async function EstudoPage() {
         })}
       </section>
 
-      <div className="h-px bg-[#3a2b1c] opacity-50" />
+      <div className="h-px bg-[#2e2b42] opacity-50" />
 
       {/* Novo Testamento — agrupado por gênero */}
       <section className="space-y-6">
-        <p className="font-display text-[9px] text-[#4a3826] uppercase tracking-[0.28em]">Novo Testamento</p>
+        <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.28em]">Novo Testamento</p>
         {NT_GROUPS.map(group => {
           const cat = BOOK_CATEGORIES[group.category]
           return (
@@ -240,7 +240,7 @@ export default async function EstudoPage() {
                         ) : null}
                       </div>
                       <p className="font-serif text-[#8a8375] text-sm group-hover:text-[#c9c0a8] transition-colors leading-tight">{b.name}</p>
-                      <p className="text-[#4a3826] text-[10px] leading-tight">{b.desc}</p>
+                      <p className="text-[#3d3a55] text-[10px] leading-tight">{b.desc}</p>
                     </Link>
                   )
                 })}
@@ -252,10 +252,10 @@ export default async function EstudoPage() {
 
       {/* Notas recentes */}
       <section className="space-y-3">
-        <p className="font-display text-[9px] text-[#4a3826] uppercase tracking-[0.25em]">Notas Recentes</p>
+        <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em]">Notas Recentes</p>
         {notes.length === 0 ? (
           <div className="text-center py-12">
-            <FileText className="w-5 h-5 text-[#3a2b1c] mx-auto mb-3" />
+            <FileText className="w-5 h-5 text-[#2e2b42] mx-auto mb-3" />
             <p className="font-serif text-[#55524a]">Nenhuma nota ainda</p>
             <Link href="/estudo/nova"
               className="inline-flex items-center gap-1.5 mt-3 text-sm text-[#c9a654] hover:opacity-80 transition-opacity font-serif">
@@ -277,8 +277,8 @@ export default async function EstudoPage() {
                       {n.book}{n.chapter ? ` ${n.chapter}` : ""}{n.verse ? `:${n.verse}` : ""}
                     </p>
                   </div>
-                  <span className="text-[10px] text-[#4a3826] flex-shrink-0">{typeLabel}</span>
-                  <span className="text-[10px] text-[#4a3826] flex-shrink-0">
+                  <span className="text-[10px] text-[#3d3a55] flex-shrink-0">{typeLabel}</span>
+                  <span className="text-[10px] text-[#3d3a55] flex-shrink-0">
                     {format(new Date(n.updatedAt), "d MMM", { locale: ptBR })}
                   </span>
                 </Link>

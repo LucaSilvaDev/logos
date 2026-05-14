@@ -87,7 +87,7 @@ export default function BuscaBibliaPage() {
 
       {/* Header */}
       <div className="flex items-center gap-3">
-        <Link href="/biblia" className="text-[#4a3826] hover:text-[#8a8375] transition-colors">
+        <Link href="/biblia" className="text-[#3d3a55] hover:text-[#8a8375] transition-colors">
           <ChevronLeft className="w-4 h-4" />
         </Link>
         <div>
@@ -99,13 +99,13 @@ export default function BuscaBibliaPage() {
       {/* Form */}
       <form onSubmit={handleSearch} className="space-y-3">
         <div className="relative">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#4a3826]" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#3d3a55]" />
           <input
             value={query}
             onChange={e => setQuery(e.target.value)}
             placeholder="Buscar por palavra ou expressão..."
             autoFocus
-            className="w-full pl-11 pr-4 py-3 text-sm bg-[#231a12] border border-[#3a2b1c] rounded-xl text-[#c9c0a8] placeholder:text-[#4a3826] outline-none focus:border-[#c9a654] transition-colors duration-200 font-serif"
+            className="w-full pl-11 pr-4 py-3 text-sm bg-[#1a1928] border border-[#2e2b42] rounded-xl text-[#c9c0a8] placeholder:text-[#3d3a55] outline-none focus:border-[#c9a654] transition-colors duration-200 font-serif"
           />
         </div>
 
@@ -120,7 +120,7 @@ export default function BuscaBibliaPage() {
                   "px-3 py-1.5 text-[10px] font-medium tracking-wider rounded-full border transition-colors",
                   version === v.id
                     ? "bg-[#c9a65415] text-[#c9a654] border-[#c9a65440]"
-                    : "border-[#3a2b1c] text-[#4a3826] hover:text-[#55524a]"
+                    : "border-[#2e2b42] text-[#3d3a55] hover:text-[#55524a]"
                 )}
               >
                 {v.label}
@@ -149,7 +149,7 @@ export default function BuscaBibliaPage() {
 
       {/* Indexed count hint — before any search */}
       {!searched && indexedCount !== null && (
-        <div className="flex items-center gap-2 text-xs text-[#4a3826]">
+        <div className="flex items-center gap-2 text-xs text-[#3d3a55]">
           <Database className="w-3.5 h-3.5 flex-shrink-0" />
           <span>
             {indexedCount > 0
@@ -166,7 +166,7 @@ export default function BuscaBibliaPage() {
           <p className="text-[#55524a] text-sm font-serif">
             Nenhum versículo encontrado para &ldquo;{query}&rdquo; em {VERSIONS.find(v => v.id === version)?.label}.
           </p>
-          <div className="flex items-start gap-2 text-xs text-[#4a3826]">
+          <div className="flex items-start gap-2 text-xs text-[#3d3a55]">
             <Database className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
             <span>
               A busca usa versículos já lidos. Acesse mais capítulos na versão{" "}
@@ -179,16 +179,16 @@ export default function BuscaBibliaPage() {
       {/* Results */}
       {results.length > 0 && (
         <div className="space-y-2">
-          <p className="text-[10px] text-[#4a3826] uppercase tracking-[0.2em]">
+          <p className="text-[10px] text-[#3d3a55] uppercase tracking-[0.2em]">
             {total > results.length ? `${results.length} de ${total}` : results.length} resultado{results.length !== 1 ? "s" : ""}
           </p>
-          <div className="divide-y divide-[#231a12]">
+          <div className="divide-y divide-[#1a1928]">
             {results.map((r, i) => (
               <button key={i}
                 onClick={() => goToBible(r.bookId, r.chapter)}
                 className="w-full group flex items-start gap-4 px-2 py-4 text-left hover:bg-[linear-gradient(90deg,rgba(201,166,84,0.05),transparent)] rounded-xl transition-all duration-300"
               >
-                <BookOpen className="w-3.5 h-3.5 text-[#3a2b1c] mt-0.5 flex-shrink-0 group-hover:text-[#c9a654] transition-colors" />
+                <BookOpen className="w-3.5 h-3.5 text-[#2e2b42] mt-0.5 flex-shrink-0 group-hover:text-[#c9a654] transition-colors" />
                 <div className="flex-1 min-w-0">
                   <p className="text-[10px] text-[#c9a654] font-medium tracking-wider uppercase mb-1.5 opacity-70 group-hover:opacity-100 transition-opacity">
                     {r.bookName} {r.chapter}:{r.verse}
@@ -197,7 +197,7 @@ export default function BuscaBibliaPage() {
                     <TextWithHighlight text={r.text} query={query} />
                   </p>
                 </div>
-                <ChevronRight className="w-3.5 h-3.5 text-[#4a3826] mt-0.5 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
+                <ChevronRight className="w-3.5 h-3.5 text-[#3d3a55] mt-0.5 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" />
               </button>
             ))}
           </div>

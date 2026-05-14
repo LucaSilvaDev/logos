@@ -30,20 +30,20 @@ export default async function DevocionalPage() {
         </Link>
       </div>
 
-      <div className="h-px bg-[#3a2b1c]" />
+      <div className="h-px bg-[#2e2b42]" />
 
       {devotionals.length === 0 ? (
         <div className="text-center py-20">
-          <NotebookPen className="w-6 h-6 text-[#3a2b1c] mx-auto mb-4" />
+          <NotebookPen className="w-6 h-6 text-[#2e2b42] mx-auto mb-4" />
           <p className="font-serif text-[#55524a] text-lg">Nenhum devocional ainda</p>
-          <p className="text-[#4a3826] text-sm mt-1 mb-6">Comece registrando sua meditação diária</p>
+          <p className="text-[#3d3a55] text-sm mt-1 mb-6">Comece registrando sua meditação diária</p>
           <Link href="/devocional/novo"
             className="text-sm text-[#c9a654] hover:opacity-80 transition-opacity font-serif">
             Criar primeira entrada →
           </Link>
         </div>
       ) : (
-        <div className="divide-y divide-[#231a12]">
+        <div className="divide-y divide-[#1a1928]">
           {devotionals.map((d: { id: string; title: string; bibleRef: string | null; tags: string | null; createdAt: Date; content: string }) => {
             const tags = d.tags ? d.tags.split(",").filter(Boolean) : []
             const preview = d.content.replace(/<[^>]*>/g, "").slice(0, 140)
@@ -59,20 +59,20 @@ export default async function DevocionalPage() {
                       </h3>
                     </div>
                     {d.bibleRef && (
-                      <p className="text-[#4a3826] text-xs italic font-serif ml-3 mb-2">{d.bibleRef}</p>
+                      <p className="text-[#3d3a55] text-xs italic font-serif ml-3 mb-2">{d.bibleRef}</p>
                     )}
                     {preview && (
-                      <p className="text-[#4a3826] text-xs leading-relaxed ml-3 line-clamp-2">{preview}</p>
+                      <p className="text-[#3d3a55] text-xs leading-relaxed ml-3 line-clamp-2">{preview}</p>
                     )}
                     {tags.length > 0 && (
                       <div className="flex gap-2 mt-2 ml-3 flex-wrap">
                         {tags.map(t => (
-                          <span key={t} className="text-[10px] text-[#3a2b1c]">#{t}</span>
+                          <span key={t} className="text-[10px] text-[#2e2b42]">#{t}</span>
                         ))}
                       </div>
                     )}
                   </div>
-                  <span className="text-[10px] text-[#3a2b1c] flex-shrink-0 font-serif mt-0.5">
+                  <span className="text-[10px] text-[#2e2b42] flex-shrink-0 font-serif mt-0.5">
                     {format(new Date(d.createdAt), "d MMM yyyy", { locale: ptBR })}
                   </span>
                 </div>

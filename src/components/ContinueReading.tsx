@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
@@ -38,18 +38,18 @@ export function ContinueReading() {
       <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#c9a654] via-[#c9a654] to-transparent opacity-40 rounded-full" />
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5">
-          <BookOpen className="w-3.5 h-3.5 text-[#4a3826] group-hover:text-[#c9a654] transition-colors shrink-0" />
+          <BookOpen className="w-3.5 h-3.5 text-[#3d3a55] group-hover:text-[#c9a654] transition-colors shrink-0" />
           <div>
             <p className="font-display text-[9px] text-[#c9a654] uppercase tracking-[0.2em] opacity-70 mb-0.5">
               Continue onde parou
             </p>
             <p className="text-[#8a8375] text-sm group-hover:text-[#c9c0a8] transition-colors">
               {bookName} {pos.chapter}
-              <span className="ml-2 text-[10px] text-[#4a3826] font-display uppercase tracking-wider">{versionLabel}</span>
+              <span className="ml-2 text-[10px] text-[#3d3a55] font-display uppercase tracking-wider">{versionLabel}</span>
             </p>
           </div>
         </div>
-        <span className="text-[#4a3826] group-hover:text-[#c9a654] transition-colors text-xs">→</span>
+        <span className="text-[#3d3a55] group-hover:text-[#c9a654] transition-colors text-xs">→</span>
       </div>
     </Link>
   )

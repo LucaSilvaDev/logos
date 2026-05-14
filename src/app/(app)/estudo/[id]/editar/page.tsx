@@ -91,7 +91,7 @@ export default function EditarNotaPage() {
         </button>
         <div className="flex items-center gap-2">
           <button onClick={remove}
-            className="p-2 rounded-lg text-[#4a3826] hover:text-[#8a3030] hover:bg-[#3a1a1a] transition-colors">
+            className="p-2 rounded-lg text-[#3d3a55] hover:text-[#8a3030] hover:bg-[#3a1a1a] transition-colors">
             <Trash2 className="w-4 h-4" />
           </button>
           <button onClick={save} disabled={!title.trim() || saving}
@@ -103,7 +103,7 @@ export default function EditarNotaPage() {
 
       <input value={title} onChange={e => setTitle(e.target.value)}
         placeholder="Título da nota..."
-        className="w-full bg-transparent font-serif text-[#e2d9c5] text-2xl placeholder:text-[#4a3826] outline-none border-b border-[#3a2b1c] pb-3 focus:border-[#c9a654] transition-colors" />
+        className="w-full bg-transparent font-serif text-[#e2d9c5] text-2xl placeholder:text-[#3d3a55] outline-none border-b border-[#2e2b42] pb-3 focus:border-[#c9a654] transition-colors" />
 
       <div className="flex flex-wrap gap-2">
         <select value={book} onChange={e => setBook(e.target.value)}

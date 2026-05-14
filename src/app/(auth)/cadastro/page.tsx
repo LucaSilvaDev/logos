@@ -34,7 +34,7 @@ export default function CadastroPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#1c1510] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#12111e] flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
 
         {/* Logotipo */}
@@ -47,7 +47,7 @@ export default function CadastroPage() {
         {/* Google */}
         <button
           onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
-          className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-[#3a2b1c] text-[#8a8375] text-sm hover:border-[#4a3826] hover:text-[#c9c0a8] transition-colors mb-6 font-serif"
+          className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-[#2e2b42] text-[#8a8375] text-sm hover:border-[#3d3a55] hover:text-[#c9c0a8] transition-colors mb-6 font-serif"
         >
           <svg className="w-4 h-4" viewBox="0 0 24 24">
             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -59,9 +59,9 @@ export default function CadastroPage() {
         </button>
 
         <div className="flex items-center gap-4 mb-6">
-          <div className="flex-1 h-px bg-[#3a2b1c]" />
-          <span className="text-[10px] text-[#4a3826] uppercase tracking-wider font-display">ou email</span>
-          <div className="flex-1 h-px bg-[#3a2b1c]" />
+          <div className="flex-1 h-px bg-[#2e2b42]" />
+          <span className="text-[10px] text-[#3d3a55] uppercase tracking-wider font-display">ou email</span>
+          <div className="flex-1 h-px bg-[#2e2b42]" />
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -70,21 +70,21 @@ export default function CadastroPage() {
           )}
 
           <div className="space-y-1">
-            <label className="text-[10px] text-[#4a3826] uppercase tracking-wider font-display">Nome</label>
+            <label className="text-[10px] text-[#3d3a55] uppercase tracking-wider font-display">Nome</label>
             <input type="text" value={name} onChange={e => setName(e.target.value)} required
               placeholder="Seu nome"
               className="app-input w-full px-3 py-2.5 text-sm" />
           </div>
 
           <div className="space-y-1">
-            <label className="text-[10px] text-[#4a3826] uppercase tracking-wider font-display">Email</label>
+            <label className="text-[10px] text-[#3d3a55] uppercase tracking-wider font-display">Email</label>
             <input type="email" value={email} onChange={e => setEmail(e.target.value)} required
               placeholder="seu@email.com"
               className="app-input w-full px-3 py-2.5 text-sm" />
           </div>
 
           <div className="space-y-1">
-            <label className="text-[10px] text-[#4a3826] uppercase tracking-wider font-display">
+            <label className="text-[10px] text-[#3d3a55] uppercase tracking-wider font-display">
               Senha <span className="normal-case opacity-60 font-sans">· mín. 8 caracteres</span>
             </label>
             <div className="relative">
@@ -92,7 +92,7 @@ export default function CadastroPage() {
                 required minLength={8} placeholder="••••••••"
                 className="app-input w-full px-3 py-2.5 pr-10 text-sm" />
               <button type="button" onClick={() => setShowPass(!showPass)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#4a3826] hover:text-[#55524a] transition-colors">
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-[#3d3a55] hover:text-[#55524a] transition-colors">
                 {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
@@ -105,14 +105,14 @@ export default function CadastroPage() {
           </button>
         </form>
 
-        <p className="text-center text-xs text-[#4a3826] mt-6">
+        <p className="text-center text-xs text-[#3d3a55] mt-6">
           Já tem conta?{" "}
           <Link href="/entrar" className="text-[#c9a654] hover:opacity-80 transition-opacity">
             Entrar
           </Link>
         </p>
 
-        <p className="text-center text-[10px] text-[#4a3826] mt-10 font-serif italic leading-relaxed">
+        <p className="text-center text-[10px] text-[#3d3a55] mt-10 font-serif italic leading-relaxed">
           &ldquo;Crescei na graça e no conhecimento de nosso Senhor&rdquo;<br />
           <span className="not-italic text-[#c9a654] opacity-40">2 Pedro 3:18</span>
         </p>

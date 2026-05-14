@@ -140,7 +140,7 @@ export function PerfilClient({ userName, userEmail, userImage }: Props) {
 
       {/* Header */}
       <div className="flex items-center gap-3">
-        <Link href="/dashboard" className="text-[#4a3826] hover:text-[#8a8375] transition-colors">
+        <Link href="/dashboard" className="text-[#3d3a55] hover:text-[#8a8375] transition-colors">
           <ChevronLeft className="w-4 h-4" />
         </Link>
         <div>
@@ -152,19 +152,19 @@ export function PerfilClient({ userName, userEmail, userImage }: Props) {
       {/* User info */}
       <div className="flex items-center gap-4">
         {userImage ? (
-          <img src={userImage} alt="" className="w-12 h-12 rounded-full ring-1 ring-[#3a2b1c]" />
+          <img src={userImage} alt="" className="w-12 h-12 rounded-full ring-1 ring-[#2e2b42]" />
         ) : (
-          <div className="w-12 h-12 rounded-full bg-[#2c2018] border border-[#3a2b1c] flex items-center justify-center">
+          <div className="w-12 h-12 rounded-full bg-[#211f31] border border-[#2e2b42] flex items-center justify-center">
             <User className="w-5 h-5 text-[#55524a]" />
           </div>
         )}
         <div>
           <p className="font-serif text-[#c9c0a8] text-base">{userName}</p>
-          <p className="text-[#4a3826] text-xs">{userEmail}</p>
+          <p className="text-[#3d3a55] text-xs">{userEmail}</p>
         </div>
       </div>
 
-      <div className="h-px bg-[#3a2b1c]" />
+      <div className="h-px bg-[#2e2b42]" />
 
       {/* Posição Teológica */}
       <section className="space-y-5">
@@ -179,7 +179,7 @@ export function PerfilClient({ userName, userEmail, userImage }: Props) {
                   "px-3 py-1.5 text-[11px] rounded-xl border transition-colors",
                   theologicalLine === v
                     ? "bg-[#c9a65415] text-[#c9a654] border-[#c9a65440]"
-                    : "border-[#3a2b1c] text-[#4a3826] hover:text-[#55524a]"
+                    : "border-[#2e2b42] text-[#3d3a55] hover:text-[#55524a]"
                 )}>
                 {v}
               </button>
@@ -196,7 +196,7 @@ export function PerfilClient({ userName, userEmail, userImage }: Props) {
                   "px-3 py-1.5 text-[11px] rounded-xl border transition-colors",
                   calvinPoints === v
                     ? "bg-[#c9a65415] text-[#c9a654] border-[#c9a65440]"
-                    : "border-[#3a2b1c] text-[#4a3826] hover:text-[#55524a]"
+                    : "border-[#2e2b42] text-[#3d3a55] hover:text-[#55524a]"
                 )}>
                 {v}
               </button>
@@ -213,7 +213,7 @@ export function PerfilClient({ userName, userEmail, userImage }: Props) {
                   "px-3 py-2 text-[11px] rounded-xl border text-left transition-colors",
                   eschatologyPosition === v
                     ? "bg-[#c9a65415] text-[#c9a654] border-[#c9a65440]"
-                    : "border-[#3a2b1c] text-[#4a3826] hover:text-[#55524a]"
+                    : "border-[#2e2b42] text-[#3d3a55] hover:text-[#55524a]"
                 )}>
                 {v}
               </button>
@@ -222,7 +222,7 @@ export function PerfilClient({ userName, userEmail, userImage }: Props) {
         </div>
       </section>
 
-      <div className="h-px bg-[#3a2b1c]" />
+      <div className="h-px bg-[#2e2b42]" />
 
       {/* Versões preferidas */}
       <section className="space-y-3">
@@ -234,7 +234,7 @@ export function PerfilClient({ userName, userEmail, userImage }: Props) {
                 "px-4 py-2 text-[11px] rounded-xl border transition-colors",
                 preferredVersions.includes(v.id)
                   ? "bg-[#c9a65415] text-[#c9a654] border-[#c9a65440]"
-                  : "border-[#3a2b1c] text-[#4a3826] hover:text-[#55524a]"
+                  : "border-[#2e2b42] text-[#3d3a55] hover:text-[#55524a]"
               )}>
               {v.label}
             </button>
@@ -242,7 +242,7 @@ export function PerfilClient({ userName, userEmail, userImage }: Props) {
         </div>
       </section>
 
-      <div className="h-px bg-[#3a2b1c]" />
+      <div className="h-px bg-[#2e2b42]" />
 
       {/* Notificações */}
       <section className="space-y-4">
@@ -251,7 +251,7 @@ export function PerfilClient({ userName, userEmail, userImage }: Props) {
         <div className="card-soft px-5 py-4 flex items-center justify-between gap-4">
           <div>
             <p className="text-[#c9c0a8] text-sm font-serif">Notificação push</p>
-            <p className="text-[#4a3826] text-xs mt-0.5">
+            <p className="text-[#3d3a55] text-xs mt-0.5">
               {permission === "denied"
                 ? "Bloqueada no navegador — habilite nas configurações do sistema"
                 : subscribed
@@ -266,7 +266,7 @@ export function PerfilClient({ userName, userEmail, userImage }: Props) {
               "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs border transition-colors disabled:opacity-30",
               subscribed
                 ? "border-[#c9a65440] text-[#c9a654] bg-[#c9a65415]"
-                : "border-[#3a2b1c] text-[#55524a] hover:text-[#c9c0a8]"
+                : "border-[#2e2b42] text-[#55524a] hover:text-[#c9c0a8]"
             )}
           >
             {subscribed ? <Bell className="w-3.5 h-3.5" /> : <BellOff className="w-3.5 h-3.5" />}
@@ -283,12 +283,12 @@ export function PerfilClient({ userName, userEmail, userImage }: Props) {
               onChange={e => setDailyReminderTime(e.target.value)}
               className="app-input px-4 py-2 text-sm w-40"
             />
-            <p className="text-[#4a3826] text-[10px]">Horário local · salvo junto com o perfil</p>
+            <p className="text-[#3d3a55] text-[10px]">Horário local · salvo junto com o perfil</p>
           </div>
         )}
       </section>
 
-      <div className="h-px bg-[#3a2b1c]" />
+      <div className="h-px bg-[#2e2b42]" />
 
       <button
         onClick={save}

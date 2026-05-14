@@ -488,7 +488,7 @@ export default function BibliaPage() {
   const bookCat = getBookCategory(book.id)
 
   const controlsBar = (
-    <div className="sticky top-0 z-10 flex flex-wrap items-center gap-3 px-6 py-3 bg-[#1c1510]/90 backdrop-blur-xl">
+    <div className="sticky top-0 z-10 flex flex-wrap items-center gap-3 px-6 py-3 bg-[#12111e]/90 backdrop-blur-xl">
 
       {/* Book selector */}
       <button
@@ -501,13 +501,13 @@ export default function BibliaPage() {
             style={{ background: BOOK_CATEGORIES[bookCat.category].color }} />
         )}
         <span className="font-serif text-sm">{book.name}</span>
-        <ChevronDown className="w-3 h-3 text-[#4a3826] group-hover:text-[#55524a] transition-colors" />
+        <ChevronDown className="w-3 h-3 text-[#3d3a55] group-hover:text-[#55524a] transition-colors" />
       </button>
 
       {/* Chapter navigation */}
       <div className="flex items-center gap-1">
         <button onClick={() => goChapter(-1)}
-          className="w-6 h-6 flex items-center justify-center text-[#4a3826] hover:text-[#c9a654] transition-colors duration-200 rounded-lg hover:bg-[#231a12]">
+          className="w-6 h-6 flex items-center justify-center text-[#3d3a55] hover:text-[#c9a654] transition-colors duration-200 rounded-lg hover:bg-[#1a1928]">
           <ChevronLeft className="w-3.5 h-3.5" />
         </button>
         <button
@@ -515,15 +515,15 @@ export default function BibliaPage() {
           className="flex items-center gap-1 text-[#8a8375] hover:text-[#c9c0a8] transition-colors px-1 group"
         >
           <span className="font-serif text-xs">Cap. {chapter}</span>
-          <ChevronDown className="w-3 h-3 text-[#4a3826] group-hover:text-[#55524a] transition-colors" />
+          <ChevronDown className="w-3 h-3 text-[#3d3a55] group-hover:text-[#55524a] transition-colors" />
         </button>
         <button onClick={() => goChapter(1)}
-          className="w-6 h-6 flex items-center justify-center text-[#4a3826] hover:text-[#c9a654] transition-colors duration-200 rounded-lg hover:bg-[#231a12]">
+          className="w-6 h-6 flex items-center justify-center text-[#3d3a55] hover:text-[#c9a654] transition-colors duration-200 rounded-lg hover:bg-[#1a1928]">
           <ChevronRight className="w-3.5 h-3.5" />
         </button>
       </div>
 
-      <div className="w-px h-3.5 bg-[#3a2b1c]" />
+      <div className="w-px h-3.5 bg-[#2e2b42]" />
 
       {/* Version pills */}
       <div className="flex items-center gap-1">
@@ -535,7 +535,7 @@ export default function BibliaPage() {
               "px-2.5 py-0.5 text-[10px] font-medium tracking-wider transition-all duration-200 rounded-full border",
               version === v.id
                 ? "bg-[#c9a65415] text-[#c9a654] border-[#c9a65440]"
-                : "text-[#4a3826] border-transparent hover:text-[#55524a] hover:border-[#3a2b1c]"
+                : "text-[#3d3a55] border-transparent hover:text-[#55524a] hover:border-[#2e2b42]"
             )}>
             {v.label}
           </button>
@@ -551,7 +551,7 @@ export default function BibliaPage() {
             onClick={() => setFontSize(s)}
             className={cn(
               "w-6 h-5 flex items-center justify-center rounded transition-colors",
-              fontSize === s ? "text-[#c9a654]" : "text-[#4a3826] hover:text-[#55524a]",
+              fontSize === s ? "text-[#c9a654]" : "text-[#3d3a55] hover:text-[#55524a]",
               s === "sm" && "text-[9px]",
               s === "md" && "text-[11px]",
               s === "lg" && "text-[13px]",
@@ -563,22 +563,22 @@ export default function BibliaPage() {
         ))}
       </div>
 
-      <div className="w-px h-3.5 bg-[#3a2b1c]" />
+      <div className="w-px h-3.5 bg-[#2e2b42]" />
 
       {/* Search link */}
       <Link href="/biblia/busca"
-        className="text-[#4a3826] hover:text-[#c9a654] transition-colors duration-200"
+        className="text-[#3d3a55] hover:text-[#c9a654] transition-colors duration-200"
         title="Buscar versículos">
         <Search className="w-3.5 h-3.5" />
       </Link>
 
-      <div className="w-px h-3.5 bg-[#3a2b1c]" />
+      <div className="w-px h-3.5 bg-[#2e2b42]" />
 
       {/* Focus mode toggle */}
       <button
         onClick={() => setFocusMode(f => !f)}
         title={focusMode ? "Sair da leitura focada (Esc)" : "Leitura focada — tela cheia"}
-        className="text-[#4a3826] hover:text-[#c9a654] transition-colors duration-200"
+        className="text-[#3d3a55] hover:text-[#c9a654] transition-colors duration-200"
       >
         {focusMode
           ? <Minimize2 className="w-3.5 h-3.5" />
@@ -612,9 +612,9 @@ export default function BibliaPage() {
 
         {apiError === "ERROR" && (
           <div className="text-center py-16 space-y-2">
-            <AlertCircle className="w-6 h-6 text-[#4a3826] mx-auto mb-3" />
+            <AlertCircle className="w-6 h-6 text-[#3d3a55] mx-auto mb-3" />
             <p className="font-serif text-[#55524a] text-sm">Não foi possível carregar os versículos.</p>
-            {apiDetail && <p className="font-mono text-[10px] text-[#4a3826]">{apiDetail}</p>}
+            {apiDetail && <p className="font-mono text-[10px] text-[#3d3a55]">{apiDetail}</p>}
             <button onClick={fetchVerses} className="text-xs text-[#c9a654] hover:opacity-80 transition-opacity mt-2 block mx-auto">
               Tentar novamente
             </button>
@@ -623,7 +623,7 @@ export default function BibliaPage() {
 
         {loading && (
           <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-4 h-4 text-[#4a3826] animate-spin" />
+            <Loader2 className="w-4 h-4 text-[#3d3a55] animate-spin" />
           </div>
         )}
 
@@ -639,7 +639,7 @@ export default function BibliaPage() {
                 </span>
               </div>
               <h1 className="chapter-heading text-base mb-1">{book.name}</h1>
-              <p className="font-sans text-[9px] text-[#4a3826] tracking-[0.25em] uppercase">
+              <p className="font-sans text-[9px] text-[#3d3a55] tracking-[0.25em] uppercase">
                 Capítulo {chapter}
               </p>
               <div className="w-12 h-px mx-auto mt-4" style={{ background: bookCat ? BOOK_CATEGORIES[bookCat.category].color : "#c9a654", opacity: 0.4 }} />
@@ -690,7 +690,7 @@ export default function BibliaPage() {
               })}
             </div>
 
-            <div className="flex justify-between mt-16 pt-6 border-t border-[#3a2b1c]/40">
+            <div className="flex justify-between mt-16 pt-6 border-t border-[#2e2b42]/40">
               <button onClick={() => goChapter(-1)} disabled={isFirstInBible}
                 className="flex items-center gap-1.5 text-sm font-serif text-[#55524a] hover:text-[#c9a654] disabled:opacity-20 transition-colors duration-200">
                 <ChevronLeft className="w-4 h-4" />
@@ -719,7 +719,7 @@ export default function BibliaPage() {
       {/* Main layout — switches between normal and focus overlay */}
       <div className={cn(
         focusMode
-          ? "fixed inset-0 z-50 bg-[#1c1510] overflow-y-auto"
+          ? "fixed inset-0 z-50 bg-[#12111e] overflow-y-auto"
           : "relative"
       )}>
         {/* Side chapter nav */}
@@ -818,7 +818,7 @@ export default function BibliaPage() {
 
             <div className="flex-1" />
 
-            <button onClick={() => setSelectedVerses(new Set())} className="text-[#4a3826] hover:text-[#55524a] transition-colors shrink-0 ml-1 p-1" title="Fechar">
+            <button onClick={() => setSelectedVerses(new Set())} className="text-[#3d3a55] hover:text-[#55524a] transition-colors shrink-0 ml-1 p-1" title="Fechar">
               <X className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
             </button>
           </div>
@@ -842,7 +842,7 @@ export default function BibliaPage() {
                 <p className="font-display text-[9px] text-[#c9a654] uppercase tracking-[0.25em] opacity-70">Capítulo</p>
                 <p className="font-serif text-[#c9c0a8] text-sm mt-0.5">{book.name}</p>
               </div>
-              <button onClick={() => setShowChapterModal(false)} className="text-[#4a3826] hover:text-[#8a8375] transition-colors">
+              <button onClick={() => setShowChapterModal(false)} className="text-[#3d3a55] hover:text-[#8a8375] transition-colors">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -893,26 +893,26 @@ export default function BibliaPage() {
                       "font-sans text-[10px] uppercase tracking-[0.2em] transition-all duration-200 px-3 py-1.5 rounded-full border",
                       tab === t
                         ? "bg-[#c9a65420] text-[#c9a654] border-[#c9a65440]"
-                        : "text-[#4a3826] border-[#ffffff08] hover:text-[#55524a]"
+                        : "text-[#3d3a55] border-[#ffffff08] hover:text-[#55524a]"
                     )}>
                     {t === "AT" ? "Antigo Testamento" : "Novo Testamento"}
                   </button>
                 ))}
               </div>
-              <button onClick={() => setShowBookModal(false)} className="text-[#4a3826] hover:text-[#8a8375] transition-colors duration-200">
+              <button onClick={() => setShowBookModal(false)} className="text-[#3d3a55] hover:text-[#8a8375] transition-colors duration-200">
                 <X className="w-4 h-4" />
               </button>
             </div>
 
             <div className="px-6 pb-3">
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#4a3826]" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#3d3a55]" />
                 <input
                   value={filter}
                   onChange={e => setFilter(e.target.value)}
                   placeholder="Buscar livro..."
                   autoFocus
-                  className="w-full pl-9 pr-4 py-2 text-sm rounded-xl text-[#8a8375] placeholder:text-[#4a3826] outline-none font-serif transition-colors duration-200"
+                  className="w-full pl-9 pr-4 py-2 text-sm rounded-xl text-[#8a8375] placeholder:text-[#3d3a55] outline-none font-serif transition-colors duration-200"
                   style={{
                     background: "rgba(255,255,255,0.04)",
                     border: "1px solid rgba(255,255,255,0.07)",

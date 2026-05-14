@@ -55,19 +55,19 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             <BookOpen className="w-4 h-4 text-[#c9a654] opacity-75" />
             <div>
               <p className="font-display text-[#e2d9c5] text-sm tracking-[0.25em] uppercase">Selah</p>
-              <p className="text-[#4a3826] text-[8px] tracking-widest uppercase font-sans mt-0.5">Pausa · Medita · Reflete</p>
+              <p className="text-[#3d3a55] text-[8px] tracking-widest uppercase font-sans mt-0.5">Pausa · Medita · Reflete</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="md:hidden text-[#4a3826] hover:text-[#8a8375] transition-colors"
+            className="md:hidden text-[#3d3a55] hover:text-[#8a8375] transition-colors"
             aria-label="Fechar menu"
           >
             <X className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="mx-5 h-px bg-[#3a2b1c] opacity-50" />
+        <div className="mx-5 h-px bg-[#2e2b42] opacity-50" />
 
         {/* Navegação */}
         <nav className="flex-1 px-3 py-5 overflow-y-auto space-y-0.5">
@@ -87,7 +87,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
               >
                 <Icon className={cn(
                   "w-4 h-4 shrink-0 transition-colors duration-200",
-                  active ? "text-[#c9a654]" : "text-[#4a3826] group-hover:text-[#8a8375]"
+                  active ? "text-[#c9a654]" : "text-[#3d3a55] group-hover:text-[#8a8375]"
                 )} />
                 <span className={cn("font-serif", active && "font-medium")}>{label}</span>
                 {active && (
@@ -100,8 +100,8 @@ export function Sidebar({ open, onClose }: SidebarProps) {
 
         {/* Rodapé confessional */}
         <div className="px-5 py-5">
-          <div className="h-px bg-[#3a2b1c] opacity-40 mb-4" />
-          <p className="text-[#4a3826] text-[8px] uppercase tracking-widest font-sans mb-1.5">Confissão</p>
+          <div className="h-px bg-[#2e2b42] opacity-40 mb-4" />
+          <p className="text-[#3d3a55] text-[8px] uppercase tracking-widest font-sans mb-1.5">Confissão</p>
           <p className="text-[#55524a] text-[10px] leading-relaxed font-serif italic">
             Reformado · TULIP<br />
             <span className="text-[#c9a654] opacity-40 not-italic">Pós-Trib · Pré-Mil Histórico</span>

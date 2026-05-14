@@ -165,7 +165,7 @@ export default async function DashboardPage() {
                 <p className="text-[#55524a] text-[10px]">Plano de Leitura</p>
                 <p className="text-[#8a8375] text-[10px]">{completedDays}/{totalPlanDays}d</p>
               </div>
-              <div className="h-1 rounded-full bg-[#3a2b1c] overflow-hidden">
+              <div className="h-1 rounded-full bg-[#2e2b42] overflow-hidden">
                 <div
                   className="h-full rounded-full bg-gradient-to-r from-[#c9a654] to-[#e8c87a]"
                   style={{ width: `${Math.min(100, (completedDays / totalPlanDays) * 100).toFixed(1)}%` }}
@@ -182,15 +182,15 @@ export default async function DashboardPage() {
           <div className="flex gap-4 text-right">
             <div>
               <p className="text-[#8a8375] text-sm font-serif leading-none">{highlightCount}</p>
-              <p className="text-[#4a3826] text-[10px] mt-0.5">grifos</p>
+              <p className="text-[#3d3a55] text-[10px] mt-0.5">grifos</p>
             </div>
             <div>
               <p className="text-[#8a8375] text-sm font-serif leading-none">{devotionalCount}</p>
-              <p className="text-[#4a3826] text-[10px] mt-0.5">devocionais</p>
+              <p className="text-[#3d3a55] text-[10px] mt-0.5">devocionais</p>
             </div>
             <div>
               <p className="text-[#8a8375] text-sm font-serif leading-none">{studyCount}</p>
-              <p className="text-[#4a3826] text-[10px] mt-0.5">notas</p>
+              <p className="text-[#3d3a55] text-[10px] mt-0.5">notas</p>
             </div>
           </div>
         </div>
@@ -204,10 +204,10 @@ export default async function DashboardPage() {
             href={href}
             className="group flex items-center gap-3 px-3 py-4 rounded-xl hover:bg-[linear-gradient(135deg,rgba(201,166,84,0.07),rgba(201,166,84,0.02))] transition-all duration-300"
           >
-            <Icon className="w-4 h-4 text-[#4a3826] group-hover:text-[#c9a654] transition-colors shrink-0" />
+            <Icon className="w-4 h-4 text-[#3d3a55] group-hover:text-[#c9a654] transition-colors shrink-0" />
             <div className="min-w-0">
               <p className="text-[#8a8375] text-sm group-hover:text-[#c9c0a8] transition-colors leading-tight">{title}</p>
-              <p className="text-[#4a3826] text-[10px] mt-0.5 truncate">{desc}</p>
+              <p className="text-[#3d3a55] text-[10px] mt-0.5 truncate">{desc}</p>
             </div>
           </Link>
         ))}
@@ -222,7 +222,7 @@ export default async function DashboardPage() {
               Ver todos
             </Link>
           </div>
-          <div className="divide-y divide-[#261b12]">
+          <div className="divide-y divide-[#1e1c2e]">
             {recentDevotionals.map((d: { id: string; title: string; bibleRef: string | null; createdAt: Date }) => (
               <Link
                 key={d.id}
@@ -233,10 +233,10 @@ export default async function DashboardPage() {
                   <div className="w-1 h-1 rounded-full bg-[#c9a654] opacity-40 mt-2 flex-shrink-0" />
                   <div>
                     <p className="text-[#8a8375] text-sm group-hover:text-[#c9c0a8] transition-colors">{d.title}</p>
-                    {d.bibleRef && <p className="text-[#4a3826] text-xs mt-0.5 italic font-serif">{d.bibleRef}</p>}
+                    {d.bibleRef && <p className="text-[#3d3a55] text-xs mt-0.5 italic font-serif">{d.bibleRef}</p>}
                   </div>
                 </div>
-                <span className="text-[10px] text-[#3a2b1c] flex-shrink-0 ml-4">
+                <span className="text-[10px] text-[#2e2b42] flex-shrink-0 ml-4">
                   {format(new Date(d.createdAt), "d MMM", { locale: ptBR })}
                 </span>
               </Link>
@@ -246,11 +246,11 @@ export default async function DashboardPage() {
       )}
 
       {/* Confissão de Fé */}
-      <div className="pt-4 border-t border-[#261b12]">
-        <p className="font-display text-[9px] text-[#3a2b1c] uppercase tracking-[0.2em] mb-3">Confissão de Fé</p>
+      <div className="pt-4 border-t border-[#1e1c2e]">
+        <p className="font-display text-[9px] text-[#2e2b42] uppercase tracking-[0.2em] mb-3">Confissão de Fé</p>
         <div className="flex flex-wrap gap-x-4 gap-y-1.5">
           {["Reformado", "TULIP — 5 Pontos", "Pós-Tribulacionista", "Pré-Milenista Histórico", "Sola Scriptura", "Sola Fide", "Sola Gratia"].map((tag) => (
-            <span key={tag} className="text-[11px] text-[#4a3826] font-serif">
+            <span key={tag} className="text-[11px] text-[#3d3a55] font-serif">
               {tag}
             </span>
           ))}

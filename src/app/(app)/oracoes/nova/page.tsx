@@ -38,7 +38,7 @@ export default function NovaOracaoPage() {
     <div className="max-w-lg mx-auto px-2 py-8 space-y-6 animate-fade-in">
       <div className="flex items-center justify-between">
         <button onClick={() => router.back()}
-          className="flex items-center gap-1.5 text-[#4a3826] hover:text-[#8a8375] text-sm transition-colors font-serif">
+          className="flex items-center gap-1.5 text-[#3d3a55] hover:text-[#8a8375] text-sm transition-colors font-serif">
           <ArrowLeft className="w-4 h-4" /> Voltar
         </button>
         <button onClick={save} disabled={!title.trim() || saving}
@@ -52,13 +52,13 @@ export default function NovaOracaoPage() {
         <h1 className="font-serif text-2xl text-[#e2d9c5] font-normal">Nova Oração</h1>
       </div>
 
-      <div className="h-px bg-[#3a2b1c]" />
+      <div className="h-px bg-[#2e2b42]" />
 
       <input
         value={title}
         onChange={e => setTitle(e.target.value)}
         placeholder="Intenção de oração…"
-        className="w-full bg-transparent border-b border-[#3a2b1c] pb-3 text-[#c9c0a8] font-serif text-base placeholder:text-[#4a3826] outline-none focus:border-[#c9a654] transition-colors"
+        className="w-full bg-transparent border-b border-[#2e2b42] pb-3 text-[#c9c0a8] font-serif text-base placeholder:text-[#3d3a55] outline-none focus:border-[#c9a654] transition-colors"
       />
 
       <div className="flex gap-2 flex-wrap">
@@ -68,7 +68,7 @@ export default function NovaOracaoPage() {
               "px-3 py-1 rounded-full text-xs font-serif transition-all",
               category === c.id
                 ? "bg-[#c9a65420] text-[#c9a654] border border-[#c9a65440]"
-                : "text-[#4a3826] hover:text-[#55524a] border border-[#3a2b1c]"
+                : "text-[#3d3a55] hover:text-[#55524a] border border-[#2e2b42]"
             )}>
             {c.label}
           </button>
@@ -80,12 +80,12 @@ export default function NovaOracaoPage() {
         onChange={e => setContent(e.target.value)}
         placeholder="O que está no seu coração? Deus ouve cada palavra…"
         rows={10}
-        className="w-full bg-transparent text-[#8a8375] font-serif text-sm leading-relaxed placeholder:text-[#3a2b1c] outline-none resize-none"
+        className="w-full bg-transparent text-[#8a8375] font-serif text-sm leading-relaxed placeholder:text-[#2e2b42] outline-none resize-none"
       />
 
       <div className="relative pl-4 py-1">
         <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-[#c9a654] opacity-20" />
-        <p className="font-serif text-[#4a3826] text-xs italic leading-relaxed">
+        <p className="font-serif text-[#3d3a55] text-xs italic leading-relaxed">
           &ldquo;Não andeis ansiosos por coisa alguma; antes em tudo apresentai as vossas petições a Deus em oração e súplica, com ação de graças.&rdquo;
         </p>
         <p className="text-[#c9a654] text-[10px] mt-1">Filipenses 4:6</p>
