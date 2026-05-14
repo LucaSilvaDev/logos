@@ -25,12 +25,19 @@ export function AppShell({ children, userName, userImage }: AppShellProps) {
 
   function toggleTheme() {
     const next = theme === "dark" ? "light" : "dark"
-    setTheme(next)
-    localStorage.setItem("selah-theme", next)
-    if (next === "light") {
-      document.documentElement.setAttribute("data-theme", "light")
+    const apply = () => {
+      setTheme(next)
+      localStorage.setItem("selah-theme", next)
+      if (next === "light") {
+        document.documentElement.setAttribute("data-theme", "light")
+      } else {
+        document.documentElement.removeAttribute("data-theme")
+      }
+    }
+    if (typeof document.startViewTransition === "function") {
+      document.startViewTransition(apply)
     } else {
-      document.documentElement.removeAttribute("data-theme")
+      apply()
     }
   }
 

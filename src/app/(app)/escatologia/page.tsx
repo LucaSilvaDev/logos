@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth"
+﻿import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { BookOpen } from "lucide-react"
 import Link from "next/link"
@@ -68,19 +68,19 @@ export default async function EscatologiaPage() {
         </div>
         <div className="text-right">
           <p className="font-serif text-3xl text-[#e2d9c5]">{pct}<span className="text-base text-[#55524a]">%</span></p>
-          <p className="text-[#3d3a55] text-[10px] uppercase tracking-wider font-display">{studied}/{totalProphetic}</p>
+          <p className="text-[#4a3826] text-[10px] uppercase tracking-wider font-display">{studied}/{totalProphetic}</p>
         </div>
       </div>
 
-      <div className="h-px bg-[#2e2b42]" />
+      <div className="h-px bg-[#3a2b1c]" />
 
       {/* Barra de progresso */}
       <div className="space-y-2">
-        <div className="flex justify-between text-[10px] text-[#3d3a55]">
+        <div className="flex justify-between text-[10px] text-[#4a3826]">
           <span className="font-display uppercase tracking-wider">Capítulos estudados</span>
           <span>{studied} / {totalProphetic}</span>
         </div>
-        <div className="h-px w-full bg-[#2e2b42] relative">
+        <div className="h-px w-full bg-[#3a2b1c] relative">
           <div className="absolute left-0 top-0 h-full bg-[#c9a654] transition-all duration-700"
             style={{ width: `${pct}%` }} />
         </div>
@@ -88,7 +88,7 @@ export default async function EscatologiaPage() {
 
       {/* Posição teológica */}
       <section className="space-y-3">
-        <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em]">Posição Escatológica</p>
+        <p className="font-display text-[9px] text-[#4a3826] uppercase tracking-[0.25em]">Posição Escatológica</p>
         <div className="space-y-2">
           {POSITION_NOTES.map(p => (
             <div key={p.label} className="card-soft px-4 py-3">
@@ -101,9 +101,9 @@ export default async function EscatologiaPage() {
 
       {/* Timeline escatológica */}
       <section className="space-y-3">
-        <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em]">Timeline Profética</p>
+        <p className="font-display text-[9px] text-[#4a3826] uppercase tracking-[0.25em]">Timeline Profética</p>
         <div className="relative">
-          <div className="absolute left-[68px] top-0 bottom-0 w-px bg-[#2e2b42]" />
+          <div className="absolute left-[68px] top-0 bottom-0 w-px bg-[#3a2b1c]" />
           {TIMELINE_EVENTS.map((e, i) => (
             <div key={i} className="flex gap-4 mb-5">
               <div className="w-16 text-right pt-0.5 flex-shrink-0">
@@ -115,7 +115,7 @@ export default async function EscatologiaPage() {
                   {e.phase}
                 </span>
               </div>
-              <div className="w-2 h-2 rounded-full border border-[#3d3a55] bg-[#12111e] flex-shrink-0 mt-1.5 relative z-10" />
+              <div className="w-2 h-2 rounded-full border border-[#4a3826] bg-[#1c1510] flex-shrink-0 mt-1.5 relative z-10" />
               <div className="flex-1">
                 <p className="font-serif text-[#c9c0a8] text-sm mb-0.5">{e.title}</p>
                 <p className="text-[#55524a] text-xs leading-relaxed">{e.desc}</p>
@@ -127,7 +127,7 @@ export default async function EscatologiaPage() {
 
       {/* Capítulos proféticos */}
       <section className="space-y-4">
-        <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em]">Capítulos Proféticos</p>
+        <p className="font-display text-[9px] text-[#4a3826] uppercase tracking-[0.25em]">Capítulos Proféticos</p>
         <div className="space-y-5">
           {PROPHETIC_BOOKS.map(pb => {
             const studiedChapters = pb.propheticChapters.filter(c => studiedSet.has(`${pb.book}-${c}`))
@@ -136,10 +136,10 @@ export default async function EscatologiaPage() {
               <div key={pb.book}>
                 <div className="flex items-baseline justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <BookOpen className="w-3 h-3 text-[#3d3a55]" />
+                    <BookOpen className="w-3 h-3 text-[#4a3826]" />
                     <h3 className="font-serif text-[#8a8375] text-sm">{pb.book}</h3>
                   </div>
-                  <span className={cn("text-[10px]", allDone ? "text-[#c9a654]" : "text-[#3d3a55]")}>
+                  <span className={cn("text-[10px]", allDone ? "text-[#c9a654]" : "text-[#4a3826]")}>
                     {studiedChapters.length}/{pb.propheticChapters.length}
                   </span>
                 </div>
@@ -153,7 +153,7 @@ export default async function EscatologiaPage() {
                           "w-7 h-7 text-[11px] font-medium flex items-center justify-center transition-all rounded-lg",
                           done
                             ? "bg-[#c9a65418] text-[#c9a654] border border-[#c9a65430]"
-                            : "text-[#3d3a55] hover:text-[#55524a] border border-[#2e2b42] hover:border-[#3d3a55]"
+                            : "text-[#4a3826] hover:text-[#55524a] border border-[#3a2b1c] hover:border-[#4a3826]"
                         )}>
                         {ch}
                       </Link>

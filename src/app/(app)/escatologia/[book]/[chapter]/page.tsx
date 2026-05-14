@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState, useEffect } from "react"
 import { useRouter, useParams } from "next/navigation"
@@ -87,20 +87,20 @@ export default function EschatologyChapterPage() {
       </div>
 
       <input value={title} onChange={e => setTitle(e.target.value)}
-        className="w-full bg-transparent font-serif text-[#8a8375] text-sm border-b border-[#2e2b42] pb-2 outline-none focus:border-[#c9a654] transition-colors"
+        className="w-full bg-transparent font-serif text-[#8a8375] text-sm border-b border-[#3a2b1c] pb-2 outline-none focus:border-[#c9a654] transition-colors"
         placeholder="Título do estudo" />
 
-      <div className="h-px bg-[#2e2b42]" />
+      <div className="h-px bg-[#3a2b1c]" />
 
       <div className="space-y-4">
         {FIELDS.map(f => (
           <div key={f.key} className="card-soft px-5 py-4">
-            <label className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.2em] mb-3 block">
+            <label className="font-display text-[9px] text-[#4a3826] uppercase tracking-[0.2em] mb-3 block">
               {f.label}
             </label>
             <textarea value={notes[f.key]} onChange={set(f.key)}
               placeholder={f.placeholder} rows={4}
-              className="w-full bg-transparent font-serif text-[#8a8375] text-sm leading-relaxed placeholder:text-[#2e2b42] outline-none resize-none" />
+              className="w-full bg-transparent font-serif text-[#8a8375] text-sm leading-relaxed placeholder:text-[#3a2b1c] outline-none resize-none" />
           </div>
         ))}
       </div>

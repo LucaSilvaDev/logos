@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth"
+﻿import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { CheckCircle2, BookOpen, X } from "lucide-react"
 import { format } from "date-fns"
@@ -44,7 +44,7 @@ export default async function PlanoPage() {
           <p className="text-[#55524a] text-xs mt-1">Escolha um plano para começar</p>
         </div>
 
-        <div className="h-px bg-[#2e2b42]" />
+        <div className="h-px bg-[#3a2b1c]" />
 
         <div className="space-y-2">
           {PLANS.map(plan => (
@@ -95,19 +95,19 @@ export default async function PlanoPage() {
         </div>
         <div className="text-right">
           <p className="font-serif text-3xl text-[#e2d9c5]">{completedPct}<span className="text-base text-[#55524a]">%</span></p>
-          <p className="text-[#3d3a55] text-[10px] uppercase tracking-wider font-display">concluído</p>
+          <p className="text-[#4a3826] text-[10px] uppercase tracking-wider font-display">concluído</p>
         </div>
       </div>
 
-      <div className="h-px bg-[#2e2b42]" />
+      <div className="h-px bg-[#3a2b1c]" />
 
       {/* Progresso */}
       <div className="space-y-2">
-        <div className="flex justify-between text-[10px] text-[#3d3a55]">
+        <div className="flex justify-between text-[10px] text-[#4a3826]">
           <span className="font-display uppercase tracking-wider">Progresso</span>
           <span>{progressCount} / {planDays} dias</span>
         </div>
-        <div className="h-px w-full bg-[#2e2b42] relative">
+        <div className="h-px w-full bg-[#3a2b1c] relative">
           <div className="absolute left-0 top-0 h-full bg-[#c9a654] transition-all duration-700"
             style={{ width: `${completedPct}%` }} />
         </div>
@@ -134,13 +134,13 @@ export default async function PlanoPage() {
       {/* Leituras recentes */}
       {recentProgress.length > 0 && (
         <div className="space-y-3">
-          <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em]">Recentes</p>
+          <p className="font-display text-[9px] text-[#4a3826] uppercase tracking-[0.25em]">Recentes</p>
           <div className="space-y-2">
             {recentProgress.map((p: { id: string; completedAt: Date; readingDay: { passages: string; day: number } }) => (
               <div key={p.id} className="card-soft flex items-center gap-3 px-4 py-2.5">
                 <CheckCircle2 className="w-3 h-3 text-[#5a9e72] opacity-60 flex-shrink-0" />
                 <span className="font-serif text-[#8a8375] text-sm flex-1">{p.readingDay.passages}</span>
-                <span className="text-[#3d3a55] text-xs">{format(new Date(p.completedAt), "d MMM", { locale: ptBR })}</span>
+                <span className="text-[#4a3826] text-xs">{format(new Date(p.completedAt), "d MMM", { locale: ptBR })}</span>
               </div>
             ))}
           </div>
@@ -148,7 +148,7 @@ export default async function PlanoPage() {
       )}
 
       {/* Cancelar plano */}
-      <div className="pt-4 border-t border-[#1a1928]">
+      <div className="pt-4 border-t border-[#231a12]">
         <CancelPlan />
       </div>
     </div>

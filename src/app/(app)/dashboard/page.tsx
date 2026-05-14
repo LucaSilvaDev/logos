@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth"
+﻿import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { getQuoteOfTheDay } from "@/lib/quotes"
 import { getDailyVerse } from "@/lib/daily-verse"
@@ -6,10 +6,10 @@ import { PLAN_CONFIG } from "@/lib/reading-plan"
 import Link from "next/link"
 import {
   BookOpen, NotebookPen, Clock, Search,
-  Flame, Church, Library, Heart, BookMarked
+  Flame, Church, Library, Heart
 } from "lucide-react"
-import { StatCounter } from "@/components/StatCounter"
-import { format } from "date-fns"
+import { ContinueReading } from "@/components/ContinueReading"
+import { format, isToday, isYesterday, subDays, startOfDay } from "date-fns"
 import { ptBR } from "date-fns/locale"
 
 function greeting() {
@@ -26,13 +26,33 @@ export default async function DashboardPage() {
 
   const verse = getDailyVerse()
 
-  const [devotionalCount, highlightCount, studyCount, prayerCount, profile] = await Promise.all([
+  const [devotionalCount, highlightCount, studyCount, prayerCount, profile, planProgress] = await Promise.all([
     db.devotional.count({ where: { userId } }),
     db.highlight.count({ where: { userId } }),
     db.studyNote.count({ where: { userId } }),
     db.prayer.count({ where: { userId } }),
     db.userProfile.findUnique({ where: { userId } }),
+    db.readingPlanProgress.findMany({
+      where: { userId },
+      select: { completedAt: true },
+      orderBy: { completedAt: "desc" },
+    }),
   ])
+
+  // Streak: consecutive days with at least one reading completed (ending today or yesterday)
+  const daySet = new Set(planProgress.map(p => startOfDay(p.completedAt).getTime()))
+  let streak = 0
+  let cursor = startOfDay(new Date())
+  if (!daySet.has(cursor.getTime())) cursor = subDays(cursor, 1)
+  while (daySet.has(cursor.getTime())) {
+    streak++
+    cursor = subDays(cursor, 1)
+  }
+
+  const totalPlanDays = profile?.readingPlanType && PLAN_CONFIG[profile.readingPlanType]
+    ? PLAN_CONFIG[profile.readingPlanType].days
+    : null
+  const completedDays = planProgress.length
 
   const recentDevotionals = await db.devotional.findMany({
     where: { userId },
@@ -95,6 +115,9 @@ export default async function DashboardPage() {
         <div className="candle-enter candle-delay-2 h-px w-16 bg-[#c9a654] opacity-40 mt-3" />
       </div>
 
+      {/* Continue onde parou — visível apenas se houver posição salva no localStorage */}
+      <ContinueReading />
+
       {/* Versículo do Dia — elemento 4: desliza de baixo após a saudação se firmar */}
       <Link href="/biblia" className="candle-enter candle-delay-3 block card-soft relative pl-6 pr-4 py-5 group">
         <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#c9a654] via-[#c9a654] to-transparent opacity-60 rounded-full" />
@@ -120,12 +143,57 @@ export default async function DashboardPage() {
         {quote.source && <p className="text-[#55524a] text-xs mt-0.5">{quote.source}</p>}
       </div>
 
-      {/* Estatísticas animadas — ícones renderizados no servidor (JSX é serializável, função não é) */}
-      <div className="candle-enter candle-delay-5 flex gap-8">
-        <StatCounter label="Devocionais" value={devotionalCount}><NotebookPen className="w-3.5 h-3.5 text-[#3d3a55]" /></StatCounter>
-        <StatCounter label="Grifos"      value={highlightCount}> <BookMarked  className="w-3.5 h-3.5 text-[#3d3a55]" /></StatCounter>
-        <StatCounter label="Notas"       value={studyCount}>     <Search      className="w-3.5 h-3.5 text-[#3d3a55]" /></StatCounter>
-        <StatCounter label="Orações"     value={prayerCount}>    <Heart       className="w-3.5 h-3.5 text-[#3d3a55]" /></StatCounter>
+      {/* Seu Progresso */}
+      <div className="candle-enter candle-delay-5 card-soft px-5 py-4 space-y-3">
+        <p className="font-display text-[9px] text-[#c9a654] uppercase tracking-[0.2em] opacity-70">
+          Seu Progresso
+        </p>
+        <div className="flex items-end justify-between gap-4 flex-wrap">
+          {/* Streak */}
+          <div className="flex items-center gap-2">
+            <Flame className="w-4 h-4 text-[#c9a654] opacity-70 shrink-0" />
+            <div>
+              <p className="text-[#e2d9c5] text-lg font-serif leading-none">{streak}</p>
+              <p className="text-[#55524a] text-[10px] mt-0.5">dia{streak !== 1 ? "s" : ""} seguido{streak !== 1 ? "s" : ""}</p>
+            </div>
+          </div>
+
+          {/* Plano de leitura */}
+          {totalPlanDays ? (
+            <div className="flex-1 min-w-[120px] max-w-[180px]">
+              <div className="flex items-center justify-between mb-1.5">
+                <p className="text-[#55524a] text-[10px]">Plano de Leitura</p>
+                <p className="text-[#8a8375] text-[10px]">{completedDays}/{totalPlanDays}d</p>
+              </div>
+              <div className="h-1 rounded-full bg-[#3a2b1c] overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-[#c9a654] to-[#e8c87a]"
+                  style={{ width: `${Math.min(100, (completedDays / totalPlanDays) * 100).toFixed(1)}%` }}
+                />
+              </div>
+            </div>
+          ) : (
+            <Link href="/plano" className="text-[10px] text-[#55524a] hover:text-[#c9a654] transition-colors font-serif italic">
+              Escolher plano →
+            </Link>
+          )}
+
+          {/* Mini stats */}
+          <div className="flex gap-4 text-right">
+            <div>
+              <p className="text-[#8a8375] text-sm font-serif leading-none">{highlightCount}</p>
+              <p className="text-[#4a3826] text-[10px] mt-0.5">grifos</p>
+            </div>
+            <div>
+              <p className="text-[#8a8375] text-sm font-serif leading-none">{devotionalCount}</p>
+              <p className="text-[#4a3826] text-[10px] mt-0.5">devocionais</p>
+            </div>
+            <div>
+              <p className="text-[#8a8375] text-sm font-serif leading-none">{studyCount}</p>
+              <p className="text-[#4a3826] text-[10px] mt-0.5">notas</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Módulos */}
@@ -136,10 +204,10 @@ export default async function DashboardPage() {
             href={href}
             className="group flex items-center gap-3 px-3 py-4 rounded-xl hover:bg-[linear-gradient(135deg,rgba(201,166,84,0.07),rgba(201,166,84,0.02))] transition-all duration-300"
           >
-            <Icon className="w-4 h-4 text-[#3d3a55] group-hover:text-[#c9a654] transition-colors shrink-0" />
+            <Icon className="w-4 h-4 text-[#4a3826] group-hover:text-[#c9a654] transition-colors shrink-0" />
             <div className="min-w-0">
               <p className="text-[#8a8375] text-sm group-hover:text-[#c9c0a8] transition-colors leading-tight">{title}</p>
-              <p className="text-[#3d3a55] text-[10px] mt-0.5 truncate">{desc}</p>
+              <p className="text-[#4a3826] text-[10px] mt-0.5 truncate">{desc}</p>
             </div>
           </Link>
         ))}
@@ -154,7 +222,7 @@ export default async function DashboardPage() {
               Ver todos
             </Link>
           </div>
-          <div className="divide-y divide-[#1e1c2e]">
+          <div className="divide-y divide-[#261b12]">
             {recentDevotionals.map((d: { id: string; title: string; bibleRef: string | null; createdAt: Date }) => (
               <Link
                 key={d.id}
@@ -165,10 +233,10 @@ export default async function DashboardPage() {
                   <div className="w-1 h-1 rounded-full bg-[#c9a654] opacity-40 mt-2 flex-shrink-0" />
                   <div>
                     <p className="text-[#8a8375] text-sm group-hover:text-[#c9c0a8] transition-colors">{d.title}</p>
-                    {d.bibleRef && <p className="text-[#3d3a55] text-xs mt-0.5 italic font-serif">{d.bibleRef}</p>}
+                    {d.bibleRef && <p className="text-[#4a3826] text-xs mt-0.5 italic font-serif">{d.bibleRef}</p>}
                   </div>
                 </div>
-                <span className="text-[10px] text-[#2e2b42] flex-shrink-0 ml-4">
+                <span className="text-[10px] text-[#3a2b1c] flex-shrink-0 ml-4">
                   {format(new Date(d.createdAt), "d MMM", { locale: ptBR })}
                 </span>
               </Link>
@@ -178,11 +246,11 @@ export default async function DashboardPage() {
       )}
 
       {/* Confissão de Fé */}
-      <div className="pt-4 border-t border-[#1e1c2e]">
-        <p className="font-display text-[9px] text-[#2e2b42] uppercase tracking-[0.2em] mb-3">Confissão de Fé</p>
+      <div className="pt-4 border-t border-[#261b12]">
+        <p className="font-display text-[9px] text-[#3a2b1c] uppercase tracking-[0.2em] mb-3">Confissão de Fé</p>
         <div className="flex flex-wrap gap-x-4 gap-y-1.5">
           {["Reformado", "TULIP — 5 Pontos", "Pós-Tribulacionista", "Pré-Milenista Histórico", "Sola Scriptura", "Sola Fide", "Sola Gratia"].map((tag) => (
-            <span key={tag} className="text-[11px] text-[#3d3a55] font-serif">
+            <span key={tag} className="text-[11px] text-[#4a3826] font-serif">
               {tag}
             </span>
           ))}

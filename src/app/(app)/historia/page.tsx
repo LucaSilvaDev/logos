@@ -1,4 +1,4 @@
-import { BookOpen } from "lucide-react"
+﻿import { BookOpen } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const TIMELINE = [
@@ -67,13 +67,13 @@ export default function HistoriaPage() {
         <p className="text-[#55524a] text-xs mt-1">33 d.C. → Hoje · {TIMELINE.length} eventos</p>
       </div>
 
-      <div className="h-px bg-[#2e2b42]" />
+      <div className="h-px bg-[#3a2b1c]" />
 
       {/* Legenda */}
       <div className="flex flex-wrap gap-x-4 gap-y-1">
         {Object.entries(CATEGORY_LABELS).map(([id, label]) => (
           <span key={id} className={cn("text-[10px]",
-            CATEGORY_GOLD[id] ? "text-[#c9a654] opacity-70" : "text-[#3d3a55]"
+            CATEGORY_GOLD[id] ? "text-[#c9a654] opacity-70" : "text-[#4a3826]"
           )}>
             {label}
           </span>
@@ -82,17 +82,17 @@ export default function HistoriaPage() {
 
       {/* Timeline */}
       <div className="relative">
-        <div className="absolute left-[72px] top-0 bottom-0 w-px bg-[#2e2b42]" />
+        <div className="absolute left-[72px] top-0 bottom-0 w-px bg-[#3a2b1c]" />
 
         {centuries.map(century => {
           const events = TIMELINE.filter(e => e.century === century)
           return (
             <div key={century} className="mb-10">
               <div className="flex items-center gap-4 mb-4">
-                <span className="w-16 text-right font-display text-[9px] text-[#3d3a55] uppercase tracking-widest">
+                <span className="w-16 text-right font-display text-[9px] text-[#4a3826] uppercase tracking-widest">
                   Séc. {century < 10 ? `0${century}` : century}
                 </span>
-                <div className="w-2 h-2 rounded-full bg-[#2e2b42] border border-[#3d3a55] relative z-10" />
+                <div className="w-2 h-2 rounded-full bg-[#3a2b1c] border border-[#4a3826] relative z-10" />
               </div>
 
               <div className="space-y-6">
@@ -102,13 +102,13 @@ export default function HistoriaPage() {
                   return (
                     <div key={i} className="flex gap-4">
                       <div className="w-16 text-right pt-1 flex-shrink-0">
-                        <span className="text-[#3d3a55] text-xs font-mono">{event.year}</span>
+                        <span className="text-[#4a3826] text-xs font-mono">{event.year}</span>
                       </div>
                       <div className="relative z-10 flex-shrink-0 mt-1.5">
                         <div className={cn("w-2.5 h-2.5 rounded-full border",
                           isKey && isGold ? "border-[#c9a654] bg-[#c9a65420]" :
                           isKey          ? "border-[#8a8375] bg-[#55524a30]" :
-                                           "border-[#2e2b42] bg-[#12111e]"
+                                           "border-[#3a2b1c] bg-[#1c1510]"
                         )} />
                       </div>
                       <div className="flex-1 pb-2">
@@ -120,7 +120,7 @@ export default function HistoriaPage() {
                               {event.title}
                             </h3>
                             <span className={cn("text-[9px] flex-shrink-0",
-                              isGold ? "text-[#c9a654] opacity-60" : "text-[#3d3a55]"
+                              isGold ? "text-[#c9a654] opacity-60" : "text-[#4a3826]"
                             )}>
                               {CATEGORY_LABELS[event.category]}
                             </span>
@@ -129,7 +129,7 @@ export default function HistoriaPage() {
                           {event.figures && event.figures.length > 0 && (
                             <div className="flex flex-wrap gap-x-2 mt-1.5">
                               {event.figures.map(f => (
-                                <span key={f} className="text-[10px] text-[#3d3a55] font-serif italic">{f}</span>
+                                <span key={f} className="text-[10px] text-[#4a3826] font-serif italic">{f}</span>
                               ))}
                             </div>
                           )}

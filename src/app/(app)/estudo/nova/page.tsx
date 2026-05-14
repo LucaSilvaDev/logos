@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
@@ -84,7 +84,7 @@ export default function NovaNotaPage() {
 
       <input value={title} onChange={e => setTitle(e.target.value)}
         placeholder="Título da nota..."
-        className="w-full bg-transparent font-serif text-[#e2d9c5] text-2xl placeholder:text-[#3d3a55] outline-none border-b border-[#2e2b42] pb-3 focus:border-[#c9a654] transition-colors" />
+        className="w-full bg-transparent font-serif text-[#e2d9c5] text-2xl placeholder:text-[#4a3826] outline-none border-b border-[#3a2b1c] pb-3 focus:border-[#c9a654] transition-colors" />
 
       <div className="flex flex-wrap gap-2">
         <select value={book} onChange={e => setBook(e.target.value)}

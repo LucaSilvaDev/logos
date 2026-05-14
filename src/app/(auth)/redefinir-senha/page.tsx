@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState, Suspense } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
@@ -58,7 +58,7 @@ function ResetForm() {
       {error && <p className="text-[#c96b5a] text-xs text-center">{error}</p>}
 
       <div className="space-y-1">
-        <label className="text-[10px] text-[#3d3a55] uppercase tracking-wider font-display">Nova senha</label>
+        <label className="text-[10px] text-[#4a3826] uppercase tracking-wider font-display">Nova senha</label>
         <div className="relative">
           <input
             type={showPass ? "text" : "password"}
@@ -69,14 +69,14 @@ function ResetForm() {
             className="app-input w-full px-3 py-2.5 pr-10 text-sm"
           />
           <button type="button" onClick={() => setShowPass(!showPass)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#3d3a55] hover:text-[#55524a] transition-colors">
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#4a3826] hover:text-[#55524a] transition-colors">
             {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>
         </div>
       </div>
 
       <div className="space-y-1">
-        <label className="text-[10px] text-[#3d3a55] uppercase tracking-wider font-display">Confirmar senha</label>
+        <label className="text-[10px] text-[#4a3826] uppercase tracking-wider font-display">Confirmar senha</label>
         <input
           type="password"
           value={confirm}
@@ -101,7 +101,7 @@ function ResetForm() {
 
 export default function RedefinirSenhaPage() {
   return (
-    <div className="min-h-screen bg-[#12111e] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#1c1510] flex items-center justify-center p-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-10">
           <BookOpen className="w-8 h-8 text-[#c9a654] opacity-60 mx-auto mb-4" />

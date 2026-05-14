@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
@@ -18,7 +18,7 @@ export default function CancelPlan() {
   if (!confirming) {
     return (
       <button onClick={() => setConfirming(true)}
-        className="flex items-center gap-1.5 text-[10px] text-[#3d3a55] hover:text-[#8a8375] transition-colors font-serif">
+        className="flex items-center gap-1.5 text-[10px] text-[#4a3826] hover:text-[#8a8375] transition-colors font-serif">
         <X className="w-3 h-3" /> Cancelar este plano
       </button>
     )
@@ -32,7 +32,7 @@ export default function CancelPlan() {
         {loading ? "…" : "Sim, cancelar"}
       </button>
       <button onClick={() => setConfirming(false)}
-        className="text-xs text-[#3d3a55] hover:opacity-80 font-serif">
+        className="text-xs text-[#4a3826] hover:opacity-80 font-serif">
         Não
       </button>
     </div>

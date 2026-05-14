@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -29,7 +29,7 @@ export function BottomNav({ onOpenSidebar }: BottomNavProps) {
             href={href}
             className={cn(
               "flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-colors duration-200",
-              active ? "text-[#c9a654]" : "text-[#3d3a55]"
+              active ? "text-[#c9a654]" : "text-[#4a3826]"
             )}
           >
             <Icon className={cn("w-5 h-5", active && "drop-shadow-[0_0_6px_rgba(201,166,84,0.5)]")} />
@@ -39,7 +39,7 @@ export function BottomNav({ onOpenSidebar }: BottomNavProps) {
       })}
       <button
         onClick={onOpenSidebar}
-        className="flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl text-[#3d3a55] transition-colors duration-200 hover:text-[#8a8375]"
+        className="flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl text-[#4a3826] transition-colors duration-200 hover:text-[#8a8375]"
       >
         <MoreHorizontal className="w-5 h-5" />
         <span className="text-[8px] uppercase tracking-widest font-display">Mais</span>

@@ -1,4 +1,4 @@
-import { auth } from "@/lib/auth"
+﻿import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { Heart, Plus, CheckCircle2, Lock } from "lucide-react"
 import Link from "next/link"
@@ -89,13 +89,13 @@ export default async function OracoesPage() {
         </Link>
       </div>
 
-      <div className="h-px bg-[#2e2b42]" />
+      <div className="h-px bg-[#3a2b1c]" />
 
       {/* Oração da hora */}
       <section className="space-y-2">
         <div className="flex items-center gap-2">
-          <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em]">Oração da Hora</p>
-          <span className="text-[9px] text-[#3d3a55] font-sans">· muda a cada hora</span>
+          <p className="font-display text-[9px] text-[#4a3826] uppercase tracking-[0.25em]">Oração da Hora</p>
+          <span className="text-[9px] text-[#4a3826] font-sans">· muda a cada hora</span>
         </div>
         <div className="card-soft relative pl-6 pr-5 py-5">
           <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#c9a654] to-transparent opacity-50 rounded-l-full" />
@@ -103,21 +103,21 @@ export default async function OracoesPage() {
             &ldquo;{prayerOfHour.text}&rdquo;
           </blockquote>
           <p className="text-[#c9a654] text-xs font-medium">{prayerOfHour.author}</p>
-          <p className="text-[#3d3a55] text-[10px] mt-0.5">{prayerOfHour.source}</p>
+          <p className="text-[#4a3826] text-[10px] mt-0.5">{prayerOfHour.source}</p>
         </div>
       </section>
 
       {/* Minhas orações — privadas */}
       <section className="space-y-3">
         <div className="flex items-center gap-2">
-          <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em]">Minhas Orações</p>
-          <span className="flex items-center gap-1 text-[9px] text-[#3d3a55]">
+          <p className="font-display text-[9px] text-[#4a3826] uppercase tracking-[0.25em]">Minhas Orações</p>
+          <span className="flex items-center gap-1 text-[9px] text-[#4a3826]">
             <Lock className="w-2.5 h-2.5" /> privadas
           </span>
         </div>
         {personal.length === 0 ? (
           <div className="text-center py-10">
-            <Heart className="w-5 h-5 text-[#2e2b42] mx-auto mb-3" />
+            <Heart className="w-5 h-5 text-[#3a2b1c] mx-auto mb-3" />
             <p className="font-serif text-[#55524a]">Nenhuma oração registrada</p>
             <Link href="/oracoes/nova"
               className="inline-flex items-center gap-1.5 mt-3 text-sm text-[#c9a654] hover:opacity-80 transition-opacity font-serif">
@@ -136,14 +136,14 @@ export default async function OracoesPage() {
       {/* Respondidas */}
       {answered.length > 0 && (
         <section className="space-y-3">
-          <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em]">Respondidas</p>
+          <p className="font-display text-[9px] text-[#4a3826] uppercase tracking-[0.25em]">Respondidas</p>
           <div className="space-y-2">
             {answered.map((p: { id: string; title: string; answeredAt: Date | null }) => (
               <div key={p.id} className="card-soft flex items-center gap-3 px-4 py-3">
                 <CheckCircle2 className="w-3.5 h-3.5 text-[#5a9e72] opacity-60 flex-shrink-0" />
                 <span className="font-serif text-[#8a8375] text-sm flex-1">{p.title}</span>
                 {p.answeredAt && (
-                  <span className="text-[#3d3a55] text-xs">
+                  <span className="text-[#4a3826] text-xs">
                     {format(new Date(p.answeredAt), "d MMM", { locale: ptBR })}
                   </span>
                 )}
@@ -155,16 +155,16 @@ export default async function OracoesPage() {
 
       {/* Orações Bíblicas Apostólicas */}
       <section className="space-y-4">
-        <div className="h-px bg-[#2e2b42]" />
+        <div className="h-px bg-[#3a2b1c]" />
         <div className="flex items-center gap-2">
-          <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em]">Orações Bíblicas</p>
-          <span className="text-[9px] text-[#3d3a55]">· dos apóstolos e profetas</span>
+          <p className="font-display text-[9px] text-[#4a3826] uppercase tracking-[0.25em]">Orações Bíblicas</p>
+          <span className="text-[9px] text-[#4a3826]">· dos apóstolos e profetas</span>
         </div>
         <div className="space-y-4">
           {APOSTOLIC_PRAYERS.map((q, i) => (
             <div key={i} className="card-soft relative pl-6 pr-5 py-4">
               <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#c9a654] to-transparent opacity-40 rounded-l-full" />
-              <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.2em] mb-2">{q.ref}</p>
+              <p className="font-display text-[9px] text-[#4a3826] uppercase tracking-[0.2em] mb-2">{q.ref}</p>
               <blockquote className="font-serif text-[#8a8375] text-sm leading-relaxed italic mb-2">
                 &ldquo;{q.text}&rdquo;
               </blockquote>
@@ -176,8 +176,8 @@ export default async function OracoesPage() {
 
       {/* Nuvem de Testemunhas */}
       <section className="space-y-4">
-        <div className="h-px bg-[#2e2b42]" />
-        <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em]">Nuvem de Testemunhas</p>
+        <div className="h-px bg-[#3a2b1c]" />
+        <p className="font-display text-[9px] text-[#4a3826] uppercase tracking-[0.25em]">Nuvem de Testemunhas</p>
         <div className="space-y-6">
           {REFORMED_PRAYERS.map((q, i) => (
             <div key={i} className="relative pl-6">
@@ -186,7 +186,7 @@ export default async function OracoesPage() {
                 &ldquo;{q.text}&rdquo;
               </blockquote>
               <p className="text-[#c9a654] text-xs font-medium">{q.author}</p>
-              {q.source && <p className="text-[#3d3a55] text-[10px] mt-0.5">{q.source}</p>}
+              {q.source && <p className="text-[#4a3826] text-[10px] mt-0.5">{q.source}</p>}
             </div>
           ))}
         </div>

@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
@@ -36,7 +36,7 @@ export default function PlanSetup({ plan }: { plan: Plan }) {
         <p className="font-serif text-[#c9c0a8] text-base group-hover:text-[#e2d9c5] transition-colors">{plan.label}</p>
         <p className="text-[#55524a] text-xs mt-0.5">{plan.desc}</p>
       </div>
-      <span className="text-[#3d3a55] group-hover:text-[#c9a654] text-xs transition-colors font-serif">
+      <span className="text-[#4a3826] group-hover:text-[#c9a654] text-xs transition-colors font-serif">
         {loading ? "…" : "Selecionar →"}
       </span>
     </button>
