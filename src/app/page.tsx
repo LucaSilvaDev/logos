@@ -22,7 +22,7 @@ export default function LandingPage() {
           Selah
         </h1>
         <p className="text-[#55524a] text-[10px] tracking-[0.3em] uppercase font-sans mb-10">
-          Pausa · Medita · Reflete
+          Pausa · Medita · Contempla
         </p>
 
         {/* Verse */}

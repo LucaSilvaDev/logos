@@ -39,7 +39,7 @@ export default function LoginPage() {
         <div className="text-center mb-10">
           <BookOpen className="w-8 h-8 text-[#c9a654] opacity-60 mx-auto mb-4" />
           <h1 className="font-display text-[#e2d9c5] text-lg tracking-widest uppercase">Selah</h1>
-          <p className="text-[#55524a] text-xs mt-1 tracking-wider">Pausa · Medita · Reflete</p>
+          <p className="text-[#55524a] text-xs mt-1 tracking-wider">Pausa · Medita · Contempla</p>
         </div>
 
         {/* Google */}

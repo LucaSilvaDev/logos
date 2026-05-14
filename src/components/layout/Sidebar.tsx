@@ -55,7 +55,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             <BookOpen className="w-4 h-4 text-[#c9a654] opacity-75" />
             <div>
               <p className="font-display text-[#e2d9c5] text-sm tracking-[0.25em] uppercase">Selah</p>
-              <p className="text-[#3d3a55] text-[8px] tracking-widest uppercase font-sans mt-0.5">Pausa · Medita · Reflete</p>
+              <p className="text-[#3d3a55] text-[8px] tracking-widest uppercase font-sans mt-0.5">Pausa · Medita · Contempla</p>
             </div>
           </div>
           <button
