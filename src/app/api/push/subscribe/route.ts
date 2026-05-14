@@ -11,6 +11,11 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Invalid subscription" }, { status: 400 })
   }
 
+  const existing = await db.pushSub.findUnique({ where: { endpoint } })
+  if (existing && existing.userId !== session.user.id) {
+    return NextResponse.json({ error: "Endpoint already registered" }, { status: 409 })
+  }
+
   await db.pushSub.upsert({
     where:  { endpoint },
     create: { userId: session.user.id, endpoint, p256dh: keys.p256dh, auth: keys.auth },

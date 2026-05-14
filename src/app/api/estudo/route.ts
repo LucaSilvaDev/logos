@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { NextResponse } from "next/server"
 import { z } from "zod"
+import { sanitizeRichText, sanitizePlainText } from "@/lib/sanitize"
 
 const schema = z.object({
   title:   z.string().min(1).max(300),
@@ -22,7 +23,14 @@ export async function POST(req: Request) {
   if (!parsed.success) return NextResponse.json({ error: "Invalid data" }, { status: 400 })
 
   const note = await db.studyNote.create({
-    data: { userId: session.user.id, ...parsed.data },
+    data: {
+      userId:  session.user.id,
+      ...parsed.data,
+      title:   sanitizePlainText(parsed.data.title),
+      content: sanitizeRichText(parsed.data.content),
+      book:    sanitizePlainText(parsed.data.book),
+      tags:    sanitizePlainText(parsed.data.tags),
+    },
   })
 
   return NextResponse.json(note)

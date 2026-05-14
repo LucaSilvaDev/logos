@@ -20,7 +20,7 @@ export default async function StudyNoteDetailPage({ params }: { params: Promise<
   const session = await auth()
   const userId = session!.user!.id!
 
-  const note = await db.studyNote.findUnique({ where: { id, userId } })
+  const note = await db.studyNote.findFirst({ where: { id, userId } })
   if (!note) notFound()
 
   return (
