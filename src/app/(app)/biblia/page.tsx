@@ -96,7 +96,7 @@ const HL_COLORS = [
 
 const BOOK_MAP = Object.fromEntries(BOOKS.map(b => [b.id, b]))
 
-interface Verse { number: number; text: string }
+interface Verse { number: number; text: string; endNumber?: number }
 interface HlEntry { id: string; color: string }
 
 function readSavedPos() {
@@ -317,7 +317,7 @@ export default function BibliaPage() {
         setApiError("ERROR")
         return
       }
-      setVerses((data.verses ?? []).map((v: Verse) => ({ number: v.number, text: v.text })))
+      setVerses((data.verses ?? []).map((v: Verse) => ({ number: v.number, text: v.text, endNumber: v.endNumber })))
     } catch {
       setApiError("ERROR")
     } finally {
@@ -650,21 +650,26 @@ export default function BibliaPage() {
               fontSize === "sm" && "bible-text-sm",
               fontSize === "lg" && "bible-text-lg",
             )}>
-              {verses.map(v => {
+              {verses.map((v, index) => {
                 const key     = `${book.id}-${chapter}-${v.number}`
                 const hlEntry = highlighted[key]
                 const hlCls   = hlEntry ? `hl-${hlEntry.color}` : ""
+                // Stagger first 16 verses; remainder all enter at the same cap delay
+                const enterDelay = Math.min(index, 15) * 30
                 return (
                   <span key={v.number}
                     onClick={e => handleVerseClick(e, v.number)}
+                    style={{ animationDelay: `${enterDelay}ms` }}
                     className={cn(
-                      "cursor-pointer transition-colors rounded-sm",
+                      "verse-enter cursor-pointer transition-colors duration-300 rounded-sm",
                       hlCls,
                       selectedVerses.has(v.number)
                         ? "bg-[#c9a65418] underline decoration-[#c9a654]/35 decoration-1 underline-offset-2"
                         : !hlEntry && "hover:bg-[#c9a65408]"
                     )}>
-                    <sup className="verse-number">{v.number}</sup>
+                    <sup className="verse-number">
+                      {v.endNumber && v.endNumber !== v.number ? `${v.number}–${v.endNumber}` : v.number}
+                    </sup>
                     <span>{v.text}</span>
                     {" "}
                   </span>

@@ -248,43 +248,75 @@ body {
 @keyframes pageTurnNext {
   0%   {
     opacity: 0;
-    transform: perspective(900px) rotateY(-22deg) translateX(80px) scale(0.96);
-    filter: brightness(0.6);
+    transform: perspective(1100px) rotateY(-28deg) translateX(60px) scale(0.97);
+    filter: brightness(0.45);
+    box-shadow: -12px 0 28px rgba(0,0,0,0.0);
   }
-  55%  {
+  30%  {
+    opacity: 0.7;
+    filter: brightness(0.75);
+    box-shadow: -16px 0 36px rgba(0,0,0,0.35);
+  }
+  65%  {
     opacity: 1;
-    filter: brightness(0.9);
+    filter: brightness(0.95);
+    box-shadow: -6px 0 14px rgba(0,0,0,0.12);
   }
   100% {
     opacity: 1;
-    transform: perspective(900px) rotateY(0deg) translateX(0) scale(1);
+    transform: perspective(1100px) rotateY(0deg) translateX(0) scale(1);
     filter: brightness(1);
+    box-shadow: 0 0 0 rgba(0,0,0,0);
   }
 }
 /* Virada de página — voltar capítulo (entra da esquerda) */
 @keyframes pageTurnPrev {
   0%   {
     opacity: 0;
-    transform: perspective(900px) rotateY(22deg) translateX(-80px) scale(0.96);
-    filter: brightness(0.6);
+    transform: perspective(1100px) rotateY(28deg) translateX(-60px) scale(0.97);
+    filter: brightness(0.45);
+    box-shadow: 12px 0 28px rgba(0,0,0,0.0);
   }
-  55%  {
+  30%  {
+    opacity: 0.7;
+    filter: brightness(0.75);
+    box-shadow: 16px 0 36px rgba(0,0,0,0.35);
+  }
+  65%  {
     opacity: 1;
-    filter: brightness(0.9);
+    filter: brightness(0.95);
+    box-shadow: 6px 0 14px rgba(0,0,0,0.12);
   }
   100% {
     opacity: 1;
-    transform: perspective(900px) rotateY(0deg) translateX(0) scale(1);
+    transform: perspective(1100px) rotateY(0deg) translateX(0) scale(1);
     filter: brightness(1);
+    box-shadow: 0 0 0 rgba(0,0,0,0);
   }
 }
 .page-turn-next {
-  animation: pageTurnNext 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: pageTurnNext 0.52s cubic-bezier(0.25, 1, 0.4, 1);
   transform-origin: left center;
 }
 .page-turn-prev {
-  animation: pageTurnPrev 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: pageTurnPrev 0.52s cubic-bezier(0.25, 1, 0.4, 1);
   transform-origin: right center;
+}
+@media (prefers-reduced-motion: reduce) {
+  .page-turn-next, .page-turn-prev { animation: none; opacity: 1; }
+}
+
+/* ─── ENTRADA ESCALONADA DOS VERSÍCULOS ──────────────────────────────────── */
+@keyframes verseEnter {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.verse-enter {
+  opacity: 0;
+  animation: verseEnter 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .verse-enter { animation: none; opacity: 1; transform: none; }
 }
 
 /* ─── TEXTO BÍBLICO ──────────────────────────────────────────────────────── */
@@ -316,11 +348,12 @@ body {
 }
 
 /* ─── GRIFOS ─────────────────────────────────────────────────────────────── */
-.hl-yellow { background: rgba(201, 166, 84, 0.28); border-radius: 2px; padding: 0 2px; }
-.hl-green  { background: rgba(90, 158, 114, 0.25); border-radius: 2px; padding: 0 2px; }
-.hl-blue   { background: rgba(107, 156, 202, 0.25); border-radius: 2px; padding: 0 2px; }
-.hl-red    { background: rgba(201, 107, 90, 0.28); border-radius: 2px; padding: 0 2px; }
-.hl-purple { background: rgba(160, 120, 210, 0.25); border-radius: 2px; padding: 0 2px; }
+/* transition: tinta sendo aplicada (300ms ease) */
+.hl-yellow { background: rgba(201, 166, 84, 0.28); border-radius: 2px; padding: 0 2px; transition: background-color 300ms ease, color 300ms ease; }
+.hl-green  { background: rgba(90, 158, 114, 0.25); border-radius: 2px; padding: 0 2px; transition: background-color 300ms ease, color 300ms ease; }
+.hl-blue   { background: rgba(107, 156, 202, 0.25); border-radius: 2px; padding: 0 2px; transition: background-color 300ms ease, color 300ms ease; }
+.hl-red    { background: rgba(201, 107, 90, 0.28); border-radius: 2px; padding: 0 2px; transition: background-color 300ms ease, color 300ms ease; }
+.hl-purple { background: rgba(160, 120, 210, 0.25); border-radius: 2px; padding: 0 2px; transition: background-color 300ms ease, color 300ms ease; }
 
 /* ─── TEMA CLARO — parchment #f2e3d0 ────────────────────────────────────── */
 [data-theme="light"] body {

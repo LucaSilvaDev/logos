@@ -91,38 +91,42 @@ function decodeEntities(s: string): string {
 }
 
 function parseBibliaOnlineHtml(html: string): { number: number; text: string }[] {
-  // Each verse paragraph: <p data-v=".N."> … </p>
-  // One verse may span multiple <p> elements (poetry lines), all sharing the same data-v.
-  // Styled words like "Senhor" appear in <span class="c sc"> WITHOUT class="t",
-  // so we cannot rely on class="t" alone — we strip ALL tags after removing
-  // structural spans (bookmark + verse-number labels).
+  // bibliaonline.com.br groups pericope verses into a single <p data-v=".1.2.3.4.">.
+  // Inside each <p>, individual verse texts live in sibling spans:
+  //   <span class="bv"></span>          ← bookmark anchor, marks verse start
+  //   <span class="v">N</span>          ← verse number label
+  //   <span class="t">verse text</span> ← actual text (may be multiple spans per verse)
+  // Strategy: match each <p>, split its content by bookmark spans (verse separators),
+  // extract verse number and text from each segment.
 
   const verseMap = new Map<number, string[]>()
-
-  const pRe = /<p[^>]*\bdata-v="([^"]+)"[^>]*>([\s\S]*?)<\/p>/gi
+  const pRe = /<p\b[^>]*\bdata-v="([^"]+)"[^>]*>([\s\S]*?)<\/p>/gi
   let m: RegExpExecArray | null
 
   while ((m = pRe.exec(html)) !== null) {
-    const dataV  = m[1]   // e.g. ".2."  or  ".3.4."
-    const inner  = m[2]
+    const pContent = m[2]
 
-    // Pull all verse numbers from data-v (".3.4.5." → [3,4,5])
-    const nums = [...dataV.matchAll(/(\d+)/g)].map(n => parseInt(n[1]))
-    if (nums.length === 0) continue
+    // Split paragraph by bookmark anchors — each marks the start of a new verse
+    const segments = pContent.split(/<span\b[^>]*\bclass="bv"[^>]*><\/span>/gi)
 
-    const text = decodeEntities(
-      inner
-        .replace(/<span[^>]*class="bv"[^>]*>[\s\S]*?<\/span>/gi, "") // remove bookmark markers
-        .replace(/<span[^>]*class="v"[^>]*>[\s\S]*?<\/span>/gi,  "") // remove verse-number labels
-        .replace(/<[^>]+>/g, " ")                                     // strip all remaining tags
-    ).replace(/\s+/g, " ").trim()
+    for (let i = 1; i < segments.length; i++) {
+      const seg = segments[i]
 
-    if (!text) continue
+      // Find verse number from the label span
+      const numMatch = seg.match(/<span\b[^>]*\bclass="v"[^>]*>([\s\S]*?)<\/span>/)
+      if (!numMatch) continue
+      const numStr = numMatch[1].replace(/<!--[\s\S]*?-->/g, "").replace(/<[^>]+>/g, "").trim()
+      const num = parseInt(numStr)
+      if (!num || num <= 0) continue
 
-    // Attribute text to the primary (first) verse number
-    const key = nums[0]
-    if (!verseMap.has(key)) verseMap.set(key, [])
-    verseMap.get(key)!.push(text)
+      // Remove the label span, strip remaining tags → plain text
+      const textHtml = seg.replace(/<span\b[^>]*\bclass="v"[^>]*>[\s\S]*?<\/span>/, "")
+      const text = decodeEntities(textHtml.replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim()
+      if (!text) continue
+
+      if (!verseMap.has(num)) verseMap.set(num, [])
+      verseMap.get(num)!.push(text)
+    }
   }
 
   return Array.from(verseMap.entries())
