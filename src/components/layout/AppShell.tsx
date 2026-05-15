@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { Sidebar } from "@/components/layout/Sidebar"
@@ -19,6 +19,12 @@ export function AppShell({ children, userName, userImage }: AppShellProps) {
   const [theme, setTheme] = useState<"dark" | "light">("dark")
   const pathname = usePathname()
 
+  // Tracks the user's explicit collapse preference before entering a reading route
+  const savedBeforeReadRef = useRef<boolean | null>(null)
+  // Always reflects latest sidebarCollapsed without stale closure issues
+  const collapsedRef = useRef(sidebarCollapsed)
+  collapsedRef.current = sidebarCollapsed
+
   useEffect(() => {
     const savedTheme = localStorage.getItem("selah-theme")
     if (savedTheme === "light") setTheme("light")
@@ -26,10 +32,31 @@ export function AppShell({ children, userName, userImage }: AppShellProps) {
     if (savedCollapsed === "1") setSidebarCollapsed(true)
   }, [])
 
+  // Auto-collapse on reading routes (/biblia, /memorizar); restore on exit
+  useEffect(() => {
+    const isReadingRoute = pathname.startsWith("/biblia") || pathname.startsWith("/memorizar")
+    if (isReadingRoute) {
+      if (savedBeforeReadRef.current === null) {
+        savedBeforeReadRef.current = collapsedRef.current
+        setSidebarCollapsed(true)
+      }
+    } else {
+      if (savedBeforeReadRef.current !== null) {
+        const prev = savedBeforeReadRef.current
+        savedBeforeReadRef.current = null
+        setSidebarCollapsed(prev)
+      }
+    }
+  }, [pathname])
+
   function toggleCollapse() {
     const next = !sidebarCollapsed
     setSidebarCollapsed(next)
     localStorage.setItem("selah-sidebar-collapsed", next ? "1" : "0")
+    // If user manually toggles while on a reading route, treat that as the new baseline
+    if (savedBeforeReadRef.current !== null) {
+      savedBeforeReadRef.current = next
+    }
   }
 
   function toggleTheme() {
