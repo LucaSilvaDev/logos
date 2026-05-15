@@ -34,7 +34,7 @@ export function ContinueReading() {
   return (
     <Link
       href={href}
-      className="candle-enter candle-delay-3 block card-soft relative px-5 py-4 group overflow-hidden"
+      className="candle-enter candle-delay-3 flame-hover block card-soft relative px-5 py-4 group overflow-hidden"
       style={{ animationDelay: "560ms" }}
     >
       {/* Subtle gold shimmer on hover */}

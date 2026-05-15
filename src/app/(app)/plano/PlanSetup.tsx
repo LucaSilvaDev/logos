@@ -33,7 +33,7 @@ export default function PlanSetup({ plan, delay = 0 }: { plan: Plan; delay?: num
     <button
       onClick={selectPlan}
       disabled={loading}
-      className="candle-flame card-soft w-full px-5 py-4 text-left group flex items-center justify-between disabled:opacity-50"
+      className="candle-flame flame-hover card-soft w-full px-5 py-4 text-left group flex items-center justify-between disabled:opacity-50"
       style={{ animationDelay: `${delay}ms` }}
     >
       <div>
