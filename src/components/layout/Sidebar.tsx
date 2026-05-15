@@ -77,7 +77,7 @@ export function Sidebar({ open, onClose, collapsed, onToggleCollapse }: SidebarP
           </button>
         </div>
 
-        <div className="mx-4 h-px bg-[#2e2b42] opacity-50 shrink-0" />
+        <div className="mx-4 h-px bg-[#2e2b42] opacity-20 shrink-0" />
 
         {/* Navegação */}
         <nav className="flex-1 px-2 py-4 overflow-y-auto space-y-0.5">

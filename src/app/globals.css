@@ -43,7 +43,7 @@ body {
 .sidebar {
   background: rgba(14, 13, 25, 0.88);
   backdrop-filter: blur(40px) saturate(1.4);
-  box-shadow: 8px 0 48px rgba(0, 0, 0, 0.45);
+  box-shadow: none;
 }
 
 /* Nav item — golden glow hover (not background change) */
@@ -64,7 +64,7 @@ body {
 .topbar {
   background: rgba(14, 13, 25, 0.82);
   backdrop-filter: blur(28px) saturate(1.5);
-  box-shadow: 0 6px 32px rgba(0, 0, 0, 0.2);
+  box-shadow: none;
 }
 
 /* ─── SUPERFÍCIES / CARDS ────────────────────────────────────────────────── */
@@ -387,12 +387,12 @@ body {
 [data-theme="light"] .sidebar {
   background: rgba(220, 198, 168, 0.86);
   backdrop-filter: blur(40px) saturate(1.6);
-  box-shadow: 8px 0 40px rgba(110,75,20,0.1);
+  box-shadow: none;
 }
 [data-theme="light"] .topbar {
   background: rgba(232, 214, 186, 0.84);
   backdrop-filter: blur(28px) saturate(1.6);
-  box-shadow: 0 6px 32px rgba(110,75,20,0.07);
+  box-shadow: none;
 }
 [data-theme="light"] .card-soft {
   background: linear-gradient(160deg, rgba(244,232,212,0.88), rgba(238,224,202,0.80));

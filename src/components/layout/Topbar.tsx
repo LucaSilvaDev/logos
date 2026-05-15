@@ -70,24 +70,20 @@ export function Topbar({ userName, userImage, theme, onToggleSidebar, onToggleTh
           }
         </button>
 
-        <div className="w-px h-4 bg-[#2e2b42]" />
-
         <Link href="/perfil" title="Perfil" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
           {userImage ? (
-            <img src={userImage} alt="" className="w-7 h-7 rounded-full ring-1 ring-[#2e2b42]" />
+            <img src={userImage} alt="" className="w-7 h-7 rounded-full" />
           ) : (
-            <div className="w-7 h-7 rounded-full bg-[#211f31] border border-[#2e2b42] flex items-center justify-center">
+            <div className="w-7 h-7 rounded-full bg-[#211f31]/60 flex items-center justify-center">
               <User className="w-3.5 h-3.5 text-[#55524a]" />
             </div>
           )}
           <span className="text-[13px] text-[#55524a] font-serif hidden sm:block">{userName}</span>
         </Link>
 
-        <div className="w-px h-4 bg-[#2e2b42]" />
-
         <button
           onClick={() => signOut({ callbackUrl: "/entrar" })}
-          className="text-[#3d3a55] hover:text-[#8a8375] transition-colors duration-200"
+          className="text-[#3d3a55] hover:text-[#8a8375] transition-colors duration-200 p-1.5 rounded-lg hover:bg-[#1a1928]"
           title="Sair"
         >
           <LogOut className="w-4 h-4" />
