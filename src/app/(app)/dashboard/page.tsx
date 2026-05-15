@@ -6,7 +6,7 @@ import { PLAN_CONFIG } from "@/lib/reading-plan"
 import Link from "next/link"
 import {
   BookOpen, NotebookPen, Clock, Search,
-  Flame, Church, Library, Heart
+  Flame, Church, Library, Heart, PenLine, Brain
 } from "lucide-react"
 import { ContinueReading } from "@/components/ContinueReading"
 import { format, isToday, isYesterday, subDays, startOfDay } from "date-fns"
@@ -72,75 +72,77 @@ export default async function DashboardPage() {
     { href: "/biblioteca",  icon: Library,     title: "Biblioteca",         desc: "TULIP · Westminster" },
   ]
 
+  const quickActions = [
+    { href: "/biblia",          icon: BookOpen,   label: "Ler" },
+    { href: "/devocional/novo", icon: PenLine,    label: "Devocional" },
+    { href: "/oracoes/nova",    icon: Heart,      label: "Orar" },
+    { href: "/memorizar",       icon: Brain,      label: "Memorizar" },
+    { href: "/estudo",          icon: Search,     label: "Estudar" },
+  ]
+
   return (
-    <div className="max-w-4xl mx-auto px-2 py-8 space-y-10">
+    <div className="max-w-4xl mx-auto px-4 py-8 space-y-6">
 
-      {/*
-        VARIANTE FRAMER MOTION — apenas para comparação (lib não instalada)
-
-        Se usássemos Motion (npm install motion), o stagger ficaria assim:
-
-          import { motion } from "motion/react"
-
-          const item = {
-            hidden:  { opacity: 0, y: 14 },
-            visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } },
-          }
-          const container = {
-            visible: { transition: { staggerChildren: 0.18 } },
-          }
-
-          <motion.div variants={container} initial="hidden" animate="visible">
-            <motion.p variants={item}>{date}</motion.p>
-            <motion.h1 variants={item}>{greeting}</motion.h1>
-            <motion.div variants={item} className="h-px ..." />
-          </motion.div>
-
-        Vantagem do Motion: stagger declarativo via staggerChildren, fácil de ajustar.
-        Vantagem do CSS puro (escolha atual): zero bundle extra, funciona em
-        Server Components sem precisar de "use client".
-      */}
-
-      {/* Saudação — ordem ritualística: data primeiro, nome depois, linha por último */}
-      <div className="space-y-1">
-        {/* Elemento 1: data — entra primeiro, discreta, prepara o contexto */}
+      {/* Saudação */}
+      <div className="space-y-1 pb-2">
         <p className="candle-enter candle-delay-0 text-[#55524a] text-sm tracking-wider uppercase font-medium">
           {format(new Date(), "EEEE, d 'de' MMMM", { locale: ptBR })}
         </p>
-        {/* Elemento 2: saudação — protagonista, chega com 180ms de pausa após a data */}
         <h1 className="candle-enter candle-delay-1 font-serif text-4xl text-[#e2d9c5] font-normal">
           {greeting()}, {session?.user?.name?.split(" ")[0]}
         </h1>
-        {/* Elemento 3: linha dourada — lacre visual, aparece por último no bloco */}
         <div className="candle-enter candle-delay-2 h-px w-16 bg-[#c9a654] opacity-40 mt-3" />
       </div>
 
-      {/* Continue onde parou — visível apenas se houver posição salva no localStorage */}
+      {/* Ações rápidas */}
+      <div className="candle-enter candle-delay-2 flex flex-wrap gap-2">
+        {quickActions.map(({ href, icon: Icon, label }) => (
+          <Link
+            key={href}
+            href={href}
+            className="group flex items-center gap-1.5 px-3.5 py-2 rounded-full text-[11px] font-sans tracking-wide transition-all duration-200 hover:scale-[1.03] text-[#8a8375] hover:text-[#c9a654]"
+            style={{
+              background: "rgba(255,255,255,0.04)",
+              border: "1px solid rgba(255,255,255,0.08)",
+            }}
+          >
+            <Icon className="w-3 h-3 shrink-0 transition-colors duration-200 text-[#3d3a55] group-hover:text-[#c9a654]" />
+            {label}
+          </Link>
+        ))}
+      </div>
+
+      {/* Continue onde parou */}
       <ContinueReading />
 
-      {/* Versículo do Dia — elemento 4: desliza de baixo após a saudação se firmar */}
-      <Link href="/biblia" className="candle-enter candle-delay-3 block card-soft relative pl-6 pr-4 py-5 group">
-        <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#c9a654] via-[#c9a654] to-transparent opacity-60 rounded-full" />
-        <p className="font-display text-[9px] text-[#c9a654] uppercase tracking-[0.2em] mb-3 opacity-70">
-          Versículo do Dia
-        </p>
-        <blockquote className="font-serif text-[1.05rem] text-[#c9c0a8] leading-relaxed italic mb-3 group-hover:text-[#e2d9c5] transition-colors">
-          &ldquo;{verse.text}&rdquo;
-        </blockquote>
-        <p className="text-[#c9a654] text-sm font-medium">{verse.ref}</p>
-      </Link>
+      {/* Bento grid — Versículo do Dia + Nuvem de Testemunhas */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
 
-      {/* Nuvem de Testemunhas — elemento 5: pausa maior, entra como eco do versículo */}
-      <div className="candle-enter candle-delay-4 card-soft relative pl-6 pr-4 py-5">
-        <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#c9a654] via-[#c9a654] to-transparent opacity-60 rounded-full" />
-        <p className="font-display text-[9px] text-[#c9a654] uppercase tracking-[0.2em] mb-3 opacity-70">
-          Nuvem de Testemunhas
-        </p>
-        <blockquote className="font-serif text-[1.1rem] text-[#c9c0a8] leading-relaxed italic mb-3">
-          &ldquo;{quote.content}&rdquo;
-        </blockquote>
-        <p className="text-[#c9a654] text-sm font-medium">{quote.author}</p>
-        {quote.source && <p className="text-[#55524a] text-xs mt-0.5">{quote.source}</p>}
+        {/* Versículo do Dia */}
+        <Link href="/biblia" className="candle-enter candle-delay-3 block card-soft relative pl-6 pr-4 py-5 group">
+          <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#c9a654] via-[#c9a654] to-transparent opacity-60 rounded-full" />
+          <p className="font-display text-[9px] text-[#c9a654] uppercase tracking-[0.2em] mb-3 opacity-70">
+            Versículo do Dia
+          </p>
+          <blockquote className="font-serif text-[1.05rem] text-[#c9c0a8] leading-relaxed italic mb-3 group-hover:text-[#e2d9c5] transition-colors">
+            &ldquo;{verse.text}&rdquo;
+          </blockquote>
+          <p className="text-[#c9a654] text-sm font-medium">{verse.ref}</p>
+        </Link>
+
+        {/* Nuvem de Testemunhas */}
+        <div className="candle-enter candle-delay-4 card-soft relative pl-6 pr-4 py-5">
+          <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#c9a654] via-[#c9a654] to-transparent opacity-60 rounded-full" />
+          <p className="font-display text-[9px] text-[#c9a654] uppercase tracking-[0.2em] mb-3 opacity-70">
+            Nuvem de Testemunhas
+          </p>
+          <blockquote className="font-serif text-[1.05rem] text-[#c9c0a8] leading-relaxed italic mb-3">
+            &ldquo;{quote.content}&rdquo;
+          </blockquote>
+          <p className="text-[#c9a654] text-sm font-medium">{quote.author}</p>
+          {quote.source && <p className="text-[#55524a] text-xs mt-0.5">{quote.source}</p>}
+        </div>
+
       </div>
 
       {/* Seu Progresso */}
