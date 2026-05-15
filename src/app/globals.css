@@ -800,6 +800,7 @@ body {
 */
 @keyframes flameLive {
   0%, 100% {
+    opacity: 1;
     box-shadow:
       0 6px 28px rgba(0,0,0,0.30),
       0 2px 8px rgba(0,0,0,0.14),
@@ -808,6 +809,7 @@ body {
       0 0 36px 2px rgba(201,166,84,0.10);
   }
   45% {
+    opacity: 1;
     box-shadow:
       0 12px 44px rgba(0,0,0,0.36),
       0 4px 12px rgba(0,0,0,0.18),
@@ -816,6 +818,7 @@ body {
       0 0 56px 4px rgba(201,166,84,0.22);
   }
   72% {
+    opacity: 1;
     box-shadow:
       0 7px 30px rgba(0,0,0,0.26),
       0 2px 8px rgba(0,0,0,0.12),
@@ -827,6 +830,7 @@ body {
 
 @keyframes flameLiveLight {
   0%, 100% {
+    opacity: 1;
     box-shadow:
       0 6px 24px rgba(110,75,20,0.14),
       0 2px 6px rgba(110,75,20,0.08),
@@ -835,6 +839,7 @@ body {
       0 0 32px 2px rgba(201,166,84,0.12);
   }
   45% {
+    opacity: 1;
     box-shadow:
       0 10px 38px rgba(110,75,20,0.22),
       0 4px 10px rgba(110,75,20,0.12),
@@ -843,6 +848,7 @@ body {
       0 0 52px 4px rgba(201,166,84,0.26);
   }
   72% {
+    opacity: 1;
     box-shadow:
       0 7px 28px rgba(110,75,20,0.16),
       0 2px 6px rgba(110,75,20,0.09),
