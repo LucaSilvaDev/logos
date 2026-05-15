@@ -27,6 +27,7 @@ model User {
   bookmarks            Bookmark[]
   prayers              Prayer[]
   studyNotes           StudyNote[]
+  verseNotes           VerseNote[]
   readingPlanProgress  ReadingPlanProgress[]
   eschatologyNotes     EschatologyNote[]
   pushSubs             PushSub[]
@@ -263,6 +264,25 @@ model PushSub {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
+}
+
+// ─── NOTA RÁPIDA POR VERSÍCULO ────────────────────────────────────────────────
+
+model VerseNote {
+  id        String   @id @default(cuid())
+  userId    String
+  book      String
+  chapter   Int
+  verse     Int
+  version   String
+  text      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, book, chapter, verse, version])
+  @@index([userId, book, chapter])
 }
 
 // ─── CACHE DE VERSÍCULOS BÍBLICOS ─────────────────────────────────────────────

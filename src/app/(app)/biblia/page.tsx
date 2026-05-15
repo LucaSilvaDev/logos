@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import {
   ChevronLeft, ChevronRight, Search, Bookmark,
   X, Loader2, AlertCircle, BookOpen, ChevronDown,
-  Maximize2, Minimize2, Trash2, PenLine, Share2, Copy, Check
+  Maximize2, Minimize2, Trash2, PenLine, Share2, Copy, Check, MessageSquare
 } from "lucide-react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
@@ -198,6 +198,11 @@ export default function BibliaPage() {
 
   const [highlighted, setHighlighted] = useState<Record<string, HlEntry>>({})
   const [bookmarked,  setBookmarked]  = useState<Record<string, string>>({})
+  const [verseNotes,  setVerseNotes]  = useState<Record<string, { id: string; text: string }>>({})
+
+  const [noteVerse,   setNoteVerse]   = useState<number | null>(null)
+  const [noteText,    setNoteText]    = useState("")
+  const [noteSaving,  setNoteSaving]  = useState(false)
 
   const [verses,    setVerses]    = useState<Verse[]>([])
   const [loading,   setLoading]   = useState(false)
@@ -234,15 +239,16 @@ export default function BibliaPage() {
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") {
-        if (selectedVerses.size > 0) { setSelectedVerses(new Set()); return }
-        if (showChapterModal) { setShowChapterModal(false); return }
-        if (showBookModal)    { setShowBookModal(false);    return }
+        if (noteVerse !== null)         { setNoteVerse(null);         return }
+        if (selectedVerses.size > 0)    { setSelectedVerses(new Set()); return }
+        if (showChapterModal)           { setShowChapterModal(false); return }
+        if (showBookModal)              { setShowBookModal(false);    return }
         if (focusMode) setFocusMode(false)
       }
     }
     document.addEventListener("keydown", onKey)
     return () => document.removeEventListener("keydown", onKey)
-  }, [focusMode, selectedVerses, showChapterModal, showBookModal])
+  }, [focusMode, noteVerse, selectedVerses, showChapterModal, showBookModal])
 
   // Persist reading position
   useEffect(() => {
@@ -293,6 +299,24 @@ export default function BibliaPage() {
       } catch { /* non-critical */ }
     }
     setBookmarked({})
+    load()
+    return () => { active = false }
+  }, [book, chapter, version])
+
+  // Load verse notes
+  useEffect(() => {
+    let active = true
+    async function load() {
+      try {
+        const res  = await fetch(`/api/biblia/notes?book=${book.id}&chapter=${chapter}&version=${version}`)
+        if (!res.ok || !active) return
+        const data: { id: string; verse: number; text: string }[] = await res.json()
+        const map: Record<string, { id: string; text: string }> = {}
+        for (const n of data) map[`${book.id}-${chapter}-${n.verse}`] = { id: n.id, text: n.text }
+        if (active) setVerseNotes(map)
+      } catch { /* non-critical */ }
+    }
+    setVerseNotes({})
     load()
     return () => { active = false }
   }, [book, chapter, version])
@@ -353,6 +377,55 @@ export default function BibliaPage() {
   function openStudyNote(verseNumber: number) {
     const bookName = BOOK_ID_NAMES[book.id] ?? book.name
     router.push(`/estudo/nova?book=${encodeURIComponent(bookName)}&chapter=${chapter}&verse=${verseNumber}`)
+  }
+
+  function openNote(verseNumber: number) {
+    const key = `${book.id}-${chapter}-${verseNumber}`
+    setNoteText(verseNotes[key]?.text ?? "")
+    setNoteVerse(verseNumber)
+  }
+
+  async function saveNote() {
+    if (noteVerse === null) return
+    setNoteSaving(true)
+    const key = `${book.id}-${chapter}-${noteVerse}`
+    try {
+      if (!noteText.trim()) {
+        const existing = verseNotes[key]
+        if (existing) {
+          await fetch("/api/biblia/notes", {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: existing.id }),
+          })
+          setVerseNotes(prev => { const n = { ...prev }; delete n[key]; return n })
+        }
+      } else {
+        const res  = await fetch("/api/biblia/notes", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ book: book.id, chapter, verse: noteVerse, version, text: noteText }),
+        })
+        const data = await res.json()
+        if (data?.id) setVerseNotes(prev => ({ ...prev, [key]: { id: data.id, text: noteText } }))
+      }
+      setNoteVerse(null)
+    } finally {
+      setNoteSaving(false)
+    }
+  }
+
+  async function deleteNote(verseNumber: number) {
+    const key = `${book.id}-${chapter}-${verseNumber}`
+    const existing = verseNotes[key]
+    if (!existing) return
+    await fetch("/api/biblia/notes", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: existing.id }),
+    })
+    setVerseNotes(prev => { const n = { ...prev }; delete n[key]; return n })
+    setNoteVerse(null)
   }
 
   function selectionRef() {
@@ -681,6 +754,9 @@ export default function BibliaPage() {
                       )}>
                       <sup className="verse-number">
                         {v.endNumber && v.endNumber !== v.number ? `${v.number}–${v.endNumber}` : v.number}
+                        {verseNotes[`${book.id}-${chapter}-${v.number}`] && (
+                          <span className="inline-block w-1 h-1 rounded-full bg-[#c9a654] ml-0.5 opacity-70 translate-y-[-1px]" />
+                        )}
                       </sup>
                       <span>{v.text}</span>
                       {" "}
@@ -734,8 +810,20 @@ export default function BibliaPage() {
           </button>
         )}
 
-        {controlsBar}
+        {!focusMode && controlsBar}
         {readingArea}
+
+        {/* Immersive mode exit button */}
+        {focusMode && (
+          <button
+            onClick={() => setFocusMode(false)}
+            title="Sair do modo imersivo (Esc)"
+            className="fixed top-4 right-4 z-[60] w-8 h-8 flex items-center justify-center rounded-full text-[#3d3a55] hover:text-[#8a8375] transition-all duration-200"
+            style={{ background: "rgba(255,255,255,0.06)", backdropFilter: "blur(16px)", border: "1px solid rgba(255,255,255,0.08)" }}
+          >
+            <Minimize2 className="w-3.5 h-3.5" />
+          </button>
+        )}
       </div>
 
       {/* Bottom verse action bar — liquid glass, multi-select */}
@@ -795,10 +883,10 @@ export default function BibliaPage() {
               {copied ? <Check className="w-4 h-4 sm:w-3 sm:h-3 text-[#5a9e72]" /> : <Copy className="w-4 h-4 sm:w-3 sm:h-3" />}
               <span className="hidden sm:inline">{copied ? "Copiado!" : "Copiar"}</span>
             </button>
-            <button onClick={() => { openStudyNote(sortedNums[0]); setSelectedVerses(new Set()) }}
+            <button onClick={() => { openNote(sortedNums[0]); setSelectedVerses(new Set()) }}
               className="flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 sm:py-1 rounded-lg text-[11px] text-[#8a8375] hover:text-[#c9c0a8] hover:bg-white/5 transition-all shrink-0"
-              title="Nova nota">
-              <PenLine className="w-4 h-4 sm:w-3 sm:h-3" />
+              title="Nota rápida">
+              <MessageSquare className={cn("w-4 h-4 sm:w-3 sm:h-3", verseNotes[`${book.id}-${chapter}-${sortedNums[0]}`] && "text-[#c9a654]")} />
               <span className="hidden sm:inline">Nota</span>
             </button>
             {typeof navigator !== "undefined" && "share" in navigator && (
@@ -821,6 +909,72 @@ export default function BibliaPage() {
             <button onClick={() => setSelectedVerses(new Set())} className="text-[#3d3a55] hover:text-[#55524a] transition-colors shrink-0 ml-1 p-1" title="Fechar">
               <X className="w-4 h-4 sm:w-3.5 sm:h-3.5" />
             </button>
+          </div>
+        )
+      })()}
+
+      {/* Inline verse note panel */}
+      {noteVerse !== null && (() => {
+        const bookName = BOOK_ID_NAMES[book.id] ?? book.name
+        const noteKey  = `${book.id}-${chapter}-${noteVerse}`
+        const existing = verseNotes[noteKey]
+        return (
+          <div
+            className="fixed bottom-0 left-0 right-0 z-[200] animate-slide-up"
+            style={{
+              background: "rgba(14,13,25,0.96)",
+              backdropFilter: "blur(48px) saturate(1.8)",
+              WebkitBackdropFilter: "blur(48px) saturate(1.8)",
+              borderTop: "1px solid rgba(255,255,255,0.09)",
+              boxShadow: "0 -8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06)",
+            }}>
+            <div className="max-w-2xl mx-auto px-4 py-3">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <MessageSquare className="w-3.5 h-3.5 text-[#c9a654] opacity-70" />
+                  <span className="text-[#c9a654] text-[11px] font-serif">
+                    {bookName} {chapter}:{noteVerse}
+                  </span>
+                </div>
+                <button onClick={() => setNoteVerse(null)} className="text-[#3d3a55] hover:text-[#55524a] transition-colors p-1">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <textarea
+                value={noteText}
+                onChange={e => setNoteText(e.target.value)}
+                placeholder="Escreva uma nota sobre este versículo..."
+                autoFocus
+                rows={3}
+                className="w-full text-sm font-serif text-[#c9c0a8] placeholder:text-[#3d3a55] bg-transparent outline-none resize-none leading-relaxed"
+              />
+
+              <div className="flex items-center justify-end gap-2 mt-2 pt-2 border-t border-white/5">
+                {existing && (
+                  <button
+                    onClick={() => deleteNote(noteVerse)}
+                    className="flex items-center gap-1.5 text-[#c96b5a] text-[11px] font-sans hover:opacity-80 transition-opacity mr-auto"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                    Excluir
+                  </button>
+                )}
+                <button
+                  onClick={() => setNoteVerse(null)}
+                  className="text-[#55524a] text-[11px] font-sans hover:text-[#8a8375] transition-colors px-3 py-1.5"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={saveNote}
+                  disabled={noteSaving}
+                  className="bg-[#c9a65420] text-[#c9a654] border border-[#c9a65440] text-[11px] font-sans px-3 py-1.5 rounded-lg hover:bg-[#c9a65430] transition-all disabled:opacity-50"
+                >
+                  {noteSaving ? "Salvando…" : "Salvar"}
+                </button>
+              </div>
+            </div>
           </div>
         )
       })()}

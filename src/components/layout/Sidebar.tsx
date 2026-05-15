@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils"
 import {
   BookOpen, LayoutDashboard, NotebookPen, Search,
   Clock, Church, Flame, Library, Heart, X, UserCircle,
-  ChevronsLeft, ChevronsRight,
+  ChevronsLeft, ChevronsRight, Brain,
 } from "lucide-react"
 
 const navItems = [
@@ -15,6 +15,7 @@ const navItems = [
   { href: "/plano",       icon: Clock,            label: "Plano de Leitura" },
   { href: "/devocional",  icon: NotebookPen,      label: "Devocional" },
   { href: "/estudo",      icon: Search,           label: "Estudo" },
+  { href: "/memorizar",   icon: Brain,            label: "Memorizar" },
   { href: "/oracoes",     icon: Heart,            label: "Orações" },
   { href: "/historia",    icon: Church,           label: "História" },
   { href: "/escatologia", icon: Flame,            label: "Escatologia" },
