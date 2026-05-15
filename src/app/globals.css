@@ -791,91 +791,71 @@ body {
 
 /* ─── FLAME HOVER ─────────────────────────────────────────────────────────── */
 /*
-  Simula uma chama real ao passar o mouse:
-  - O card sobe 3px (uplift) via transition — suave nos dois sentidos
-  - Um halo dourado pulsa de forma assimétrica (45% ≠ 72%) para imitar
-    a irregularidade de uma chama, sem repetição mecânica perfeita
-  - Ao sair do hover, a animation para e card-soft:hover's transition
-    retoma o controle do box-shadow suavemente
+  Técnica sem conflito de animation:
+  - O elemento principal usa APENAS transition (transform + box-shadow) →
+    nunca substitui a candleFlame/candleEnter que está rodando ou em forwards.
+  - O pulso vivo vai para o ::after: quando hover sai, opacity do ::after
+    faz fade-out em 0.5s, escondendo o snap da animation antes que seja visível.
+  - Resultado: entrada/saída 100% suaves, sem piscar.
 */
-@keyframes flameLive {
-  0%, 100% {
-    opacity: 1;
-    box-shadow:
-      0 6px 28px rgba(0,0,0,0.30),
-      0 2px 8px rgba(0,0,0,0.14),
-      inset 0 1px 0 rgba(201,166,84,0.08),
-      0 0 0 1px rgba(201,166,84,0.20),
-      0 0 36px 2px rgba(201,166,84,0.10);
-  }
-  45% {
-    opacity: 1;
-    box-shadow:
-      0 12px 44px rgba(0,0,0,0.36),
-      0 4px 12px rgba(0,0,0,0.18),
-      inset 0 1px 0 rgba(201,166,84,0.15),
-      0 0 0 1px rgba(201,166,84,0.38),
-      0 0 56px 4px rgba(201,166,84,0.22);
-  }
-  72% {
-    opacity: 1;
-    box-shadow:
-      0 7px 30px rgba(0,0,0,0.26),
-      0 2px 8px rgba(0,0,0,0.12),
-      inset 0 1px 0 rgba(201,166,84,0.05),
-      0 0 0 1px rgba(201,166,84,0.22),
-      0 0 40px 2px rgba(201,166,84,0.13);
-  }
+@keyframes flamePulse {
+  0%, 100% { box-shadow: 0 0 28px  4px rgba(201,166,84,0.10); }
+  45%       { box-shadow: 0 0 56px 10px rgba(201,166,84,0.26); }
+  72%       { box-shadow: 0 0 36px  5px rgba(201,166,84,0.14); }
 }
 
-@keyframes flameLiveLight {
-  0%, 100% {
-    opacity: 1;
-    box-shadow:
-      0 6px 24px rgba(110,75,20,0.14),
-      0 2px 6px rgba(110,75,20,0.08),
-      inset 0 1px 0 rgba(255,255,255,0.55),
-      0 0 0 1px rgba(180,130,50,0.28),
-      0 0 32px 2px rgba(201,166,84,0.12);
-  }
-  45% {
-    opacity: 1;
-    box-shadow:
-      0 10px 38px rgba(110,75,20,0.22),
-      0 4px 10px rgba(110,75,20,0.12),
-      inset 0 1px 0 rgba(255,255,255,0.65),
-      0 0 0 1px rgba(180,130,50,0.48),
-      0 0 52px 4px rgba(201,166,84,0.26);
-  }
-  72% {
-    opacity: 1;
-    box-shadow:
-      0 7px 28px rgba(110,75,20,0.16),
-      0 2px 6px rgba(110,75,20,0.09),
-      inset 0 1px 0 rgba(255,255,255,0.50),
-      0 0 0 1px rgba(180,130,50,0.32),
-      0 0 38px 2px rgba(201,166,84,0.15);
-  }
+@keyframes flamePulseLight {
+  0%, 100% { box-shadow: 0 0 24px  4px rgba(180,130,50,0.14); }
+  45%       { box-shadow: 0 0 48px 10px rgba(180,130,50,0.32); }
+  72%       { box-shadow: 0 0 30px  5px rgba(180,130,50,0.18); }
 }
 
 .flame-hover {
-  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.4s ease;
+}
+
+/* Pseudo-elemento carrega o halo pulsante */
+.flame-hover::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 19px; /* 1px a mais que card-soft (18px) */
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.5s ease;
 }
 
 .flame-hover:hover {
   transform: translateY(-3px);
-  animation: flameLive 2.6s ease-in-out infinite;
+  box-shadow:
+    0 8px 32px rgba(0,0,0,0.28),
+    0 2px 8px rgba(0,0,0,0.14),
+    inset 0 1px 0 rgba(201,166,84,0.10),
+    0 0 0 1px rgba(201,166,84,0.26);
+}
+
+.flame-hover:hover::after {
+  opacity: 1;
+  animation: flamePulse 2.6s ease-in-out infinite;
 }
 
 [data-theme="light"] .flame-hover:hover {
-  animation-name: flameLiveLight;
+  box-shadow:
+    0 8px 28px rgba(110,75,20,0.18),
+    0 2px 6px rgba(110,75,20,0.10),
+    inset 0 1px 0 rgba(255,255,255,0.55),
+    0 0 0 1px rgba(180,130,50,0.38);
+}
+
+[data-theme="light"] .flame-hover:hover::after {
+  animation-name: flamePulseLight;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .flame-hover:hover {
-    animation: none;
-    transform: none;
-  }
+  .flame-hover:hover        { transform: none; }
+  .flame-hover:hover::after { animation: none; opacity: 0; }
 }
 
 /* ─── PAGE TRANSITION ────────────────────────────────────────────────────── */
