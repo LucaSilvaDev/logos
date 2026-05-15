@@ -37,22 +37,32 @@ export default async function PlanoPage() {
 
   if (!planType) {
     return (
-      <div className="max-w-xl mx-auto px-2 py-8 space-y-8 animate-fade-in">
-        <div>
-          <p className="font-display text-[9px] text-[#55524a] uppercase tracking-[0.25em] mb-1">Disciplina Espiritual</p>
-          <h1 className="font-serif text-3xl text-[#e2d9c5] font-normal">Plano de Leitura</h1>
-          <p className="text-[#55524a] text-xs mt-1">Escolha um plano para começar</p>
+      <div className="max-w-xl mx-auto px-2 py-8 space-y-8">
+
+        <div className="space-y-1">
+          <p className="candle-enter candle-delay-0 font-display text-[9px] text-[#55524a] uppercase tracking-[0.25em]">
+            Disciplina Espiritual
+          </p>
+          <h1 className="candle-enter candle-delay-1 font-serif text-3xl text-[#e2d9c5] font-normal">
+            Plano de Leitura
+          </h1>
+          <p className="candle-enter candle-delay-2 text-[#55524a] text-xs">
+            Escolha um plano para começar
+          </p>
         </div>
 
-        <div className="h-px bg-[#2e2b42]" />
+        <div className="candle-enter candle-delay-2 h-px bg-[#2e2b42] opacity-40" />
 
         <div className="space-y-2">
-          {PLANS.map(plan => (
-            <PlanSetup key={plan.id} plan={plan} />
+          {PLANS.map((plan, i) => (
+            <PlanSetup key={plan.id} plan={plan} delay={380 + i * 110} />
           ))}
         </div>
 
-        <div className="relative pl-6 pr-4 py-4">
+        <div
+          className="candle-enter relative pl-6 pr-4 py-4"
+          style={{ animationDelay: `${380 + PLANS.length * 110}ms` }}
+        >
           <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-[#c9a654] opacity-30" />
           <p className="font-serif text-[#8a8375] text-sm leading-relaxed italic">
             &ldquo;Bem-aventurado o homem que não anda no conselho dos ímpios...
@@ -60,6 +70,7 @@ export default async function PlanoPage() {
           </p>
           <p className="text-[#c9a654] text-xs mt-2 font-serif">Salmos 1:1–2</p>
         </div>
+
       </div>
     )
   }
@@ -83,9 +94,9 @@ export default async function PlanoPage() {
   const today = new Date()
 
   return (
-    <div className="max-w-xl mx-auto px-2 py-8 space-y-8 animate-fade-in">
+    <div className="max-w-xl mx-auto px-2 py-8 space-y-8">
 
-      <div className="flex items-end justify-between">
+      <div className="candle-enter candle-delay-0 flex items-end justify-between">
         <div>
           <p className="font-display text-[9px] text-[#55524a] uppercase tracking-[0.25em] mb-1">Disciplina Espiritual</p>
           <h1 className="font-serif text-3xl text-[#e2d9c5] font-normal">Plano de Leitura</h1>
@@ -99,10 +110,10 @@ export default async function PlanoPage() {
         </div>
       </div>
 
-      <div className="h-px bg-[#2e2b42]" />
+      <div className="candle-enter candle-delay-1 h-px bg-[#2e2b42] opacity-40" />
 
       {/* Progresso */}
-      <div className="space-y-2">
+      <div className="candle-enter candle-delay-2 space-y-2">
         <div className="flex justify-between text-[10px] text-[#3d3a55]">
           <span className="font-display uppercase tracking-wider">Progresso</span>
           <span>{progressCount} / {planDays} dias</span>
@@ -114,7 +125,7 @@ export default async function PlanoPage() {
       </div>
 
       {/* Leitura de hoje */}
-      <div className="card-soft relative pl-8 pr-5 py-5">
+      <div className="candle-flame candle-delay-3 card-soft relative pl-8 pr-5 py-5">
         <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#c9a654] to-transparent opacity-60" />
         <div className="flex items-center gap-2 mb-2">
           <BookOpen className="w-3.5 h-3.5 text-[#c9a654] opacity-60" />
@@ -133,11 +144,15 @@ export default async function PlanoPage() {
 
       {/* Leituras recentes */}
       {recentProgress.length > 0 && (
-        <div className="space-y-3">
+        <div className="candle-enter candle-delay-4 space-y-3">
           <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em]">Recentes</p>
           <div className="space-y-2">
-            {recentProgress.map((p: { id: string; completedAt: Date; readingDay: { passages: string; day: number } }) => (
-              <div key={p.id} className="card-soft flex items-center gap-3 px-4 py-2.5">
+            {recentProgress.map((p: { id: string; completedAt: Date; readingDay: { passages: string; day: number } }, i: number) => (
+              <div
+                key={p.id}
+                className="candle-flame card-soft flex items-center gap-3 px-4 py-2.5"
+                style={{ animationDelay: `${680 + i * 80}ms` }}
+              >
                 <CheckCircle2 className="w-3 h-3 text-[#5a9e72] opacity-60 flex-shrink-0" />
                 <span className="font-serif text-[#8a8375] text-sm flex-1">{p.readingDay.passages}</span>
                 <span className="text-[#3d3a55] text-xs">{format(new Date(p.completedAt), "d MMM", { locale: ptBR })}</span>
@@ -148,7 +163,7 @@ export default async function PlanoPage() {
       )}
 
       {/* Cancelar plano */}
-      <div className="pt-4 border-t border-[#1a1928]">
+      <div className="candle-enter pt-4 border-t border-[#1a1928]" style={{ animationDelay: "1100ms" }}>
         <CancelPlan />
       </div>
     </div>
