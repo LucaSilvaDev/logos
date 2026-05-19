@@ -6,6 +6,18 @@ import { RefreshCw, ThumbsUp, RotateCcw, BookOpen, Shuffle, Loader2 } from "luci
 import Link from "next/link"
 import { BOOK_ID_NAMES } from "@/lib/reading-plan"
 
+const SESSION_KEY = "selah-memorizar-known"
+
+function loadKnown(): Set<string> {
+  try { return new Set(JSON.parse(sessionStorage.getItem(SESSION_KEY) ?? "[]")) }
+  catch { return new Set() }
+}
+
+function saveKnown(ids: Set<string>) {
+  try { sessionStorage.setItem(SESSION_KEY, JSON.stringify([...ids])) }
+  catch {}
+}
+
 export interface FlashCard {
   id:    string
   ref:   string
@@ -30,10 +42,14 @@ const COLOR_BORDER: Record<string, string> = {
 }
 
 export function MemorizarClient({ initialCards }: { initialCards: FlashCard[] }) {
-  const [queue,         setQueue]         = useState<FlashCard[]>(() => shuffle(initialCards))
+  const [knownIds,      setKnownIds]      = useState<Set<string>>(loadKnown)
+  const [queue,         setQueue]         = useState<FlashCard[]>(() => {
+    const known = loadKnown()
+    return shuffle(initialCards.filter(c => !known.has(c.id)))
+  })
   const [index,         setIndex]         = useState(0)
   const [flipped,       setFlipped]       = useState(false)
-  const [knownCount,    setKnownCount]    = useState(0)
+  const [knownCount,    setKnownCount]    = useState(() => loadKnown().size)
   const [loadingRandom, setLoadingRandom] = useState(false)
   const [randomMode,    setRandomMode]    = useState(false)
 
@@ -45,6 +61,12 @@ export function MemorizarClient({ initialCards }: { initialCards: FlashCard[] })
   }
 
   function markKnown() {
+    if (!randomMode) {
+      const newKnown = new Set(knownIds)
+      newKnown.add(current.id)
+      setKnownIds(newKnown)
+      saveKnown(newKnown)
+    }
     const next = queue.filter((_, i) => i !== index)
     setKnownCount(k => k + 1)
     setQueue(next)
@@ -53,6 +75,9 @@ export function MemorizarClient({ initialCards }: { initialCards: FlashCard[] })
   }
 
   function resetDeck() {
+    const empty = new Set<string>()
+    setKnownIds(empty)
+    saveKnown(empty)
     setQueue(shuffle(initialCards))
     setIndex(0)
     setFlipped(false)
