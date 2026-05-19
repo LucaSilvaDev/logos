@@ -16,40 +16,48 @@ export default async function DevocionalPage() {
   })
 
   return (
-    <div className="max-w-2xl mx-auto px-2 py-8 space-y-8 animate-fade-in">
+    <div className="max-w-2xl mx-auto px-2 py-8 space-y-8">
 
       <div className="flex items-end justify-between">
         <div>
-          <p className="font-display text-[9px] text-[#55524a] uppercase tracking-[0.25em] mb-1">Registro Espiritual</p>
-          <h1 className="font-serif text-3xl text-[#e2d9c5] font-normal">Devocional</h1>
-          <p className="text-[#55524a] text-xs mt-1">{devotionals.length} entrada{devotionals.length !== 1 ? "s" : ""}</p>
+          <p className="candle-enter candle-delay-0 font-display text-[9px] text-[#55524a] uppercase tracking-[0.25em] mb-1">Registro Espiritual</p>
+          <h1 className="candle-enter candle-delay-1 font-serif text-3xl text-[#e2d9c5] font-normal">Devocional</h1>
+          <p className="candle-enter candle-delay-2 text-[#55524a] text-xs mt-1">{devotionals.length} entrada{devotionals.length !== 1 ? "s" : ""}</p>
         </div>
         <Link href="/devocional/novo"
-          className="flex items-center gap-1.5 text-sm text-[#c9a654] hover:opacity-80 transition-opacity font-serif">
+          className="candle-enter candle-delay-2 flex items-center gap-1.5 text-sm text-[#c9a654] hover:opacity-80 transition-opacity font-serif">
           <Plus className="w-4 h-4" /> Nova entrada
         </Link>
       </div>
 
-      <div className="h-px bg-[#2e2b42]" />
+      <div className="candle-enter candle-delay-2 h-px bg-[#2e2b42] opacity-40" />
 
       {devotionals.length === 0 ? (
-        <div className="text-center py-20">
-          <NotebookPen className="w-6 h-6 text-[#2e2b42] mx-auto mb-4" />
+        <div className="candle-enter candle-delay-3 text-center py-16">
+          <NotebookPen className="w-5 h-5 text-[#2e2b42] mx-auto mb-4" />
           <p className="font-serif text-[#55524a] text-lg">Nenhum devocional ainda</p>
           <p className="text-[#3d3a55] text-sm mt-1 mb-6">Comece registrando sua meditação diária</p>
           <Link href="/devocional/novo"
             className="text-sm text-[#c9a654] hover:opacity-80 transition-opacity font-serif">
             Criar primeira entrada →
           </Link>
+          <div className="relative pl-6 pr-4 py-4 mt-10 text-left max-w-sm mx-auto">
+            <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-[#c9a654] opacity-25" />
+            <p className="font-serif text-[#55524a] text-sm leading-relaxed italic">
+              &ldquo;Medita nisto, emprega-te totalmente nisso, para que o teu aproveitamento seja manifesto a todos.&rdquo;
+            </p>
+            <p className="text-[#c9a654] text-xs mt-2 opacity-60">1 Timóteo 4:15</p>
+          </div>
         </div>
       ) : (
         <div className="divide-y divide-[#1a1928]">
-          {devotionals.map((d: { id: string; title: string; bibleRef: string | null; tags: string | null; createdAt: Date; content: string }) => {
+          {devotionals.map((d: { id: string; title: string; bibleRef: string | null; tags: string | null; createdAt: Date; content: string }, i: number) => {
             const tags = d.tags ? d.tags.split(",").filter(Boolean) : []
             const preview = d.content.replace(/<[^>]*>/g, "").slice(0, 140)
             return (
               <Link key={d.id} href={`/devocional/${d.id}`}
-                className="group block px-2 py-5 hover:bg-[linear-gradient(90deg,rgba(201,166,84,0.05),transparent)] transition-all duration-300 rounded-xl">
+                className="candle-flame group block px-2 py-5 hover:bg-[linear-gradient(90deg,rgba(201,166,84,0.05),transparent)] transition-all duration-300 rounded-xl"
+                style={{ animationDelay: `${300 + i * 80}ms` }}>
                 <div className="flex items-start justify-between gap-6">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2.5 mb-1.5">

@@ -39,7 +39,7 @@ export function PrayerCard({ prayer }: { prayer: Prayer }) {
   }
 
   return (
-    <div className="card-soft px-4 py-4 space-y-0">
+    <div className="flame-hover card-soft px-4 py-4 space-y-0">
       {/* Header — clicável para expandir */}
       <button onClick={() => { setExpanded(e => !e); setConfirming(false) }}
         className="w-full text-left flex items-start gap-3 group">

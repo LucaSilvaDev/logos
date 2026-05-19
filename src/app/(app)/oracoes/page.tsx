@@ -73,31 +73,31 @@ export default async function OracoesPage() {
   const prayerOfHour = REFORMED_PRAYERS[hour % REFORMED_PRAYERS.length]
 
   return (
-    <div className="max-w-2xl mx-auto px-2 py-8 space-y-8 animate-fade-in">
+    <div className="max-w-2xl mx-auto px-2 py-8 space-y-8">
 
       <div className="flex items-end justify-between">
         <div>
-          <p className="font-display text-[9px] text-[#55524a] uppercase tracking-[0.25em] mb-1">Comunhão com Deus</p>
-          <h1 className="font-serif text-3xl text-[#e2d9c5] font-normal">Orações</h1>
-          <p className="text-[#55524a] text-xs mt-1">
+          <p className="candle-enter candle-delay-0 font-display text-[9px] text-[#55524a] uppercase tracking-[0.25em] mb-1">Comunhão com Deus</p>
+          <h1 className="candle-enter candle-delay-1 font-serif text-3xl text-[#e2d9c5] font-normal">Orações</h1>
+          <p className="candle-enter candle-delay-2 text-[#55524a] text-xs mt-1">
             {personal.length} ativa{personal.length !== 1 ? "s" : ""} · {answered.length} respondida{answered.length !== 1 ? "s" : ""}
           </p>
         </div>
         <Link href="/oracoes/nova"
-          className="flex items-center gap-1.5 text-sm text-[#c9a654] hover:opacity-80 transition-opacity font-serif">
+          className="candle-enter candle-delay-2 flex items-center gap-1.5 text-sm text-[#c9a654] hover:opacity-80 transition-opacity font-serif">
           <Plus className="w-4 h-4" /> Nova oração
         </Link>
       </div>
 
-      <div className="h-px bg-[#2e2b42]" />
+      <div className="candle-enter candle-delay-2 h-px bg-[#2e2b42] opacity-40" />
 
       {/* Oração da hora */}
-      <section className="space-y-2">
+      <section className="candle-flame candle-delay-3 space-y-2">
         <div className="flex items-center gap-2">
           <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em]">Oração da Hora</p>
           <span className="text-[9px] text-[#3d3a55] font-sans">· muda a cada hora</span>
         </div>
-        <div className="card-soft relative pl-6 pr-5 py-5">
+        <div className="flame-hover card-soft relative pl-6 pr-5 py-5">
           <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#c9a654] to-transparent opacity-50 rounded-l-full" />
           <blockquote className="font-serif text-[#8a8375] text-sm leading-relaxed italic mb-3">
             &ldquo;{prayerOfHour.text}&rdquo;
@@ -108,7 +108,7 @@ export default async function OracoesPage() {
       </section>
 
       {/* Minhas orações — privadas */}
-      <section className="space-y-3">
+      <section className="candle-enter candle-delay-4 space-y-3">
         <div className="flex items-center gap-2">
           <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em]">Minhas Orações</p>
           <span className="flex items-center gap-1 text-[9px] text-[#3d3a55]">
@@ -116,18 +116,21 @@ export default async function OracoesPage() {
           </span>
         </div>
         {personal.length === 0 ? (
-          <div className="text-center py-10">
+          <div className="text-center py-8">
             <Heart className="w-5 h-5 text-[#2e2b42] mx-auto mb-3" />
             <p className="font-serif text-[#55524a]">Nenhuma oração registrada</p>
+            <p className="text-[#3d3a55] text-xs mt-1 mb-4 italic font-serif">Apresentai os vossos pedidos a Deus</p>
             <Link href="/oracoes/nova"
-              className="inline-flex items-center gap-1.5 mt-3 text-sm text-[#c9a654] hover:opacity-80 transition-opacity font-serif">
+              className="inline-flex items-center gap-1.5 text-sm text-[#c9a654] hover:opacity-80 transition-opacity font-serif">
               <Plus className="w-3.5 h-3.5" /> Adicionar oração
             </Link>
           </div>
         ) : (
           <div className="space-y-2">
-            {personal.map((p: { id: string; title: string; content: string; category: string; createdAt: Date }) => (
-              <PrayerCard key={p.id} prayer={p} />
+            {personal.map((p: { id: string; title: string; content: string; category: string; createdAt: Date }, i: number) => (
+              <div key={p.id} className="candle-flame" style={{ animationDelay: `${760 + i * 70}ms` }}>
+                <PrayerCard prayer={p} />
+              </div>
             ))}
           </div>
         )}
@@ -135,11 +138,12 @@ export default async function OracoesPage() {
 
       {/* Respondidas */}
       {answered.length > 0 && (
-        <section className="space-y-3">
+        <section className="candle-enter space-y-3" style={{ animationDelay: `${760 + personal.length * 70}ms` }}>
           <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em]">Respondidas</p>
           <div className="space-y-2">
-            {answered.map((p: { id: string; title: string; answeredAt: Date | null }) => (
-              <div key={p.id} className="card-soft flex items-center gap-3 px-4 py-3">
+            {answered.map((p: { id: string; title: string; answeredAt: Date | null }, i: number) => (
+              <div key={p.id} className="candle-flame card-soft flex items-center gap-3 px-4 py-3"
+                style={{ animationDelay: `${820 + personal.length * 70 + i * 60}ms` }}>
                 <CheckCircle2 className="w-3.5 h-3.5 text-[#5a9e72] opacity-60 flex-shrink-0" />
                 <span className="font-serif text-[#8a8375] text-sm flex-1">{p.title}</span>
                 {p.answeredAt && (
@@ -155,14 +159,15 @@ export default async function OracoesPage() {
 
       {/* Orações Bíblicas Apostólicas */}
       <section className="space-y-4">
-        <div className="h-px bg-[#2e2b42]" />
+        <div className="h-px bg-[#2e2b42] opacity-40" />
         <div className="flex items-center gap-2">
           <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em]">Orações Bíblicas</p>
           <span className="text-[9px] text-[#3d3a55]">· dos apóstolos e profetas</span>
         </div>
         <div className="space-y-4">
           {APOSTOLIC_PRAYERS.map((q, i) => (
-            <div key={i} className="card-soft relative pl-6 pr-5 py-4">
+            <div key={i} className="candle-flame flame-hover card-soft relative pl-6 pr-5 py-4"
+              style={{ animationDelay: `${200 + i * 90}ms` }}>
               <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#c9a654] to-transparent opacity-40 rounded-l-full" />
               <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.2em] mb-2">{q.ref}</p>
               <blockquote className="font-serif text-[#8a8375] text-sm leading-relaxed italic mb-2">
@@ -176,11 +181,11 @@ export default async function OracoesPage() {
 
       {/* Nuvem de Testemunhas */}
       <section className="space-y-4">
-        <div className="h-px bg-[#2e2b42]" />
+        <div className="h-px bg-[#2e2b42] opacity-40" />
         <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em]">Nuvem de Testemunhas</p>
         <div className="space-y-6">
           {REFORMED_PRAYERS.map((q, i) => (
-            <div key={i} className="relative pl-6">
+            <div key={i} className="candle-enter relative pl-6" style={{ animationDelay: `${150 + i * 60}ms` }}>
               <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-[#c9a654] opacity-20" />
               <blockquote className="font-serif text-[#8a8375] text-sm leading-relaxed italic mb-2">
                 &ldquo;{q.text}&rdquo;

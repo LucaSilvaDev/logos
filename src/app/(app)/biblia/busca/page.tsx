@@ -86,7 +86,7 @@ export default function BuscaBibliaPage() {
     <div className="max-w-2xl mx-auto px-6 py-8 space-y-8">
 
       {/* Header */}
-      <div className="flex items-center gap-3">
+      <div className="candle-enter candle-delay-0 flex items-center gap-3">
         <Link href="/biblia" className="text-[#3d3a55] hover:text-[#8a8375] transition-colors">
           <ChevronLeft className="w-4 h-4" />
         </Link>
@@ -97,7 +97,7 @@ export default function BuscaBibliaPage() {
       </div>
 
       {/* Form */}
-      <form onSubmit={handleSearch} className="space-y-3">
+      <form onSubmit={handleSearch} className="candle-enter candle-delay-1 space-y-3">
         <div className="relative">
           <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#3d3a55]" />
           <input
@@ -186,7 +186,8 @@ export default function BuscaBibliaPage() {
             {results.map((r, i) => (
               <button key={i}
                 onClick={() => goToBible(r.bookId, r.chapter)}
-                className="w-full group flex items-start gap-4 px-2 py-4 text-left hover:bg-[linear-gradient(90deg,rgba(201,166,84,0.05),transparent)] rounded-xl transition-all duration-300"
+                className="candle-flame w-full group flex items-start gap-4 px-2 py-4 text-left hover:bg-[linear-gradient(90deg,rgba(201,166,84,0.05),transparent)] rounded-xl transition-all duration-300"
+                style={{ animationDelay: `${i * 60}ms` }}
               >
                 <BookOpen className="w-3.5 h-3.5 text-[#2e2b42] mt-0.5 flex-shrink-0 group-hover:text-[#c9a654] transition-colors" />
                 <div className="flex-1 min-w-0">

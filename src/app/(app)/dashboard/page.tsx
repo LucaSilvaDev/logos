@@ -119,7 +119,7 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
 
         {/* Versículo do Dia */}
-        <Link href="/biblia" className="candle-enter candle-delay-3 block card-soft relative pl-6 pr-4 py-5 group">
+        <Link href="/biblia" className="candle-enter candle-delay-3 flame-hover block card-soft relative pl-6 pr-4 py-5 group">
           <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#c9a654] via-[#c9a654] to-transparent opacity-60 rounded-full" />
           <p className="font-display text-[9px] text-[#c9a654] uppercase tracking-[0.2em] mb-3 opacity-70">
             Versículo do Dia
@@ -131,7 +131,7 @@ export default async function DashboardPage() {
         </Link>
 
         {/* Nuvem de Testemunhas */}
-        <div className="candle-enter candle-delay-4 card-soft relative pl-6 pr-4 py-5">
+        <div className="candle-enter candle-delay-4 flame-hover card-soft relative pl-6 pr-4 py-5">
           <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#c9a654] via-[#c9a654] to-transparent opacity-60 rounded-full" />
           <p className="font-display text-[9px] text-[#c9a654] uppercase tracking-[0.2em] mb-3 opacity-70">
             Nuvem de Testemunhas
@@ -146,7 +146,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Seu Progresso */}
-      <div className="candle-enter candle-delay-5 card-soft px-5 py-4 space-y-3">
+      <div className="candle-enter candle-delay-5 flame-hover card-soft px-5 py-4 space-y-3">
         <p className="font-display text-[9px] text-[#c9a654] uppercase tracking-[0.2em] opacity-70">
           Seu Progresso
         </p>
