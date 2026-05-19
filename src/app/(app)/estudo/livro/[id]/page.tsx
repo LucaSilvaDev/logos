@@ -5,6 +5,7 @@ import { ArrowLeft, Plus, FileText, BookOpen } from "lucide-react"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import { BOOK_ID_NAMES } from "@/lib/reading-plan"
+import { QuickNotePanel } from "./QuickNotePanel"
 
 const NOTE_TYPE_LABELS: Record<string, string> = {
   exegesis:    "Exegese",
@@ -27,17 +28,20 @@ export default async function EstudoLivroPage({ params }: { params: Promise<{ id
   })
 
   return (
-    <div className="max-w-2xl mx-auto px-2 py-8 space-y-6 animate-fade-in">
+    <div className="max-w-2xl mx-auto px-2 py-8 space-y-6">
 
       <div className="flex items-center justify-between">
         <Link href="/estudo"
           className="flex items-center gap-1.5 text-[#55524a] hover:text-[#8a8375] text-sm transition-colors font-serif">
           <ArrowLeft className="w-4 h-4" /> Estudo
         </Link>
-        <Link href={`/estudo/nova?book=${encodeURIComponent(bookName)}`}
-          className="flex items-center gap-1.5 text-sm text-[#c9a654] hover:opacity-80 transition-opacity font-serif">
-          <Plus className="w-4 h-4" /> Nova nota
-        </Link>
+        <div className="flex items-center gap-4">
+          <QuickNotePanel bookName={bookName} />
+          <Link href={`/estudo/nova?book=${encodeURIComponent(bookName)}`}
+            className="flex items-center gap-1.5 text-sm text-[#55524a] hover:text-[#c9a654] transition-colors font-serif">
+            <Plus className="w-4 h-4" /> Nota completa
+          </Link>
+        </div>
       </div>
 
       <div>
@@ -51,13 +55,10 @@ export default async function EstudoLivroPage({ params }: { params: Promise<{ id
       <div className="h-px bg-[#2e2b42]" />
 
       {notes.length === 0 ? (
-        <div className="text-center py-16">
+        <div className="text-center py-12">
           <FileText className="w-5 h-5 text-[#2e2b42] mx-auto mb-3" />
           <p className="font-serif text-[#55524a]">Nenhuma nota para {bookName}</p>
-          <Link href={`/estudo/nova?book=${encodeURIComponent(bookName)}`}
-            className="inline-flex items-center gap-1.5 mt-3 text-sm text-[#c9a654] hover:opacity-80 transition-opacity font-serif">
-            <Plus className="w-3.5 h-3.5" /> Criar primeira nota
-          </Link>
+          <p className="text-[#3d3a55] text-xs mt-1 mb-4">Use "Nota rápida" acima para anotar pontos importantes</p>
         </div>
       ) : (
         <div className="space-y-2">

@@ -6,7 +6,7 @@ import { z } from "zod"
 const createSchema = z.object({
   book:    z.string().min(2).max(5),
   chapter: z.number().int().min(1),
-  verse:   z.number().int().min(1),
+  verse:   z.number().int().min(0),
   version: z.string().min(2).max(10),
   text:    z.string().min(1).max(5000),
 })

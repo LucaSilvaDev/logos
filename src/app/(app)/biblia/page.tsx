@@ -204,6 +204,10 @@ export default function BibliaPage() {
   const [noteText,    setNoteText]    = useState("")
   const [noteSaving,  setNoteSaving]  = useState(false)
 
+  const [chapterNoteOpen,   setChapterNoteOpen]   = useState(false)
+  const [chapterNoteText,   setChapterNoteText]   = useState("")
+  const [chapterNoteSaving, setChapterNoteSaving] = useState(false)
+
   const [verses,    setVerses]    = useState<Verse[]>([])
   const [loading,   setLoading]   = useState(false)
   const [apiError,  setApiError]  = useState<"ERROR" | "AUTH_REQUIRED" | "RATE_LIMIT" | null>(null)
@@ -239,6 +243,7 @@ export default function BibliaPage() {
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") {
+        if (chapterNoteOpen)            { setChapterNoteOpen(false);  return }
         if (noteVerse !== null)         { setNoteVerse(null);         return }
         if (selectedVerses.size > 0)    { setSelectedVerses(new Set()); return }
         if (showChapterModal)           { setShowChapterModal(false); return }
@@ -248,7 +253,7 @@ export default function BibliaPage() {
     }
     document.addEventListener("keydown", onKey)
     return () => document.removeEventListener("keydown", onKey)
-  }, [focusMode, noteVerse, selectedVerses, showChapterModal, showBookModal])
+  }, [focusMode, chapterNoteOpen, noteVerse, selectedVerses, showChapterModal, showBookModal])
 
   // Persist reading position
   useEffect(() => {
@@ -317,6 +322,7 @@ export default function BibliaPage() {
       } catch { /* non-critical */ }
     }
     setVerseNotes({})
+    setChapterNoteOpen(false)
     load()
     return () => { active = false }
   }, [book, chapter, version])
@@ -426,6 +432,56 @@ export default function BibliaPage() {
     })
     setVerseNotes(prev => { const n = { ...prev }; delete n[key]; return n })
     setNoteVerse(null)
+  }
+
+  function openChapterNote() {
+    setNoteVerse(null)
+    const key = `${book.id}-${chapter}-0`
+    setChapterNoteText(verseNotes[key]?.text ?? "")
+    setChapterNoteOpen(true)
+  }
+
+  async function saveChapterNote() {
+    setChapterNoteSaving(true)
+    const key = `${book.id}-${chapter}-0`
+    try {
+      if (!chapterNoteText.trim()) {
+        const existing = verseNotes[key]
+        if (existing) {
+          await fetch("/api/biblia/notes", {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: existing.id }),
+          })
+          setVerseNotes(prev => { const n = { ...prev }; delete n[key]; return n })
+        }
+      } else {
+        const res  = await fetch("/api/biblia/notes", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ book: book.id, chapter, verse: 0, version, text: chapterNoteText }),
+        })
+        const data = await res.json()
+        if (data?.id) setVerseNotes(prev => ({ ...prev, [key]: { id: data.id, text: chapterNoteText } }))
+      }
+      setChapterNoteOpen(false)
+    } finally {
+      setChapterNoteSaving(false)
+    }
+  }
+
+  async function deleteChapterNote() {
+    const key = `${book.id}-${chapter}-0`
+    const existing = verseNotes[key]
+    if (!existing) return
+    await fetch("/api/biblia/notes", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: existing.id }),
+    })
+    setVerseNotes(prev => { const n = { ...prev }; delete n[key]; return n })
+    setChapterNoteText("")
+    setChapterNoteOpen(false)
   }
 
   function selectionRef() {
@@ -644,6 +700,23 @@ export default function BibliaPage() {
         title="Buscar versículos">
         <Search className="w-3.5 h-3.5" />
       </Link>
+
+      <div className="w-px h-3.5 bg-[#2e2b42]" />
+
+      {/* Chapter note */}
+      <button
+        onClick={openChapterNote}
+        title="Nota do capítulo"
+        className={cn(
+          "relative transition-colors duration-200",
+          chapterNoteOpen ? "text-[#c9a654]" : "text-[#3d3a55] hover:text-[#c9a654]"
+        )}
+      >
+        <PenLine className="w-3.5 h-3.5" />
+        {verseNotes[`${book.id}-${chapter}-0`] && (
+          <span className="absolute -top-0.5 -right-0.5 w-1.5 h-1.5 rounded-full bg-[#c9a654]" />
+        )}
+      </button>
 
       <div className="w-px h-3.5 bg-[#2e2b42]" />
 
@@ -972,6 +1045,73 @@ export default function BibliaPage() {
                   className="bg-[#c9a65420] text-[#c9a654] border border-[#c9a65440] text-[11px] font-sans px-3 py-1.5 rounded-lg hover:bg-[#c9a65430] transition-all disabled:opacity-50"
                 >
                   {noteSaving ? "Salvando…" : "Salvar"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )
+      })()}
+
+      {/* Chapter note panel */}
+      {chapterNoteOpen && (() => {
+        const bookName    = BOOK_ID_NAMES[book.id] ?? book.name
+        const chapterKey  = `${book.id}-${chapter}-0`
+        const existing    = verseNotes[chapterKey]
+        return (
+          <div
+            className="fixed bottom-0 left-0 right-0 z-[200] animate-slide-up"
+            style={{
+              background: "rgba(14,13,25,0.96)",
+              backdropFilter: "blur(48px) saturate(1.8)",
+              WebkitBackdropFilter: "blur(48px) saturate(1.8)",
+              borderTop: "1px solid rgba(255,255,255,0.09)",
+              boxShadow: "0 -8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06)",
+            }}
+          >
+            <div className="max-w-2xl mx-auto px-4 py-3">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <PenLine className="w-3.5 h-3.5 text-[#c9a654] opacity-70" />
+                  <span className="text-[#c9a654] text-[11px] font-serif">
+                    {bookName} {chapter} — Notas do capítulo
+                  </span>
+                </div>
+                <button onClick={() => setChapterNoteOpen(false)} className="text-[#3d3a55] hover:text-[#55524a] transition-colors p-1">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              <textarea
+                value={chapterNoteText}
+                onChange={e => setChapterNoteText(e.target.value)}
+                placeholder="Pontos importantes, observações, reflexões sobre este capítulo..."
+                autoFocus
+                rows={4}
+                className="w-full text-sm font-serif text-[#c9c0a8] placeholder:text-[#3d3a55] bg-transparent outline-none resize-none leading-relaxed"
+              />
+
+              <div className="flex items-center justify-end gap-2 mt-2 pt-2 border-t border-white/5">
+                {existing && (
+                  <button
+                    onClick={deleteChapterNote}
+                    className="flex items-center gap-1.5 text-[#c96b5a] text-[11px] font-sans hover:opacity-80 transition-opacity mr-auto"
+                  >
+                    <Trash2 className="w-3 h-3" />
+                    Excluir
+                  </button>
+                )}
+                <button
+                  onClick={() => setChapterNoteOpen(false)}
+                  className="text-[#55524a] text-[11px] font-sans hover:text-[#8a8375] transition-colors px-3 py-1.5"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={saveChapterNote}
+                  disabled={chapterNoteSaving}
+                  className="bg-[#c9a65420] text-[#c9a654] border border-[#c9a65440] text-[11px] font-sans px-3 py-1.5 rounded-lg hover:bg-[#c9a65430] transition-all disabled:opacity-50"
+                >
+                  {chapterNoteSaving ? "Salvando…" : "Salvar"}
                 </button>
               </div>
             </div>
