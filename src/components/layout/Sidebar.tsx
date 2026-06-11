@@ -120,7 +120,7 @@ export function Sidebar({ open, onClose, collapsed, onToggleCollapse }: SidebarP
                 <span className={cn(
                   "pointer-events-none absolute left-full ml-3 top-1/2 -translate-y-1/2",
                   "px-2.5 py-1.5 rounded-lg text-[11px] text-[#e2d9c5] whitespace-nowrap",
-                  "bg-[#211f31] border border-[#2e2b42] shadow-lg",
+                  "bg-[#1c1c1f] border border-[rgba(255,255,255,0.08)] shadow-lg",
                   "opacity-0 group-hover:opacity-100 transition-opacity duration-150 z-50",
                   collapsed ? "hidden md:block" : "hidden"
                 )}>
