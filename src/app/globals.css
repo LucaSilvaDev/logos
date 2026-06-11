@@ -69,27 +69,27 @@ body {
 
 /* ─── SUPERFÍCIES / CARDS ────────────────────────────────────────────────── */
 .surface {
-  background: linear-gradient(160deg, rgba(30,28,46,0.8), rgba(22,21,36,0.7));
+  background: linear-gradient(160deg, rgba(30,30,32,0.85), rgba(22,22,24,0.75));
   border-radius: 20px;
   border: 1px solid rgba(255,255,255,0.06);
   box-shadow: 0 4px 24px rgba(0,0,0,0.32), 0 1px 4px rgba(0,0,0,0.16), inset 0 1px 0 rgba(255,255,255,0.05);
 }
 .surface-raised {
-  background: linear-gradient(160deg, rgba(38,36,56,0.85), rgba(28,27,44,0.75));
+  background: linear-gradient(160deg, rgba(38,38,40,0.88), rgba(28,28,30,0.78));
   border-radius: 20px;
   border: 1px solid rgba(255,255,255,0.07);
   box-shadow: 0 6px 32px rgba(0,0,0,0.38), 0 2px 8px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.06);
 }
 /* Card suave para listas contemplativas */
 .card-soft {
-  background: linear-gradient(160deg, rgba(28,26,43,0.65), rgba(20,19,33,0.55));
+  background: linear-gradient(160deg, rgba(28,28,30,0.70), rgba(20,20,22,0.60));
   border-radius: 18px;
   border: 1px solid rgba(255,255,255,0.05);
   box-shadow: 0 3px 18px rgba(0,0,0,0.24), 0 1px 4px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.04);
   transition: background 0.25s, box-shadow 0.25s, border-color 0.25s;
 }
 .card-soft:hover {
-  background: linear-gradient(160deg, rgba(36,34,54,0.75), rgba(26,25,42,0.65));
+  background: linear-gradient(160deg, rgba(36,36,38,0.80), rgba(26,26,28,0.70));
   border-color: rgba(255,255,255,0.08);
   box-shadow: 0 6px 28px rgba(0,0,0,0.32), 0 2px 8px rgba(0,0,0,0.16), inset 0 1px 0 rgba(201,166,84,0.08);
 }

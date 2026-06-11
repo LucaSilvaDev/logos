@@ -1051,7 +1051,7 @@ export default function BibliaPage() {
           <div
             className="fixed bottom-0 left-0 right-0 z-[200] animate-slide-up"
             style={{
-              background: "rgba(14,13,25,0.96)",
+              background: "rgba(14,14,16,0.96)",
               backdropFilter: "blur(48px) saturate(1.8)",
               WebkitBackdropFilter: "blur(48px) saturate(1.8)",
               borderTop: "1px solid rgba(255,255,255,0.09)",
@@ -1117,7 +1117,7 @@ export default function BibliaPage() {
           <div
             className="fixed bottom-0 left-0 right-0 z-[200] animate-slide-up"
             style={{
-              background: "rgba(14,13,25,0.96)",
+              background: "rgba(14,14,16,0.96)",
               backdropFilter: "blur(48px) saturate(1.8)",
               WebkitBackdropFilter: "blur(48px) saturate(1.8)",
               borderTop: "1px solid rgba(255,255,255,0.09)",
@@ -1182,7 +1182,7 @@ export default function BibliaPage() {
           <div
             className="fixed bottom-0 left-0 right-0 z-[200] animate-slide-up"
             style={{
-              background: "rgba(14,13,25,0.97)",
+              background: "rgba(14,14,16,0.97)",
               backdropFilter: "blur(48px) saturate(1.8)",
               WebkitBackdropFilter: "blur(48px) saturate(1.8)",
               borderTop: "1px solid rgba(255,255,255,0.09)",
@@ -1230,7 +1230,7 @@ export default function BibliaPage() {
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowChapterModal(false)} />
           <div className="relative z-10 w-full max-w-sm overflow-hidden flex flex-col modal-enter"
             style={{
-              background: "rgba(14, 13, 25, 0.88)",
+              background: "rgba(14, 14, 16, 0.88)",
               backdropFilter: "blur(48px) saturate(1.6)",
               boxShadow: "0 24px 64px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.05), inset 0 1px 0 rgba(255,255,255,0.07)",
               borderRadius: "24px",
@@ -1277,7 +1277,7 @@ export default function BibliaPage() {
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setShowBookModal(false)} />
           <div className="relative z-10 w-full max-w-2xl overflow-hidden flex flex-col modal-enter"
             style={{
-              background: "rgba(14, 13, 25, 0.88)",
+              background: "rgba(14, 14, 16, 0.88)",
               backdropFilter: "blur(48px) saturate(1.6)",
               boxShadow: "0 24px 64px rgba(0,0,0,0.55), 0 0 0 1px rgba(255,255,255,0.05), inset 0 1px 0 rgba(255,255,255,0.07)",
               borderRadius: "24px",
