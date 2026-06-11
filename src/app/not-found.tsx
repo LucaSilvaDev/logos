@@ -12,7 +12,7 @@ export default function NotFound() {
         <p className="text-white/50 font-semibold text-lg mb-1">Página não encontrada</p>
         <p className="text-white/25 text-sm mb-8">Este caminho não existe no sistema devocional.</p>
         <Link href="/dashboard"
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-500/20 border border-blue-400/30 text-blue-300 hover:bg-blue-500/30 transition-all text-sm font-medium">
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#c9a65415] border border-[#c9a65430] text-[#c9a654] hover:bg-[#c9a65425] transition-all text-sm font-medium">
           <Home className="w-4 h-4" /> Ir para o Dashboard
         </Link>
       </div>

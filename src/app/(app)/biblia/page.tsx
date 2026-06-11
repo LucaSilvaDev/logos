@@ -91,7 +91,7 @@ const VERSIONS = [
 const HL_COLORS = [
   { id: "yellow", style: "#c9a654" },
   { id: "green",  style: "#5a9e72" },
-  { id: "blue",   style: "#6b9cca" },
+  { id: "blue",   style: "#a09898" },
   { id: "red",    style: "#c96b5a" },
 ]
 

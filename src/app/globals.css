@@ -29,7 +29,7 @@ body {
   Texto sutil        : #55524a
   Ouro (acento)      : #c9a654 — iluminismo, manuscritos medievais
   Ouro dim           : #7a6535
-  Azul               : #6b9cca — azul muted, céu crepuscular
+  Prata              : #a09898 — neutro muted, grifos secundários
   Verde              : #5a9e72
   Vermelho           : #c96b5a
 */
@@ -138,7 +138,7 @@ body {
 /* ─── BADGES ─────────────────────────────────────────────────────────────── */
 .badge       { background: #252528; border: 1px solid #2e2e32; color: #8a8375; border-radius: 4px; font-size: 0.65rem; }
 .badge-gold  { background: #2a2010; border: 1px solid #7a6535; color: #c9a654; }
-.badge-blue  { background: #162030; border: 1px solid #2a4060; color: #6b9cca; }
+.badge-blue  { background: #1e1e22; border: 1px solid #2e2e32; color: #a09898; }
 .badge-green { background: #152010; border: 1px solid #2a4525; color: #5a9e72; }
 .badge-red   { background: #251510; border: 1px solid #4a2515; color: #c96b5a; }
 
@@ -364,7 +364,7 @@ body {
 /* transition: tinta sendo aplicada (300ms ease) */
 .hl-yellow { background: rgba(201, 166, 84, 0.28); border-radius: 2px; padding: 0 2px; transition: background-color 300ms ease, color 300ms ease; }
 .hl-green  { background: rgba(90, 158, 114, 0.25); border-radius: 2px; padding: 0 2px; transition: background-color 300ms ease, color 300ms ease; }
-.hl-blue   { background: rgba(107, 156, 202, 0.25); border-radius: 2px; padding: 0 2px; transition: background-color 300ms ease, color 300ms ease; }
+.hl-blue   { background: rgba(160, 152, 152, 0.22); border-radius: 2px; padding: 0 2px; transition: background-color 300ms ease, color 300ms ease; }
 .hl-red    { background: rgba(201, 107, 90, 0.28); border-radius: 2px; padding: 0 2px; transition: background-color 300ms ease, color 300ms ease; }
 .hl-purple { background: rgba(160, 120, 210, 0.25); border-radius: 2px; padding: 0 2px; transition: background-color 300ms ease, color 300ms ease; }
 
@@ -442,7 +442,7 @@ body {
 /* Grifos — mantidos no tema claro */
 [data-theme="light"] .hl-yellow { background: rgba(122, 79, 10, 0.2); }
 [data-theme="light"] .hl-green  { background: rgba(45, 107, 72, 0.15); }
-[data-theme="light"] .hl-blue   { background: rgba(42, 91, 138, 0.15); }
+[data-theme="light"] .hl-blue   { background: rgba(130, 120, 110, 0.18); }
 
 /* Badges */
 [data-theme="light"] .badge      { background: #eddbc4; border-color: rgba(163,128,80,0.3); color: #8a6848; }
@@ -458,7 +458,7 @@ body {
 [data-theme="light"] .text-\[\#c9a654\] { color: #7a4f0a; }
 [data-theme="light"] .text-\[\#5a9e72\] { color: #1e5c38; }
 [data-theme="light"] .text-\[\#c96b5a\] { color: #8b2a1c; }
-[data-theme="light"] .text-\[\#6b9cca\] { color: #2a5b8a; }
+[data-theme="light"] .text-\[\#6b9cca\] { color: #7a4f0a; }
 [data-theme="light"] .text-\[\#7a6535\] { color: #7a4f0a; }
 [data-theme="light"] .text-\[\#d4cbb8\] { color: #2a1810; }
 
@@ -530,7 +530,7 @@ body {
 }
 [data-theme="light"] .tiptap strong { color: #1e140a; }
 [data-theme="light"] .tiptap mark   { background: rgba(122,79,10,0.2); }
-[data-theme="light"] .tiptap a      { color: #2a5b8a; }
+[data-theme="light"] .tiptap a      { color: #7a4f0a; }
 [data-theme="light"] .tiptap h1,
 [data-theme="light"] .tiptap h2     { color: #7a4f0a; }
 [data-theme="light"] .tiptap p.is-editor-empty:first-child::before { color: #b09878; }
@@ -542,7 +542,7 @@ body {
 }
 [data-theme="light"] .prose-devotional strong { color: #1e140a; }
 [data-theme="light"] .prose-devotional mark   { background: rgba(122,79,10,0.2); }
-[data-theme="light"] .prose-devotional a      { color: #2a5b8a; }
+[data-theme="light"] .prose-devotional a      { color: #7a4f0a; }
 [data-theme="light"] .prose-devotional h1,
 [data-theme="light"] .prose-devotional h2,
 [data-theme="light"] .prose-devotional h3     { color: #7a4f0a; }
@@ -677,8 +677,8 @@ body {
   bottom: 5%;
   left: -80px;
   background: radial-gradient(ellipse at 55% 60%,
-    rgba(107, 156, 202, 0.09) 0%,
-    rgba(107, 156, 202, 0.03) 50%,
+    rgba(201, 166, 84, 0.05) 0%,
+    rgba(201, 166, 84, 0.01) 50%,
     transparent 72%);
   filter: blur(60px);
   pointer-events: none;
@@ -710,8 +710,8 @@ body {
 }
 [data-theme="light"] .liquid-orb-2 {
   background: radial-gradient(ellipse at 55% 60%,
-    rgba(80, 130, 180, 0.07) 0%,
-    rgba(80, 130, 180, 0.02) 50%,
+    rgba(180, 130, 40, 0.05) 0%,
+    rgba(180, 130, 40, 0.01) 50%,
     transparent 72%);
 }
 [data-theme="light"] .liquid-orb-3 {
@@ -891,7 +891,7 @@ body {
 .prose-devotional mark { background: rgba(201,166,84,0.28); border-radius: 2px; padding: 0 2px; }
 .prose-devotional ul, .prose-devotional ol { padding-left: 1.5rem; margin: 0.6rem 0; }
 .prose-devotional li { margin: 0.3rem 0; }
-.prose-devotional a { color: #6b9cca; text-decoration: underline; }
+.prose-devotional a { color: #c9a654; text-decoration: underline; }
 .prose-devotional strong { color: #e2d9c5; }
 .prose-devotional h1, .prose-devotional h2, .prose-devotional h3 {
   font-family: 'Cinzel', serif;
@@ -925,7 +925,7 @@ body {
   margin: 1rem 0;
   font-style: italic;
 }
-.tiptap a { color: #6b9cca; text-decoration: underline; }
+.tiptap a { color: #c9a654; text-decoration: underline; }
 .tiptap mark { background: rgba(201,166,84,0.28); border-radius: 2px; }
 .tiptap strong { color: #e2d9c5; }
 .tiptap ul, .tiptap ol { padding-left: 1.5rem; }
@@ -944,8 +944,8 @@ body {
 }
 .bible-link:hover { opacity: 0.75; }
 .note-link {
-  color: #6b9cca;
-  border-bottom: 1px solid rgba(107,156,202,0.3);
+  color: #c9a654;
+  border-bottom: 1px solid rgba(201,166,84,0.3);
   cursor: pointer;
   transition: opacity 0.15s;
 }

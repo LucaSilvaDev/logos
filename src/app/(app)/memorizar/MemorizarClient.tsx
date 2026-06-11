@@ -39,7 +39,7 @@ function shuffle<T>(arr: T[]): T[] {
 const COLOR_BORDER: Record<string, string> = {
   yellow: "rgba(201,166,84,0.35)",
   green:  "rgba(90,158,114,0.35)",
-  blue:   "rgba(107,156,202,0.35)",
+  blue:   "rgba(160,152,152,0.35)",
   red:    "rgba(201,107,90,0.35)",
 }
 
