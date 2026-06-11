@@ -1,11 +1,12 @@
 ﻿"use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { useRouter } from "next/navigation"
 import {
   ChevronLeft, ChevronRight, Search, Bookmark,
   X, Loader2, AlertCircle, BookOpen, ChevronDown,
-  Maximize2, Minimize2, Trash2, PenLine, Share2, Copy, Check, MessageSquare
+  Maximize2, Minimize2, Trash2, PenLine, Share2, Copy, Check, MessageSquare,
+  ArrowLeftRight
 } from "lucide-react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
@@ -223,6 +224,13 @@ export default function BibliaPage() {
   const [selectedVerses, setSelectedVerses] = useState<Set<number>>(new Set())
   const [copied, setCopied] = useState(false)
 
+  const [compareOpen,     setCompareOpen]     = useState(false)
+  const [compareVerseNum, setCompareVerseNum] = useState<number | null>(null)
+  const [compareData,     setCompareData]     = useState<Record<string, string>>({})
+  const [compareLoading,  setCompareLoading]  = useState(false)
+
+  const touchStartX = useRef(0)
+  const touchStartY = useRef(0)
 
   // Reading progress bar
   const [scrollProgress, setScrollProgress] = useState(0)
@@ -243,6 +251,7 @@ export default function BibliaPage() {
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (e.key === "Escape") {
+        if (compareOpen)                { setCompareOpen(false);      return }
         if (chapterNoteOpen)            { setChapterNoteOpen(false);  return }
         if (noteVerse !== null)         { setNoteVerse(null);         return }
         if (selectedVerses.size > 0)    { setSelectedVerses(new Set()); return }
@@ -253,7 +262,7 @@ export default function BibliaPage() {
     }
     document.addEventListener("keydown", onKey)
     return () => document.removeEventListener("keydown", onKey)
-  }, [focusMode, chapterNoteOpen, noteVerse, selectedVerses, showChapterModal, showBookModal])
+  }, [focusMode, chapterNoteOpen, noteVerse, selectedVerses, showChapterModal, showBookModal, compareOpen])
 
   // Persist reading position
   useEffect(() => {
@@ -531,6 +540,28 @@ export default function BibliaPage() {
     setSelectedVerses(new Set())
   }
 
+  async function fetchCompare(verseNum: number) {
+    setCompareOpen(true)
+    setCompareVerseNum(verseNum)
+    setCompareLoading(true)
+    setCompareData({})
+    try {
+      const results = await Promise.all(
+        VERSIONS.map(v =>
+          fetch(`/api/biblia?book=${book.id}&chapter=${chapter}&version=${v.id}`)
+            .then(r => r.json())
+            .then(data => ({ id: v.id, text: (data.verses ?? []).find((vs: Verse) => vs.number === verseNum)?.text ?? "—" }))
+            .catch(() => ({ id: v.id, text: "—" }))
+        )
+      )
+      const map: Record<string, string> = {}
+      for (const r of results) map[r.id] = r.text
+      setCompareData(map)
+    } finally {
+      setCompareLoading(false)
+    }
+  }
+
   // Toggle verse selection on click
   function handleVerseClick(e: React.MouseEvent, verseNumber: number) {
     e.stopPropagation()
@@ -735,7 +766,18 @@ export default function BibliaPage() {
   )
 
   const readingArea = (
-    <div className="overflow-x-hidden">
+    <div
+      className="overflow-x-hidden"
+      onTouchStart={e => { touchStartX.current = e.touches[0].clientX; touchStartY.current = e.touches[0].clientY }}
+      onTouchEnd={e => {
+        const dx = e.changedTouches[0].clientX - touchStartX.current
+        const dy = e.changedTouches[0].clientY - touchStartY.current
+        if (Math.abs(dx) > Math.abs(dy) * 1.5 && Math.abs(dx) > 60) {
+          if (dx < 0 && !isLastInBible) goChapter(1)
+          else if (dx > 0 && !isFirstInBible) goChapter(-1)
+        }
+      }}
+    >
       <div className="max-w-2xl mx-auto px-8 py-12">
 
         {apiError === "AUTH_REQUIRED" && (
@@ -789,6 +831,14 @@ export default function BibliaPage() {
                 Capítulo {chapter}
               </p>
               <div className="w-12 h-px mx-auto mt-4" style={{ background: bookCat ? BOOK_CATEGORIES[bookCat.category].color : "#c9a654", opacity: 0.4 }} />
+              <div className="flex items-center justify-center gap-2.5 mt-3">
+                <span className="text-[9px] text-[#3d3a55] font-mono tabular-nums">{chapter}</span>
+                <div className="w-20 h-px bg-[#2e2b42] relative overflow-hidden rounded-full">
+                  <div className="absolute left-0 top-0 h-full rounded-full transition-all duration-700"
+                    style={{ width: `${Math.round((chapter / book.chapters) * 100)}%`, background: bookCat ? BOOK_CATEGORIES[bookCat.category].color : "#c9a654", opacity: 0.5 }} />
+                </div>
+                <span className="text-[9px] text-[#3d3a55] font-mono tabular-nums">{book.chapters}</span>
+              </div>
             </div>
 
             <div className={cn(
@@ -976,6 +1026,12 @@ export default function BibliaPage() {
               <span className="w-4 h-4 sm:w-3 sm:h-3 flex items-center justify-center text-[10px] sm:text-[9px]">⬇</span>
               <span className="hidden sm:inline">Imagem</span>
             </button>
+            <button onClick={() => { fetchCompare(sortedNums[0]); setSelectedVerses(new Set()) }}
+              className="flex items-center gap-1.5 px-2 sm:px-2.5 py-1.5 sm:py-1 rounded-lg text-[11px] text-[#8a8375] hover:text-[#c9c0a8] hover:bg-white/5 transition-all shrink-0"
+              title="Comparar versões">
+              <ArrowLeftRight className="w-4 h-4 sm:w-3 sm:h-3" />
+              <span className="hidden sm:inline">Comparar</span>
+            </button>
 
             <div className="flex-1" />
 
@@ -1114,6 +1170,55 @@ export default function BibliaPage() {
                   {chapterNoteSaving ? "Salvando…" : "Salvar"}
                 </button>
               </div>
+            </div>
+          </div>
+        )
+      })()}
+
+      {/* Version comparison panel */}
+      {compareOpen && compareVerseNum !== null && (() => {
+        const bookName = BOOK_ID_NAMES[book.id] ?? book.name
+        return (
+          <div
+            className="fixed bottom-0 left-0 right-0 z-[200] animate-slide-up"
+            style={{
+              background: "rgba(14,13,25,0.97)",
+              backdropFilter: "blur(48px) saturate(1.8)",
+              WebkitBackdropFilter: "blur(48px) saturate(1.8)",
+              borderTop: "1px solid rgba(255,255,255,0.09)",
+              boxShadow: "0 -8px 32px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.06)",
+            }}>
+            <div className="max-w-2xl mx-auto px-4 py-3">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <ArrowLeftRight className="w-3.5 h-3.5 text-[#c9a654] opacity-70" />
+                  <span className="text-[#c9a654] text-[11px] font-serif">
+                    {bookName} {chapter}:{compareVerseNum} — comparar versões
+                  </span>
+                </div>
+                <button onClick={() => setCompareOpen(false)} className="text-[#3d3a55] hover:text-[#55524a] transition-colors p-1">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              {compareLoading ? (
+                <div className="flex items-center justify-center py-6">
+                  <Loader2 className="w-4 h-4 text-[#3d3a55] animate-spin" />
+                </div>
+              ) : (
+                <div className="space-y-3 pb-1">
+                  {VERSIONS.map(v => (
+                    <div key={v.id} className="flex gap-3">
+                      <span className={cn(
+                        "text-[10px] font-medium tracking-wider shrink-0 mt-0.5 w-7",
+                        version === v.id ? "text-[#c9a654]" : "text-[#3d3a55]"
+                      )}>{v.label}</span>
+                      <p className="font-serif text-[#8a8375] text-sm leading-relaxed flex-1">
+                        {compareData[v.id] ?? "—"}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         )
