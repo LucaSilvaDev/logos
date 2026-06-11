@@ -13,7 +13,7 @@
 body {
   font-family: 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
-  background: #12111e;
+  background: #1c1b2e;
   color: #e2d9c5;
 }
 
@@ -35,13 +35,13 @@ body {
 */
 
 /* ─── LAYOUT ─────────────────────────────────────────────────────────────── */
-.bg-base       { background: #12111e; }
-.bg-surface    { background: #1a1928; }
-.bg-raised     { background: #211f31; }
+.bg-base       { background: #1c1b2e; }
+.bg-surface    { background: #242338; }
+.bg-raised     { background: #2e2c45; }
 
 /* ─── SIDEBAR ────────────────────────────────────────────────────────────── */
 .sidebar {
-  background: rgba(14, 13, 25, 0.88);
+  background: rgba(22, 21, 38, 0.92);
   backdrop-filter: blur(40px) saturate(1.4);
   box-shadow: none;
 }
@@ -62,7 +62,7 @@ body {
 
 /* ─── TOPBAR ─────────────────────────────────────────────────────────────── */
 .topbar {
-  background: rgba(14, 13, 25, 0.82);
+  background: rgba(22, 21, 38, 0.88);
   backdrop-filter: blur(28px) saturate(1.5);
   box-shadow: none;
 }
@@ -109,34 +109,34 @@ body {
   border-radius: 6px;
   transition: all 0.15s;
 }
-.btn-ghost:hover { color: #e2d9c5; background: #1a1928; }
+.btn-ghost:hover { color: #e2d9c5; background: #242338; }
 
 /* ─── ALIAS (compatibilidade com código existente) ───────────────────────── */
-.bg-glass-base { background: #12111e; }
-.glass { background: rgba(26,25,40,0.92); backdrop-filter: blur(24px); border: 1px solid #2e2b42; }
-.glass-sidebar { background: #0e0d19; border-right: 1px solid #2e2b42; }
+.bg-glass-base { background: #1c1b2e; }
+.glass { background: rgba(32,30,50,0.92); backdrop-filter: blur(24px); border: 1px solid #3c3958; }
+.glass-sidebar { background: #181730; border-right: 1px solid #3c3958; }
 .glass-card {
-  background: #1a1928;
-  border: 1px solid #2e2b42;
+  background: #242338;
+  border: 1px solid #3c3958;
   border-radius: 16px;
   transition: border-color 0.15s;
 }
-.glass-card:hover { border-color: #3d3a55; }
-.app-topbar { background: #0e0d19; border-bottom: 1px solid #2e2b42; }
-.app-card { background: #1a1928; border: 1px solid #2e2b42; border-radius: 16px; }
+.glass-card:hover { border-color: #4e4a66; }
+.app-topbar { background: #181730; border-bottom: 1px solid #3c3958; }
+.app-card { background: #242338; border: 1px solid #3c3958; border-radius: 16px; }
 .app-input {
-  background: #12111e;
-  border: 1px solid #2e2b42;
+  background: #1c1b2e;
+  border: 1px solid #3c3958;
   color: #e2d9c5;
   border-radius: 6px;
   outline: none;
   transition: border-color 0.15s;
 }
 .app-input:focus { border-color: #c9a654; }
-.app-input::placeholder { color: #55524a; }
+.app-input::placeholder { color: #7a7368; }
 
 /* ─── BADGES ─────────────────────────────────────────────────────────────── */
-.badge       { background: #211f31; border: 1px solid #2e2b42; color: #8a8375; border-radius: 4px; font-size: 0.65rem; }
+.badge       { background: #2e2c45; border: 1px solid #3c3958; color: #8a8375; border-radius: 4px; font-size: 0.65rem; }
 .badge-gold  { background: #2a2010; border: 1px solid #7a6535; color: #c9a654; }
 .badge-blue  { background: #162030; border: 1px solid #2a4060; color: #6b9cca; }
 .badge-green { background: #152010; border: 1px solid #2a4525; color: #5a9e72; }
@@ -322,11 +322,11 @@ body {
   font-family: 'Lora', Georgia, serif;
   font-size: 0.7rem;
   font-style: italic;
-  color: #55524a;
+  color: #7a7368;
   letter-spacing: 0.04em;
   margin-top: 2.4em;
   margin-bottom: 0.25em;
-  opacity: 0.85;
+  opacity: 0.9;
   pointer-events: none;
   user-select: none;
 }
@@ -595,9 +595,9 @@ body {
 
 /* ─── BOTTOM NAV ─────────────────────────────────────────────────────────── */
 .bottom-nav {
-  background: rgba(14, 13, 25, 0.88);
+  background: rgba(22, 21, 38, 0.92);
   backdrop-filter: blur(36px) saturate(1.4);
-  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.2);
 }
 
 [data-theme="light"] .bottom-nav {
@@ -868,8 +868,8 @@ body {
 /* ─── SCROLLBAR ──────────────────────────────────────────────────────────── */
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #2e2b42; border-radius: 99px; }
-::-webkit-scrollbar-thumb:hover { background: #3d3a55; }
+::-webkit-scrollbar-thumb { background: #3c3958; border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: #4e4a66; }
 
 /* ─── PROSE (devocionais e notas) ────────────────────────────────────────── */
 .prose-devotional {
@@ -910,7 +910,7 @@ body {
 }
 .tiptap p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
-  color: #55524a;
+  color: #7a7368;
   pointer-events: none;
   float: left;
   height: 0;
@@ -983,3 +983,37 @@ body {
   ::view-transition-old(root),
   ::view-transition-new(root) { animation-duration: 0s; }
 }
+
+/* ─── LEGIBILIDADE DARK — overrides dos Tailwind inline ─────────────────────
+   Problema: textos #55524a e #3d3a55 eram quase invisíveis no fundo #12111e.
+   Solução: aumentar levemente a luminosidade só no tema escuro, sem afetar o
+   tema claro (que já tem seus próprios overrides com [data-theme="light"]).
+   ─────────────────────────────────────────────────────────────────────────── */
+html:not([data-theme="light"]) .text-\[\#55524a\]  { color: #7a7368; }
+html:not([data-theme="light"]) .text-\[\#3d3a55\]  { color: #5e5a6e; }
+html:not([data-theme="light"]) .text-\[\#c9c0a8\]  { color: #d4ccb8; }
+
+/* Fundos — fundo base e superfícies */
+html:not([data-theme="light"]) .bg-\[\#12111e\]    { background: #1c1b2e; }
+html:not([data-theme="light"]) .bg-\[\#0e0d19\]    { background: #181730; }
+html:not([data-theme="light"]) .bg-\[\#1a1928\]    { background: #242338; }
+html:not([data-theme="light"]) .bg-\[\#1a1929\]    { background: #242338; }
+html:not([data-theme="light"]) .bg-\[\#211f31\]    { background: #2e2c45; }
+html:not([data-theme="light"]) .bg-\[\#2e2b42\]    { background: #3c3958; }
+html:not([data-theme="light"]) .hover\:bg-\[\#1a1928\]:hover { background: #242338; }
+
+/* Bordas e divisórias */
+html:not([data-theme="light"]) .border-\[\#2e2b42\]          { border-color: #3c3958; }
+html:not([data-theme="light"]) .border-\[\#1a1928\]          { border-color: #2a2840; }
+html:not([data-theme="light"]) .border-\[\#1e1c2e\]          { border-color: #2a2840; }
+html:not([data-theme="light"]) .divide-\[\#1a1928\] > * + *  { border-color: #2a2840; }
+html:not([data-theme="light"]) .divide-\[\#1e1c2e\] > * + *  { border-color: #2a2840; }
+
+/* Placeholders */
+html:not([data-theme="light"]) .placeholder\:text-\[\#3d3a55\]::placeholder { color: #5e5a6e; }
+html:not([data-theme="light"]) .placeholder\:text-\[\#55524a\]::placeholder { color: #7a7368; }
+html:not([data-theme="light"]) .placeholder\:text-\[\#2e2b42\]::placeholder { color: #5e5a6e; }
+
+/* Fundos com opacidade — barra da Bíblia e modais */
+html:not([data-theme="light"]) .bg-\[\#12111e\]\/90 { background: rgba(28,27,46,0.90); }
+html:not([data-theme="light"]) .bg-\[\#12111e\]\/95 { background: rgba(28,27,46,0.95); }
