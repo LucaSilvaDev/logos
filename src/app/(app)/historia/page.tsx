@@ -57,20 +57,21 @@ const CATEGORY_GOLD: Record<string, boolean> = {
 
 export default function HistoriaPage() {
   const centuries = [...new Set(TIMELINE.map(e => e.century))].sort((a, b) => a - b)
+  let globalIdx = 0
 
   return (
-    <div className="max-w-2xl mx-auto px-2 py-8 space-y-6 animate-fade-in">
+    <div className="max-w-2xl mx-auto px-2 py-8 space-y-6">
 
       <div>
-        <p className="font-display text-[9px] text-[#55524a] uppercase tracking-[0.25em] mb-1">Fides et Historia</p>
-        <h1 className="font-serif text-3xl text-[#e2d9c5] font-normal">História da Igreja</h1>
-        <p className="text-[#55524a] text-xs mt-1">33 d.C. → Hoje · {TIMELINE.length} eventos</p>
+        <p className="candle-enter candle-delay-0 font-display text-[9px] text-[#55524a] uppercase tracking-[0.25em] mb-1">Fides et Historia</p>
+        <h1 className="candle-enter candle-delay-1 font-serif text-3xl text-[#e2d9c5] font-normal">História da Igreja</h1>
+        <p className="candle-enter candle-delay-2 text-[#55524a] text-xs mt-1">33 d.C. → Hoje · {TIMELINE.length} eventos</p>
       </div>
 
-      <div className="h-px bg-[#2e2b42]" />
+      <div className="candle-enter candle-delay-2 h-px bg-[#2e2b42]" />
 
       {/* Legenda */}
-      <div className="flex flex-wrap gap-x-4 gap-y-1">
+      <div className="candle-enter candle-delay-3 flex flex-wrap gap-x-4 gap-y-1">
         {Object.entries(CATEGORY_LABELS).map(([id, label]) => (
           <span key={id} className={cn("text-[10px]",
             CATEGORY_GOLD[id] ? "text-[#c9a654] opacity-70" : "text-[#3d3a55]"
@@ -86,9 +87,11 @@ export default function HistoriaPage() {
 
         {centuries.map(century => {
           const events = TIMELINE.filter(e => e.century === century)
+          const centuryDelay = 300 + globalIdx * 35
           return (
             <div key={century} className="mb-10">
-              <div className="flex items-center gap-4 mb-4">
+              <div className="candle-enter flex items-center gap-4 mb-4"
+                style={{ animationDelay: `${centuryDelay}ms` }}>
                 <span className="w-16 text-right font-display text-[9px] text-[#3d3a55] uppercase tracking-widest">
                   Séc. {century < 10 ? `0${century}` : century}
                 </span>
@@ -97,10 +100,13 @@ export default function HistoriaPage() {
 
               <div className="space-y-6">
                 {events.map((event, i) => {
+                  const eventDelay = 320 + globalIdx * 35
+                  globalIdx++
                   const isKey = event.importance >= 5
                   const isGold = CATEGORY_GOLD[event.category]
                   return (
-                    <div key={i} className="flex gap-4">
+                    <div key={i} className="candle-flame flex gap-4"
+                      style={{ animationDelay: `${eventDelay}ms` }}>
                       <div className="w-16 text-right pt-1 flex-shrink-0">
                         <span className="text-[#3d3a55] text-xs font-mono">{event.year}</span>
                       </div>

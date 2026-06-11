@@ -1,4 +1,5 @@
-﻿import { BookOpen } from "lucide-react"
+import { BookOpen } from "lucide-react"
+import { WSC } from "@/lib/catechism"
 
 const TULIP = [
   {
@@ -105,25 +106,25 @@ const CREDO_NICENO = [
 
 export default function BibliotecaPage() {
   return (
-    <div className="max-w-3xl mx-auto px-2 py-8 space-y-12 animate-fade-in">
+    <div className="max-w-3xl mx-auto px-2 py-8 space-y-12">
 
       <div>
-        <p className="font-display text-[9px] text-[#55524a] uppercase tracking-[0.25em] mb-1">Teologia Reformada</p>
-        <h1 className="font-serif text-3xl text-[#e2d9c5] font-normal">Biblioteca</h1>
-        <p className="text-[#55524a] text-xs mt-1">Credo · TULIP · Westminster · Citações Reformadas</p>
+        <p className="candle-enter candle-delay-0 font-display text-[9px] text-[#55524a] uppercase tracking-[0.25em] mb-1">Teologia Reformada</p>
+        <h1 className="candle-enter candle-delay-1 font-serif text-3xl text-[#e2d9c5] font-normal">Biblioteca</h1>
+        <p className="candle-enter candle-delay-2 text-[#55524a] text-xs mt-1">Credo · TULIP · Westminster · Catecismo · Citações Reformadas</p>
       </div>
 
-      <div className="h-px bg-[#2e2b42]" />
+      <div className="candle-enter candle-delay-2 h-px bg-[#2e2b42]" />
 
       {/* Credos */}
       <section className="space-y-8">
-        <div>
+        <div className="candle-enter candle-delay-3">
           <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em] mb-1">Confissões Ecumênicas</p>
           <h2 className="font-serif text-xl text-[#c9c0a8]">Os Credos da Igreja</h2>
         </div>
 
         {/* Credo Apostólico */}
-        <div className="card-soft relative px-6 py-6">
+        <div className="candle-flame flame-hover card-soft relative px-6 py-6" style={{ animationDelay: "400ms" }}>
           <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#c9a654] to-transparent opacity-60 rounded-l-full" />
           <div className="mb-4">
             <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em] mb-0.5">Século II · Universal</p>
@@ -143,7 +144,7 @@ export default function BibliotecaPage() {
         </div>
 
         {/* Credo Niceno */}
-        <div className="card-soft relative px-6 py-6">
+        <div className="candle-flame flame-hover card-soft relative px-6 py-6" style={{ animationDelay: "520ms" }}>
           <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#c9a654] to-transparent opacity-60 rounded-l-full" />
           <div className="mb-4">
             <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em] mb-0.5">381 d.C. · Concílio de Constantinopla</p>
@@ -163,18 +164,19 @@ export default function BibliotecaPage() {
         </div>
       </section>
 
-      <div className="h-px bg-[#2e2b42]" />
+      <div className="candle-enter h-px bg-[#2e2b42]" style={{ animationDelay: "600ms" }} />
 
       {/* TULIP */}
       <section className="space-y-6">
-        <div>
+        <div className="candle-enter" style={{ animationDelay: "640ms" }}>
           <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em] mb-1">Os 5 Pontos do Calvinismo</p>
           <h2 className="font-serif text-xl text-[#c9c0a8]">TULIP</h2>
         </div>
 
         <div className="space-y-3">
-          {TULIP.map(point => (
-            <div key={point.letter} className="card-soft py-5 px-5 flex gap-6">
+          {TULIP.map((point, i) => (
+            <div key={point.letter} className="candle-flame card-soft py-5 px-5 flex gap-6"
+              style={{ animationDelay: `${700 + i * 80}ms` }}>
               <div className="font-display text-4xl text-[#c9a654] opacity-30 leading-none flex-shrink-0 w-10 text-right">
                 {point.letter}
               </div>
@@ -197,14 +199,15 @@ export default function BibliotecaPage() {
 
       {/* Westminster */}
       <section className="space-y-6">
-        <div>
+        <div className="candle-enter" style={{ animationDelay: "1100ms" }}>
           <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em] mb-1">1646</p>
           <h2 className="font-serif text-xl text-[#c9c0a8]">Confissão de Westminster</h2>
         </div>
 
         <div className="space-y-2">
-          {WESTMINSTER.map(ch => (
-            <div key={ch.cap} className="card-soft py-4 px-4 flex gap-4">
+          {WESTMINSTER.map((ch, i) => (
+            <div key={ch.cap} className="candle-flame card-soft py-4 px-4 flex gap-4"
+              style={{ animationDelay: `${1160 + i * 60}ms` }}>
               <span className="font-mono text-[10px] text-[#3d3a55] flex-shrink-0 w-8 text-right pt-0.5">
                 {ch.cap}
               </span>
@@ -217,16 +220,39 @@ export default function BibliotecaPage() {
         </div>
       </section>
 
+      {/* Catecismo Menor de Westminster */}
+      <section className="space-y-6">
+        <div className="candle-enter" style={{ animationDelay: "1760ms" }}>
+          <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em] mb-1">1647 · 107 Perguntas</p>
+          <h2 className="font-serif text-xl text-[#c9c0a8]">Catecismo Menor de Westminster</h2>
+          <p className="text-[#3d3a55] text-xs mt-1">Use os flashcards no <span className="text-[#c9a654] opacity-70">Memorizar</span> para aprender de cor</p>
+        </div>
+
+        <div className="space-y-1">
+          {WSC.map((qa, i) => (
+            <div key={qa.n} className="candle-enter flex gap-4 py-3 border-b border-[#1a1928]"
+              style={{ animationDelay: `${1820 + Math.min(i, 30) * 30}ms` }}>
+              <span className="font-mono text-[10px] text-[#3d3a55] flex-shrink-0 w-7 text-right pt-0.5">{qa.n}</span>
+              <div className="flex-1">
+                <p className="font-serif text-[#8a8375] text-xs mb-1 leading-relaxed">{qa.q}</p>
+                <p className="text-[#55524a] text-xs leading-relaxed">{qa.a}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Citações */}
       <section className="space-y-6">
-        <div>
+        <div className="candle-enter" style={{ animationDelay: "2000ms" }}>
           <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em] mb-1">Nuvem de Testemunhas</p>
           <h2 className="font-serif text-xl text-[#c9c0a8]">Citações Reformadas</h2>
         </div>
 
         <div className="space-y-8">
           {QUOTES.map((q, i) => (
-            <div key={i} className="relative pl-6">
+            <div key={i} className="candle-enter relative pl-6"
+              style={{ animationDelay: `${2060 + i * 60}ms` }}>
               <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-[#c9a654] opacity-20" />
               <blockquote className="font-serif text-[#8a8375] text-sm leading-relaxed italic mb-2">
                 &ldquo;{q.text}&rdquo;
@@ -240,11 +266,13 @@ export default function BibliotecaPage() {
 
       {/* Solas */}
       <section className="space-y-4">
-        <div className="h-px bg-[#2e2b42]" />
-        <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em]">As 5 Solas da Reforma</p>
+        <div className="candle-enter h-px bg-[#2e2b42]" style={{ animationDelay: "2540ms" }} />
+        <p className="candle-enter font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em]"
+          style={{ animationDelay: "2580ms" }}>As 5 Solas da Reforma</p>
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
-          {SOLAS.map(s => (
-            <div key={s.sola} className="card-soft p-4 text-center">
+          {SOLAS.map((s, i) => (
+            <div key={s.sola} className="candle-flame card-soft p-4 text-center"
+              style={{ animationDelay: `${2620 + i * 60}ms` }}>
               <p className="font-display text-[10px] text-[#c9a654] opacity-70 tracking-wider uppercase mb-1">{s.sola}</p>
               <p className="text-[#55524a] text-[10px]">{s.desc}</p>
             </div>

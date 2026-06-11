@@ -2,9 +2,10 @@
 
 import { useState } from "react"
 import { cn } from "@/lib/utils"
-import { RefreshCw, ThumbsUp, RotateCcw, BookOpen, Shuffle, Loader2 } from "lucide-react"
+import { RefreshCw, ThumbsUp, RotateCcw, BookOpen, Shuffle, Loader2, ScrollText } from "lucide-react"
 import Link from "next/link"
 import { BOOK_ID_NAMES } from "@/lib/reading-plan"
+import { WSC } from "@/lib/catechism"
 
 const SESSION_KEY = "selah-memorizar-known"
 
@@ -23,6 +24,7 @@ export interface FlashCard {
   ref:   string
   text:  string
   color: string
+  type?: "verse" | "catechism"
 }
 
 function shuffle<T>(arr: T[]): T[] {
@@ -50,8 +52,9 @@ export function MemorizarClient({ initialCards }: { initialCards: FlashCard[] })
   const [index,         setIndex]         = useState(0)
   const [flipped,       setFlipped]       = useState(false)
   const [knownCount,    setKnownCount]    = useState(() => loadKnown().size)
-  const [loadingRandom, setLoadingRandom] = useState(false)
-  const [randomMode,    setRandomMode]    = useState(false)
+  const [loadingRandom,   setLoadingRandom]   = useState(false)
+  const [randomMode,      setRandomMode]      = useState(false)
+  const [catechismMode,   setCatechismMode]   = useState(false)
 
   const current = queue[index]
 
@@ -83,6 +86,23 @@ export function MemorizarClient({ initialCards }: { initialCards: FlashCard[] })
     setFlipped(false)
     setKnownCount(0)
     setRandomMode(false)
+    setCatechismMode(false)
+  }
+
+  function loadCatechism() {
+    const cards: FlashCard[] = shuffle(WSC.map(qa => ({
+      id:    `wsc-${qa.n}`,
+      ref:   `P.${qa.n} — ${qa.q}`,
+      text:  qa.a,
+      color: "yellow",
+      type:  "catechism" as const,
+    })))
+    setQueue(cards)
+    setIndex(0)
+    setFlipped(false)
+    setKnownCount(0)
+    setRandomMode(false)
+    setCatechismMode(true)
   }
 
   async function loadRandom() {
@@ -140,7 +160,14 @@ export function MemorizarClient({ initialCards }: { initialCards: FlashCard[] })
             }
             Versículos aleatórios
           </button>
-          {!randomMode && initialCards.length > 0 && (
+          <button
+            onClick={loadCatechism}
+            className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-[13px] font-serif text-[#c9a654] bg-[#c9a65415] border border-[#c9a65430] hover:bg-[#c9a65425] transition-all"
+          >
+            <ScrollText className="w-3.5 h-3.5" />
+            Catecismo de Westminster
+          </button>
+          {!randomMode && !catechismMode && initialCards.length > 0 && (
             <button
               onClick={resetDeck}
               className="flex items-center justify-center gap-2 text-[#55524a] hover:text-[#c9c0a8] text-sm font-sans transition-colors py-1.5"
@@ -149,14 +176,13 @@ export function MemorizarClient({ initialCards }: { initialCards: FlashCard[] })
               Reiniciar meus grifos
             </button>
           )}
-          {randomMode && (
+          {(randomMode || catechismMode) && (
             <button
-              onClick={loadRandom}
-              disabled={loadingRandom}
+              onClick={loadCatechism}
               className="flex items-center justify-center gap-2 text-[#55524a] hover:text-[#c9c0a8] text-sm font-sans transition-colors py-1.5"
             >
-              <Shuffle className="w-3.5 h-3.5" />
-              Mais aleatórios
+              <RefreshCw className="w-3.5 h-3.5" />
+              Mais do catecismo
             </button>
           )}
         </div>
@@ -173,6 +199,7 @@ export function MemorizarClient({ initialCards }: { initialCards: FlashCard[] })
       <div className="flex items-center gap-3 mb-8 text-[#3d3a55] text-[11px] font-sans">
         <span className="text-[#55524a]">{index + 1} / {queue.length}</span>
         {randomMode && <span className="text-[#c9a654] opacity-60">· aleatórios</span>}
+        {catechismMode && <span className="text-[#c9a654] opacity-60">· catecismo</span>}
         {knownCount > 0 && (
           <span className="text-[#5a9e72]">· {knownCount} memorizados</span>
         )}
@@ -198,7 +225,7 @@ export function MemorizarClient({ initialCards }: { initialCards: FlashCard[] })
             flipped && "[transform:rotateY(180deg)]"
           )}
         >
-          {/* Front — reference */}
+          {/* Front — reference / question */}
           <div
             className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl p-8 [backface-visibility:hidden]"
             style={{
@@ -208,7 +235,11 @@ export function MemorizarClient({ initialCards }: { initialCards: FlashCard[] })
               boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
             }}
           >
-            <p className="font-serif text-[#c9a654] text-2xl text-center mb-4 leading-snug">{current.ref}</p>
+            {current.type === "catechism" ? (
+              <p className="font-serif text-[#c9a654] text-sm text-center mb-4 leading-relaxed overflow-y-auto max-h-48">{current.ref}</p>
+            ) : (
+              <p className="font-serif text-[#c9a654] text-2xl text-center mb-4 leading-snug">{current.ref}</p>
+            )}
             <p className="text-[#3d3a55] text-[10px] font-sans uppercase tracking-widest">Toque para revelar</p>
           </div>
 

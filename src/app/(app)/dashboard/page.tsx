@@ -49,6 +49,10 @@ export default async function DashboardPage() {
     cursor = subDays(cursor, 1)
   }
 
+  const now = new Date()
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
+  const chaptersThisMonth = planProgress.filter(p => new Date(p.completedAt) >= monthStart).length
+
   const totalPlanDays = profile?.readingPlanType && PLAN_CONFIG[profile.readingPlanType]
     ? PLAN_CONFIG[profile.readingPlanType].days
     : null
@@ -181,7 +185,13 @@ export default async function DashboardPage() {
           )}
 
           {/* Mini stats */}
-          <div className="flex gap-4 text-right">
+          <div className="flex gap-4 text-right flex-wrap justify-end">
+            {chaptersThisMonth > 0 && (
+              <div>
+                <p className="text-[#8a8375] text-sm font-serif leading-none">{chaptersThisMonth}</p>
+                <p className="text-[#3d3a55] text-[10px] mt-0.5">este mês</p>
+              </div>
+            )}
             <div>
               <p className="text-[#8a8375] text-sm font-serif leading-none">{highlightCount}</p>
               <p className="text-[#3d3a55] text-[10px] mt-0.5">grifos</p>
@@ -193,6 +203,10 @@ export default async function DashboardPage() {
             <div>
               <p className="text-[#8a8375] text-sm font-serif leading-none">{studyCount}</p>
               <p className="text-[#3d3a55] text-[10px] mt-0.5">notas</p>
+            </div>
+            <div>
+              <p className="text-[#8a8375] text-sm font-serif leading-none">{prayerCount}</p>
+              <p className="text-[#3d3a55] text-[10px] mt-0.5">orações</p>
             </div>
           </div>
         </div>

@@ -63,9 +63,10 @@ export default async function OracoesPage() {
   const session = await auth()
   const userId = session!.user!.id!
 
-  const [personal, answered] = await Promise.all([
+  const [personal, answered, answeredTotal] = await Promise.all([
     db.prayer.findMany({ where: { userId, answered: false }, orderBy: { createdAt: "desc" } }),
-    db.prayer.findMany({ where: { userId, answered: true }, orderBy: { answeredAt: "desc" }, take: 5 }),
+    db.prayer.findMany({ where: { userId, answered: true }, orderBy: { answeredAt: "desc" }, take: 30 }),
+    db.prayer.count({ where: { userId, answered: true } }),
   ])
 
   // Oração da hora — muda a cada hora, determinístico
@@ -80,7 +81,7 @@ export default async function OracoesPage() {
           <p className="candle-enter candle-delay-0 font-display text-[9px] text-[#55524a] uppercase tracking-[0.25em] mb-1">Comunhão com Deus</p>
           <h1 className="candle-enter candle-delay-1 font-serif text-3xl text-[#e2d9c5] font-normal">Orações</h1>
           <p className="candle-enter candle-delay-2 text-[#55524a] text-xs mt-1">
-            {personal.length} ativa{personal.length !== 1 ? "s" : ""} · {answered.length} respondida{answered.length !== 1 ? "s" : ""}
+            {personal.length} ativa{personal.length !== 1 ? "s" : ""} · {answeredTotal} respondida{answeredTotal !== 1 ? "s" : ""}
           </p>
         </div>
         <Link href="/oracoes/nova"
@@ -139,7 +140,10 @@ export default async function OracoesPage() {
       {/* Respondidas */}
       {answered.length > 0 && (
         <section className="candle-enter space-y-3" style={{ animationDelay: `${760 + personal.length * 70}ms` }}>
-          <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em]">Respondidas</p>
+          <div className="flex items-center justify-between">
+            <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em]">Respondidas</p>
+            <span className="text-[10px] text-[#3d3a55]">{answeredTotal} total</span>
+          </div>
           <div className="space-y-2">
             {answered.map((p: { id: string; title: string; answeredAt: Date | null }, i: number) => (
               <div key={p.id} className="candle-flame card-soft flex items-center gap-3 px-4 py-3"
@@ -154,6 +158,11 @@ export default async function OracoesPage() {
               </div>
             ))}
           </div>
+          {answeredTotal > 30 && (
+            <p className="text-[10px] text-[#3d3a55] text-center font-serif italic pt-1">
+              Mostrando as 30 mais recentes de {answeredTotal}
+            </p>
+          )}
         </section>
       )}
 

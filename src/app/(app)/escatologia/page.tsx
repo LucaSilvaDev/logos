@@ -58,24 +58,24 @@ export default async function EscatologiaPage() {
   const pct = Math.round((studied / totalProphetic) * 100)
 
   return (
-    <div className="max-w-3xl mx-auto px-2 py-8 space-y-8 animate-fade-in">
+    <div className="max-w-3xl mx-auto px-2 py-8 space-y-8">
 
       <div className="flex items-end justify-between">
         <div>
-          <p className="font-display text-[9px] text-[#55524a] uppercase tracking-[0.25em] mb-1">Profecia Bíblica</p>
-          <h1 className="font-serif text-3xl text-[#e2d9c5] font-normal">Escatologia</h1>
-          <p className="text-[#55524a] text-xs mt-1">Relógio Profético · {totalProphetic} capítulos</p>
+          <p className="candle-enter candle-delay-0 font-display text-[9px] text-[#55524a] uppercase tracking-[0.25em] mb-1">Profecia Bíblica</p>
+          <h1 className="candle-enter candle-delay-1 font-serif text-3xl text-[#e2d9c5] font-normal">Escatologia</h1>
+          <p className="candle-enter candle-delay-2 text-[#55524a] text-xs mt-1">Relógio Profético · {totalProphetic} capítulos</p>
         </div>
-        <div className="text-right">
+        <div className="candle-enter candle-delay-2 text-right">
           <p className="font-serif text-3xl text-[#e2d9c5]">{pct}<span className="text-base text-[#55524a]">%</span></p>
           <p className="text-[#3d3a55] text-[10px] uppercase tracking-wider font-display">{studied}/{totalProphetic}</p>
         </div>
       </div>
 
-      <div className="h-px bg-[#2e2b42]" />
+      <div className="candle-enter candle-delay-2 h-px bg-[#2e2b42]" />
 
       {/* Barra de progresso */}
-      <div className="space-y-2">
+      <div className="candle-enter candle-delay-3 space-y-2">
         <div className="flex justify-between text-[10px] text-[#3d3a55]">
           <span className="font-display uppercase tracking-wider">Capítulos estudados</span>
           <span>{studied} / {totalProphetic}</span>
@@ -88,10 +88,12 @@ export default async function EscatologiaPage() {
 
       {/* Posição teológica */}
       <section className="space-y-3">
-        <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em]">Posição Escatológica</p>
+        <p className="candle-enter font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em]"
+          style={{ animationDelay: "400ms" }}>Posição Escatológica</p>
         <div className="space-y-2">
-          {POSITION_NOTES.map(p => (
-            <div key={p.label} className="card-soft px-4 py-3">
+          {POSITION_NOTES.map((p, i) => (
+            <div key={p.label} className="candle-flame card-soft px-4 py-3"
+              style={{ animationDelay: `${450 + i * 80}ms` }}>
               <p className="font-serif text-[#c9c0a8] text-sm mb-0.5">{p.label}</p>
               <p className="text-[#55524a] text-xs leading-relaxed">{p.desc}</p>
             </div>
@@ -101,11 +103,13 @@ export default async function EscatologiaPage() {
 
       {/* Timeline escatológica */}
       <section className="space-y-3">
-        <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em]">Timeline Profética</p>
+        <p className="candle-enter font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em]"
+          style={{ animationDelay: "700ms" }}>Timeline Profética</p>
         <div className="relative">
           <div className="absolute left-[68px] top-0 bottom-0 w-px bg-[#2e2b42]" />
           {TIMELINE_EVENTS.map((e, i) => (
-            <div key={i} className="flex gap-4 mb-5">
+            <div key={i} className="candle-flame flex gap-4 mb-5"
+              style={{ animationDelay: `${750 + i * 70}ms` }}>
               <div className="w-16 text-right pt-0.5 flex-shrink-0">
                 <span className={cn("text-[9px] font-display uppercase tracking-wider",
                   e.phase === "Eterno" ? "text-[#c9a654] opacity-60" :
@@ -127,13 +131,15 @@ export default async function EscatologiaPage() {
 
       {/* Capítulos proféticos */}
       <section className="space-y-4">
-        <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em]">Capítulos Proféticos</p>
+        <p className="candle-enter font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em]"
+          style={{ animationDelay: "1200ms" }}>Capítulos Proféticos</p>
         <div className="space-y-5">
-          {PROPHETIC_BOOKS.map(pb => {
+          {PROPHETIC_BOOKS.map((pb, bIdx) => {
             const studiedChapters = pb.propheticChapters.filter(c => studiedSet.has(`${pb.book}-${c}`))
             const allDone = studiedChapters.length === pb.propheticChapters.length
             return (
-              <div key={pb.book}>
+              <div key={pb.book} className="candle-enter"
+                style={{ animationDelay: `${1260 + bIdx * 50}ms` }}>
                 <div className="flex items-baseline justify-between mb-2">
                   <div className="flex items-center gap-2">
                     <BookOpen className="w-3 h-3 text-[#3d3a55]" />
