@@ -26,7 +26,7 @@ export function BottomNav({ onOpenSidebar }: BottomNavProps) {
       className="bottom-nav md:hidden"
       style={{
         position: "fixed",
-        bottom: "calc(0.875rem + env(safe-area-inset-bottom))",
+        bottom: "calc(0.25rem + env(safe-area-inset-bottom))",
         left: "1rem",
         right: "1rem",
         zIndex: 50,
