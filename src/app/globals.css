@@ -10,11 +10,46 @@
 /* ─── BASE ───────────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; }
 
+/* ─── NATIVE APP FEEL ────────────────────────────────────────────────────── */
+/* Removes blue tap highlight on all elements */
+* { -webkit-tap-highlight-color: transparent; }
+
+html {
+  /* Prevents elastic bounce scroll on iOS (body-level) */
+  overscroll-behavior: none;
+  /* Smooth momentum scrolling everywhere on iOS */
+  -webkit-overflow-scrolling: touch;
+}
+
 body {
   font-family: 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   background: #121214;
   color: #e2d9c5;
+  /* Prevent rubber-band scroll on iOS at the body level */
+  overscroll-behavior: none;
+  /* Prevent text selection during swipe gestures */
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Re-enable text selection only where it makes sense */
+p, span, h1, h2, h3, h4, h5, h6,
+.prose, .prose-devotional, .note-content,
+[data-selectable], input, textarea {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* Removes 300ms tap delay on interactive elements */
+a, button, [role="button"], label, select, input, textarea {
+  touch-action: manipulation;
+}
+
+/* Scrollable containers use momentum scrolling on iOS */
+.overflow-y-auto, .overflow-y-scroll, .overflow-x-auto, .overflow-x-scroll {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
 }
 
 /* ─── PALETA — BIBLIOTECA REFORMADA ──────────────────────────────────────── */
@@ -591,17 +626,13 @@ body {
   border-color: rgba(122, 79, 10, 0.85);
 }
 
-/* ─── BOTTOM NAV ─────────────────────────────────────────────────────────── */
-.bottom-nav {
-  background: #121214;
-  border-top: 1px solid rgba(255,255,255,0.05);
-}
-
+/* ─── BOTTOM NAV — floating glass pill ──────────────────────────────────── */
+/* Dark styles are applied inline in BottomNav.tsx for performance */
+/* Light theme override */
 [data-theme="light"] .bottom-nav {
-  background: rgba(220, 198, 168, 0.86);
-  backdrop-filter: blur(36px) saturate(1.6);
-  box-shadow: 0 -8px 32px rgba(110,75,20,0.08);
-  border-top: none;
+  background: rgba(248, 244, 236, 0.88) !important;
+  border: 1px solid rgba(180, 150, 80, 0.18) !important;
+  box-shadow: 0 8px 40px rgba(100, 70, 10, 0.18), 0 1px 0 rgba(255,255,255,0.7) inset !important;
 }
 
 /* ─── LIQUID GLASS ORBS ──────────────────────────────────────────────────── */

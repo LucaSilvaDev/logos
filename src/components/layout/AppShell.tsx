@@ -100,7 +100,8 @@ export function AppShell({ children, userName, userImage }: AppShellProps) {
           onToggleTheme={toggleTheme}
         />
 
-        <main className="flex-1 overflow-y-auto pb-16 md:pb-0">
+        {/* pb accounts for floating nav height (60px) + gap (14px) + safe area */}
+        <main className="flex-1 overflow-y-auto pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0">
           {/* Dashboard tem stagger próprio (candle-enter); todas as outras páginas usam animate-page-in */}
           <div key={pathname} className={cn("h-full", pathname !== "/dashboard" && "animate-page-in")}>
             {children}
