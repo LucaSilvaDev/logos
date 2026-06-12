@@ -114,33 +114,57 @@ function parseBibliaOnlineHtml(html: string): { number: number; text: string; he
   }
 
   // ── Step 2: Parse verse paragraphs ──────────────────────────────────────
+  // bibliaonline.com.br uses two distinct structures:
+  //   • Prose: one <p data-v=".3.4.5."> may contain multiple verses, each
+  //     preceded by <span class="bv"> + <span class="v">N</span>.
+  //   • Poetry/quotation: each line is its own <p data-v=".49.">, only the
+  //     first line has the bv marker; the rest are plain continuation <p>s.
+  // We handle both: bv-paragraphs use the split approach; continuation
+  // paragraphs fall back to data-v for the verse number.
   const verseMap = new Map<number, string[]>()
   const pRe = /<p\b[^>]*\bdata-v="([^"]+)"[^>]*>([\s\S]*?)<\/p>/gi
   let m: RegExpExecArray | null
 
   while ((m = pRe.exec(html)) !== null) {
+    const dataV   = m[1]
     const pContent = m[2]
+    const hasBV   = /<span\b[^>]*\bclass="bv"/.test(pContent)
 
-    // Split paragraph by bookmark anchors — each marks the start of a new verse
-    const segments = pContent.split(/<span\b[^>]*\bclass="bv"[^>]*><\/span>/gi)
+    if (hasBV) {
+      // Prose: split by bookmark anchors — each marks the start of a new verse
+      const segments = pContent.split(/<span\b[^>]*\bclass="bv"[^>]*><\/span>/gi)
 
-    for (let i = 1; i < segments.length; i++) {
-      const seg = segments[i]
+      for (let i = 1; i < segments.length; i++) {
+        const seg = segments[i]
 
-      // Find verse number from the label span
-      const numMatch = seg.match(/<span\b[^>]*\bclass="v"[^>]*>([\s\S]*?)<\/span>/)
-      if (!numMatch) continue
-      const numStr = numMatch[1].replace(/<!--[\s\S]*?-->/g, "").replace(/<[^>]+>/g, "").trim()
-      const num = parseInt(numStr)
+        const numMatch = seg.match(/<span\b[^>]*\bclass="v"[^>]*>([\s\S]*?)<\/span>/)
+        if (!numMatch) continue
+        const numStr = numMatch[1].replace(/<!--[\s\S]*?-->/g, "").replace(/<[^>]+>/g, "").trim()
+        const num = parseInt(numStr)
+        if (!num || num <= 0) continue
+
+        const textHtml = seg.replace(/<span\b[^>]*\bclass="v"[^>]*>[\s\S]*?<\/span>/, "")
+        const text = decodeEntities(textHtml.replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim()
+        if (!text) continue
+
+        if (!verseMap.has(num)) verseMap.set(num, [])
+        verseMap.get(num)!.push(text)
+      }
+    } else {
+      // Poetry continuation: no bv marker — verse number comes from data-v
+      const dvMatch = dataV.match(/\.(\d+)\./)
+      if (!dvMatch) continue
+      const num = parseInt(dvMatch[1])
       if (!num || num <= 0) continue
 
-      // Remove the label span, strip remaining tags → plain text
-      const textHtml = seg.replace(/<span\b[^>]*\bclass="v"[^>]*>[\s\S]*?<\/span>/, "")
-      const text = decodeEntities(textHtml.replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim()
-      if (!text) continue
-
+      // Collect all <span class="t"> text lines from this paragraph
+      const tRe = /<span\b[^>]*\bclass="t"[^>]*>([\s\S]*?)<\/span>/gi
+      let tm: RegExpExecArray | null
       if (!verseMap.has(num)) verseMap.set(num, [])
-      verseMap.get(num)!.push(text)
+      while ((tm = tRe.exec(pContent)) !== null) {
+        const t = decodeEntities(tm[1].replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim()
+        if (t) verseMap.get(num)!.push(t)
+      }
     }
   }
 
