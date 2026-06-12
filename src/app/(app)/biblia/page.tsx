@@ -577,8 +577,29 @@ export default function BibliaPage() {
 
   async function shareVerse() {
     if (selectedVerses.size === 0) return
-    const shareText = `${selectionText()}\n\n— ${selectionRef()}\n\nSelah`
-    if (navigator.share) await navigator.share({ text: shareText }).catch(() => {})
+    const text = verses
+      .filter(v => selectedVerses.has(v.number))
+      .sort((a, b) => a.number - b.number)
+      .map(v => v.text)
+      .join(" ")
+    const ref = selectionRef()
+
+    // Try image sharing first (mobile), fall back to text
+    if (navigator.share && navigator.canShare) {
+      try {
+        const dataUrl = generateVerseImage(text, ref)
+        const blob = await fetch(dataUrl).then(r => r.blob())
+        const file = new File([blob], `${ref.replace(/\s/g, "_")}.png`, { type: "image/png" })
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], title: ref })
+          setSelectedVerses(new Set())
+          return
+        }
+      } catch { /* fall through to text share */ }
+    }
+    if (navigator.share) {
+      await navigator.share({ text: `${text}\n\n— ${ref}\n\nSelah` }).catch(() => {})
+    }
     setSelectedVerses(new Set())
   }
 

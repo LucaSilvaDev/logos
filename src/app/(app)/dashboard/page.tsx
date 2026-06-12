@@ -2,14 +2,14 @@
 import { db } from "@/lib/db"
 import { getQuoteOfTheDay } from "@/lib/quotes"
 import { getDailyVerse } from "@/lib/daily-verse"
-import { PLAN_CONFIG } from "@/lib/reading-plan"
+import { PLAN_CONFIG, BOOK_CHAPTERS } from "@/lib/reading-plan"
 import Link from "next/link"
 import {
   BookOpen, NotebookPen, Clock, Search,
   Flame, Church, Library, Heart, PenLine, Brain
 } from "lucide-react"
 import { ContinueReading } from "@/components/ContinueReading"
-import { format, isToday, isYesterday, subDays, startOfDay } from "date-fns"
+import { format, subDays, startOfDay } from "date-fns"
 import { ptBR } from "date-fns/locale"
 
 function greeting() {
@@ -26,7 +26,7 @@ export default async function DashboardPage() {
 
   const verse = getDailyVerse()
 
-  const [devotionalCount, highlightCount, studyCount, prayerCount, profile, planProgress] = await Promise.all([
+  const [devotionalCount, highlightCount, studyCount, prayerCount, profile, planProgress, chapterReads] = await Promise.all([
     db.devotional.count({ where: { userId } }),
     db.highlight.count({ where: { userId } }),
     db.studyNote.count({ where: { userId } }),
@@ -35,23 +35,45 @@ export default async function DashboardPage() {
     db.readingPlanProgress.findMany({
       where: { userId },
       select: { completedAt: true },
-      orderBy: { completedAt: "desc" },
+    }),
+    db.chapterRead.findMany({
+      where: { userId },
+      select: { book: true, chapter: true, readAt: true },
     }),
   ])
 
-  // Streak: consecutive days with at least one reading completed (ending today or yesterday)
-  const daySet = new Set(planProgress.map(p => startOfDay(p.completedAt).getTime()))
+  // Streak: consecutive days with any reading activity (plan OR manual chapter read)
+  const allActivityDays = new Set<number>([
+    ...planProgress.map(p => startOfDay(p.completedAt).getTime()),
+    ...chapterReads.map(r => startOfDay(r.readAt).getTime()),
+  ])
   let streak = 0
   let cursor = startOfDay(new Date())
-  if (!daySet.has(cursor.getTime())) cursor = subDays(cursor, 1)
-  while (daySet.has(cursor.getTime())) {
+  if (!allActivityDays.has(cursor.getTime())) cursor = subDays(cursor, 1)
+  while (allActivityDays.has(cursor.getTime())) {
     streak++
     cursor = subDays(cursor, 1)
   }
 
   const now = new Date()
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1)
-  const chaptersThisMonth = planProgress.filter(p => new Date(p.completedAt) >= monthStart).length
+  const chaptersThisMonth = chapterReads.filter(r => new Date(r.readAt) >= monthStart).length
+
+  // Bible reading stats from ChapterRead
+  const totalBibleChapters = Object.values(BOOK_CHAPTERS).reduce((a, b) => a + b, 0)
+  const totalChaptersRead  = chapterReads.length
+  const biblePercent       = totalBibleChapters > 0
+    ? Math.round((totalChaptersRead / totalBibleChapters) * 1000) / 10
+    : 0
+
+  // Books completed: all chapters of a book marked read
+  const readMap = new Map<string, Set<number>>()
+  for (const r of chapterReads) {
+    if (!readMap.has(r.book)) readMap.set(r.book, new Set())
+    readMap.get(r.book)!.add(r.chapter)
+  }
+  const completedBooks = Object.entries(BOOK_CHAPTERS)
+    .filter(([id, total]) => (readMap.get(id)?.size ?? 0) >= total).length
 
   const totalPlanDays = profile?.readingPlanType && PLAN_CONFIG[profile.readingPlanType]
     ? PLAN_CONFIG[profile.readingPlanType].days
@@ -150,16 +172,44 @@ export default async function DashboardPage() {
       </div>
 
       {/* Seu Progresso */}
-      <div className="candle-enter candle-delay-5 flame-hover card-soft px-5 py-4 space-y-3">
+      <div className="candle-enter candle-delay-5 card-soft px-5 py-4 space-y-4">
         <p className="font-display text-[9px] text-[#c9a654] uppercase tracking-[0.2em] opacity-70">
           Seu Progresso
         </p>
+
+        {/* Barra de progresso da Bíblia */}
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-2">
+              <BookOpen className="w-3.5 h-3.5 text-[#c9a654] opacity-60" />
+              <p className="text-[#55524a] text-[10px]">Bíblia lida</p>
+            </div>
+            <div className="flex items-center gap-2">
+              {completedBooks > 0 && (
+                <span className="text-[10px] text-[#55524a]">{completedBooks} livro{completedBooks !== 1 ? "s" : ""} completo{completedBooks !== 1 ? "s" : ""}</span>
+              )}
+              <span className="text-[#8a8375] text-[11px] font-serif tabular-nums">
+                {totalChaptersRead}/{totalBibleChapters}
+              </span>
+              <span className="text-[#c9a654] text-[11px] font-serif font-medium tabular-nums">
+                {biblePercent}%
+              </span>
+            </div>
+          </div>
+          <div className="h-1.5 rounded-full bg-[#1e1c2e] overflow-hidden">
+            <div
+              className="h-full rounded-full bg-gradient-to-r from-[#c9a654] to-[#e8c87a] transition-all duration-700"
+              style={{ width: `${Math.max(biblePercent, biblePercent > 0 ? 0.5 : 0)}%` }}
+            />
+          </div>
+        </div>
+
         <div className="flex items-end justify-between gap-4 flex-wrap">
           {/* Streak */}
           <div className="flex items-center gap-2">
-            <Flame className="w-4 h-4 text-[#c9a654] opacity-70 shrink-0" />
+            <Flame className={`w-4 h-4 shrink-0 ${streak >= 3 ? "text-[#c9a654]" : "text-[#3d3a55]"}`} />
             <div>
-              <p className="text-[#e2d9c5] text-lg font-serif leading-none">{streak}</p>
+              <p className="text-[#e2d9c5] text-xl font-serif leading-none">{streak}</p>
               <p className="text-[#55524a] text-[10px] mt-0.5">dia{streak !== 1 ? "s" : ""} seguido{streak !== 1 ? "s" : ""}</p>
             </div>
           </div>
@@ -189,7 +239,7 @@ export default async function DashboardPage() {
             {chaptersThisMonth > 0 && (
               <div>
                 <p className="text-[#8a8375] text-sm font-serif leading-none">{chaptersThisMonth}</p>
-                <p className="text-[#3d3a55] text-[10px] mt-0.5">este mês</p>
+                <p className="text-[#3d3a55] text-[10px] mt-0.5">cap. este mês</p>
               </div>
             )}
             <div>
