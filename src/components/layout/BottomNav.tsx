@@ -31,7 +31,6 @@ export function BottomNav({ onOpenSidebar }: BottomNavProps) {
         right: "1rem",
         zIndex: 50,
         height: "60px",
-        display: "flex",
         alignItems: "center",
         justifyContent: "space-around",
         borderRadius: "20px",

@@ -635,8 +635,9 @@ a, button, [role="button"], label, select, input, textarea {
   box-shadow: 0 8px 40px rgba(100, 70, 10, 0.18), 0 1px 0 rgba(255,255,255,0.7) inset !important;
 }
 
-/* Smooth show/hide transitions */
+/* Smooth show/hide transitions — display:flex here so md:hidden can override it */
 .bottom-nav {
+  display: flex;
   transition: opacity 0.22s ease, transform 0.22s ease;
 }
 
