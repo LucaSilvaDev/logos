@@ -6,7 +6,7 @@ import { PLAN_CONFIG, BOOK_CHAPTERS } from "@/lib/reading-plan"
 import Link from "next/link"
 import {
   BookOpen, NotebookPen, Clock, Search,
-  Flame, Church, Library, Heart, PenLine, Brain
+  Flame, Church, Library, Heart, PenLine, Brain, Map as MapIcon
 } from "lucide-react"
 import { ContinueReading } from "@/components/ContinueReading"
 import { format, subDays, startOfDay } from "date-fns"
@@ -180,10 +180,10 @@ export default async function DashboardPage() {
         {/* Barra de progresso da Bíblia */}
         <div>
           <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
+            <Link href="/progresso" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
               <BookOpen className="w-3.5 h-3.5 text-[#c9a654] opacity-60" />
-              <p className="text-[#55524a] text-[10px]">Bíblia lida</p>
-            </div>
+              <p className="text-[#55524a] text-[10px] hover:text-[#c9a654] transition-colors">Bíblia lida</p>
+            </Link>
             <div className="flex items-center gap-2">
               {completedBooks > 0 && (
                 <span className="text-[10px] text-[#55524a]">{completedBooks} livro{completedBooks !== 1 ? "s" : ""} completo{completedBooks !== 1 ? "s" : ""}</span>

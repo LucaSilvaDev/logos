@@ -98,6 +98,12 @@ a, button, [role="button"], label, select, input, textarea {
 .topbar {
   background: #121214;
   border-bottom: 1px solid rgba(255,255,255,0.05);
+  /* Push content below iPhone status bar / Dynamic Island */
+  padding-top: env(safe-area-inset-top);
+}
+/* Sidebar needs the same treatment on mobile overlay */
+.sidebar {
+  padding-top: env(safe-area-inset-top);
 }
 
 /* ─── SUPERFÍCIES / CARDS ────────────────────────────────────────────────── */

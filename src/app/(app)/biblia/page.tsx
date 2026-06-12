@@ -365,9 +365,14 @@ export default function BibliaPage() {
     return () => { active = false }
   }, [book.id])
 
+  function haptic(duration = 10) {
+    try { navigator.vibrate?.(duration) } catch { /* ignore */ }
+  }
+
   async function toggleRead() {
     const key  = `${book.id}-${chapter}`
     const isRead = readChapters.has(key)
+    haptic(isRead ? 10 : 30)
     setReadSaving(true)
     // Optimistic update
     setReadChapters(prev => {

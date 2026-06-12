@@ -1,7 +1,8 @@
 ﻿"use client"
 
 import { useState, useEffect } from "react"
-import { Save, Bell, BellOff, User, ChevronLeft, Check } from "lucide-react"
+import { Save, Bell, BellOff, User, ChevronLeft, Check, LogOut } from "lucide-react"
+import { signOut } from "next-auth/react"
 import Link from "next/link"
 import { cn } from "@/lib/utils"
 
@@ -290,16 +291,26 @@ export function PerfilClient({ userName, userEmail, userImage }: Props) {
 
       <div className="h-px bg-[#2e2b42]" />
 
-      <button
-        onClick={save}
-        disabled={saving}
-        className="btn-gold px-6 py-2.5 rounded-xl text-sm flex items-center gap-2 disabled:opacity-50"
-      >
-        {saved
-          ? <><Check className="w-4 h-4" /> Salvo</>
-          : <><Save className="w-4 h-4" /> {saving ? "Salvando..." : "Salvar Perfil"}</>
-        }
-      </button>
+      <div className="flex items-center justify-between gap-4">
+        <button
+          onClick={save}
+          disabled={saving}
+          className="btn-gold px-6 py-2.5 rounded-xl text-sm flex items-center gap-2 disabled:opacity-50"
+        >
+          {saved
+            ? <><Check className="w-4 h-4" /> Salvo</>
+            : <><Save className="w-4 h-4" /> {saving ? "Salvando..." : "Salvar Perfil"}</>
+          }
+        </button>
+
+        <button
+          onClick={() => signOut({ callbackUrl: "/entrar" })}
+          className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm text-[#55524a] hover:text-[#e07070] border border-[#2e2b42] hover:border-[#e07070]/30 transition-all duration-200"
+        >
+          <LogOut className="w-4 h-4" />
+          Sair da conta
+        </button>
+      </div>
     </div>
   )
 }
