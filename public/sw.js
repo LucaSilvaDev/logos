@@ -1,5 +1,5 @@
 const SHELL_CACHE = "selah-shell-v1"
-const BIBLE_CACHE = "selah-bible-v2"
+const BIBLE_CACHE = "selah-bible-v3"
 const KNOWN_CACHES = [SHELL_CACHE, BIBLE_CACHE]
 
 // App shell assets precached on install

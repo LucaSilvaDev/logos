@@ -81,7 +81,8 @@ async function fetchFromYouVersion(bookId: string, chapter: string, version: str
 // --- BibliaOnline.com.br (NVT, NAA) ---
 // Scraping SSR HTML — versículos em <span class="v"> dentro de <article coreBibleStyles>
 
-const BIBLIA_ONLINE_VERSIONS = new Set(["nvt", "naa"])
+// nvi added here — abibliadigital.com.br returns 500 for NVI
+const BIBLIA_ONLINE_VERSIONS = new Set(["nvi", "nvt", "naa"])
 
 function decodeEntities(s: string): string {
   return s
