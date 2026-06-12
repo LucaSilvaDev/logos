@@ -245,6 +245,10 @@ export default function BibliaPage() {
   // Reading progress bar
   const [scrollProgress, setScrollProgress] = useState(0)
 
+  // Chapter read tracking
+  const [readChapters, setReadChapters] = useState<Set<string>>(new Set())
+  const [readSaving,   setReadSaving]   = useState(false)
+
   useEffect(() => {
     const el = document.querySelector("main") as HTMLElement | null
     if (!el) return
@@ -345,6 +349,49 @@ export default function BibliaPage() {
     load()
     return () => { active = false }
   }, [book, chapter, version])
+
+  // Load read chapters for the current book
+  useEffect(() => {
+    let active = true
+    async function load() {
+      try {
+        const res  = await fetch(`/api/biblia/read?book=${book.id}`)
+        if (!res.ok || !active) return
+        const data: { book: string; chapter: number }[] = await res.json()
+        if (active) setReadChapters(new Set(data.map(r => `${r.book}-${r.chapter}`)))
+      } catch { /* non-critical */ }
+    }
+    load()
+    return () => { active = false }
+  }, [book.id])
+
+  async function toggleRead() {
+    const key  = `${book.id}-${chapter}`
+    const isRead = readChapters.has(key)
+    setReadSaving(true)
+    // Optimistic update
+    setReadChapters(prev => {
+      const next = new Set(prev)
+      isRead ? next.delete(key) : next.add(key)
+      return next
+    })
+    try {
+      await fetch("/api/biblia/read", {
+        method:  isRead ? "DELETE" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body:    JSON.stringify({ book: book.id, chapter }),
+      })
+    } catch {
+      // Revert on error
+      setReadChapters(prev => {
+        const next = new Set(prev)
+        isRead ? next.add(key) : next.delete(key)
+        return next
+      })
+    } finally {
+      setReadSaving(false)
+    }
+  }
 
   const filteredBooks = BOOKS.filter(b =>
     b.testament === tab && b.name.toLowerCase().includes(filter.toLowerCase())
@@ -894,7 +941,36 @@ export default function BibliaPage() {
               })}
             </div>
 
-            <div className="flex justify-between mt-16 pt-6 border-t border-[#2e2b42]/40">
+            {/* Mark as read */}
+            <div className="flex justify-center mt-12 mb-2">
+              {(() => {
+                const isRead = readChapters.has(`${book.id}-${chapter}`)
+                return (
+                  <button
+                    onClick={toggleRead}
+                    disabled={readSaving}
+                    className={cn(
+                      "flex items-center gap-2.5 px-6 py-3 rounded-full text-sm font-serif transition-all duration-300",
+                      isRead
+                        ? "bg-[#c9a654]/12 text-[#c9a654] border border-[#c9a654]/30 hover:bg-[#c9a654]/8"
+                        : "bg-[#1e1c28] text-[#6b6860] border border-[#2e2b42]/60 hover:text-[#c9a654] hover:border-[#c9a654]/25"
+                    )}
+                  >
+                    <span className={cn(
+                      "w-5 h-5 rounded-full border flex items-center justify-center transition-all duration-300 flex-shrink-0",
+                      isRead
+                        ? "bg-[#c9a654] border-[#c9a654]"
+                        : "border-[#3d3a55]"
+                    )}>
+                      {isRead && <Check className="w-3 h-3 text-[#0e0d14]" strokeWidth={3} />}
+                    </span>
+                    {isRead ? "Capítulo concluído" : "Marcar como lido"}
+                  </button>
+                )
+              })()}
+            </div>
+
+            <div className="flex justify-between mt-8 pt-6 border-t border-[#2e2b42]/40">
               <button onClick={() => goChapter(-1)} disabled={isFirstInBible}
                 className="flex items-center gap-1.5 text-sm font-serif text-[#55524a] hover:text-[#c9a654] disabled:opacity-20 transition-colors duration-200">
                 <ChevronLeft className="w-4 h-4" />
@@ -1259,23 +1335,31 @@ export default function BibliaPage() {
 
             <div className="overflow-y-auto px-4 pb-5">
               <div className="grid gap-1.5" style={{ gridTemplateColumns: `repeat(${chapterCols}, minmax(0, 1fr))` }}>
-                {Array.from({ length: book.chapters }, (_, i) => i + 1).map(n => (
-                  <button key={n}
-                    onClick={() => {
-                      setDirection(n > chapter ? "next" : "prev")
-                      setAnimKey(k => k + 1)
-                      setChapter(n)
-                      setShowChapterModal(false)
-                    }}
-                    className={cn(
-                      "py-2 text-xs font-serif rounded-xl transition-all duration-200",
-                      n === chapter
-                        ? "bg-[#c9a65420] text-[#c9a654]"
-                        : "text-[#55524a] hover:text-[#c9c0a8] hover:bg-[#ffffff08]"
-                    )}>
-                    {n}
-                  </button>
-                ))}
+                {Array.from({ length: book.chapters }, (_, i) => i + 1).map(n => {
+                  const isChRead = readChapters.has(`${book.id}-${n}`)
+                  return (
+                    <button key={n}
+                      onClick={() => {
+                        setDirection(n > chapter ? "next" : "prev")
+                        setAnimKey(k => k + 1)
+                        setChapter(n)
+                        setShowChapterModal(false)
+                      }}
+                      className={cn(
+                        "relative py-2 text-xs font-serif rounded-xl transition-all duration-200",
+                        n === chapter
+                          ? "bg-[#c9a65420] text-[#c9a654]"
+                          : isChRead
+                            ? "text-[#c9a654]/60 hover:text-[#c9a654] hover:bg-[#c9a65410]"
+                            : "text-[#55524a] hover:text-[#c9c0a8] hover:bg-[#ffffff08]"
+                      )}>
+                      {n}
+                      {isChRead && n !== chapter && (
+                        <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#c9a654]/50" />
+                      )}
+                    </button>
+                  )
+                })}
               </div>
             </div>
           </div>
