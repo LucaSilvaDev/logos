@@ -635,6 +635,18 @@ a, button, [role="button"], label, select, input, textarea {
   box-shadow: 0 8px 40px rgba(100, 70, 10, 0.18), 0 1px 0 rgba(255,255,255,0.7) inset !important;
 }
 
+/* Hide nav when verse action bar is open */
+body.verse-bar-open .bottom-nav {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(12px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.bottom-nav {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
 /* ─── LIQUID GLASS ORBS ──────────────────────────────────────────────────── */
 @keyframes liquidDrift1 {
   0%, 100% {

@@ -224,6 +224,16 @@ export default function BibliaPage() {
   const [selectedVerses, setSelectedVerses] = useState<Set<number>>(new Set())
   const [copied, setCopied] = useState(false)
 
+  // Hide floating nav while verse action bar is open
+  useEffect(() => {
+    if (selectedVerses.size > 0) {
+      document.body.classList.add("verse-bar-open")
+    } else {
+      document.body.classList.remove("verse-bar-open")
+    }
+    return () => document.body.classList.remove("verse-bar-open")
+  }, [selectedVerses.size])
+
   const [compareOpen,     setCompareOpen]     = useState(false)
   const [compareVerseNum, setCompareVerseNum] = useState<number | null>(null)
   const [compareData,     setCompareData]     = useState<Record<string, string>>({})
