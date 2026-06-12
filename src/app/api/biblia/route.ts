@@ -167,7 +167,7 @@ async function fetchFromBibliaOnline(bookId: string, chapter: string, version: s
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         "Accept-Language": "pt-BR,pt;q=0.9",
       },
-      next: { revalidate: 86400 }, // cache 24h — texto bíblico não muda
+      cache: "no-store",
     })
 
     if (!res.ok) {
