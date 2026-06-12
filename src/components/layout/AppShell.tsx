@@ -19,11 +19,13 @@ export function AppShell({ children, userName, userImage }: AppShellProps) {
   const [theme, setTheme] = useState<"dark" | "light">("dark")
   const pathname = usePathname()
 
-  // Tracks the user's explicit collapse preference before entering a reading route
   const savedBeforeReadRef = useRef<boolean | null>(null)
-  // Always reflects latest sidebarCollapsed without stale closure issues
   const collapsedRef = useRef(sidebarCollapsed)
   collapsedRef.current = sidebarCollapsed
+
+  const mainRef = useRef<HTMLElement>(null)
+  const lastScrollY = useRef(0)
+  const ticking = useRef(false)
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("selah-theme")
@@ -32,7 +34,7 @@ export function AppShell({ children, userName, userImage }: AppShellProps) {
     if (savedCollapsed === "1") setSidebarCollapsed(true)
   }, [])
 
-  // Auto-collapse on reading routes (/biblia, /memorizar); restore on exit
+  // Auto-collapse sidebar on reading routes
   useEffect(() => {
     const isReadingRoute = pathname.startsWith("/biblia") || pathname.startsWith("/memorizar")
     if (isReadingRoute) {
@@ -49,11 +51,48 @@ export function AppShell({ children, userName, userImage }: AppShellProps) {
     }
   }, [pathname])
 
+  // Show nav when route changes (navigated to new page)
+  useEffect(() => {
+    document.body.classList.remove("nav-hidden")
+    lastScrollY.current = 0
+  }, [pathname])
+
+  // Scroll-based hide/show — hide on scroll down, show on scroll up
+  useEffect(() => {
+    const el = mainRef.current
+    if (!el) return
+
+    function onScroll() {
+      if (ticking.current) return
+      ticking.current = true
+      requestAnimationFrame(() => {
+        if (!el) { ticking.current = false; return }
+        const currentY = el.scrollTop
+        const delta = currentY - lastScrollY.current
+
+        // Need at least 8px movement to trigger, avoids jitter
+        if (Math.abs(delta) > 8) {
+          if (delta > 0 && currentY > 60) {
+            // Scrolling down — hide nav
+            document.body.classList.add("nav-hidden")
+          } else {
+            // Scrolling up — show nav
+            document.body.classList.remove("nav-hidden")
+          }
+          lastScrollY.current = currentY
+        }
+        ticking.current = false
+      })
+    }
+
+    el.addEventListener("scroll", onScroll, { passive: true })
+    return () => el.removeEventListener("scroll", onScroll)
+  }, [])
+
   function toggleCollapse() {
     const next = !sidebarCollapsed
     setSidebarCollapsed(next)
     localStorage.setItem("selah-sidebar-collapsed", next ? "1" : "0")
-    // If user manually toggles while on a reading route, treat that as the new baseline
     if (savedBeforeReadRef.current !== null) {
       savedBeforeReadRef.current = next
     }
@@ -79,7 +118,6 @@ export function AppShell({ children, userName, userImage }: AppShellProps) {
 
   return (
     <div className="flex h-screen overflow-hidden bg-glass-base relative">
-      {/* Liquid glass ambient orbs */}
       <div className="liquid-orb-1" />
       <div className="liquid-orb-2" />
       <div className="liquid-orb-3" />
@@ -100,9 +138,8 @@ export function AppShell({ children, userName, userImage }: AppShellProps) {
           onToggleTheme={toggleTheme}
         />
 
-        {/* pb accounts for floating nav height (60px) + gap (14px) + safe area */}
-        <main className="flex-1 overflow-y-auto pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0">
-          {/* Dashboard tem stagger próprio (candle-enter); todas as outras páginas usam animate-page-in */}
+        {/* pb accounts for floating nav height (60px) + gap + safe area */}
+        <main ref={mainRef} className="flex-1 overflow-y-auto pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0">
           <div key={pathname} className={cn("h-full", pathname !== "/dashboard" && "animate-page-in")}>
             {children}
           </div>
