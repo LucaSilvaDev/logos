@@ -369,12 +369,20 @@ a, button, [role="button"], label, select, input, textarea {
 .bible-text {
   font-family: 'EB Garamond', Georgia, serif;
   font-size: 1.125rem;
-  line-height: 2.1;
   color: #e2d9c5;
   letter-spacing: 0.01em;
 }
 .bible-text-sm { font-size: 0.9375rem; }
 .bible-text-lg { font-size: 1.3125rem; }
+
+/* Each verse as its own block — breathing room between verses */
+.bible-verse-row {
+  display: block;
+  line-height: 1.85;
+  margin-bottom: 1.1em;
+  padding-left: 0.1em;
+}
+.bible-verse-row:last-child { margin-bottom: 0; }
 .verse-number {
   font-family: 'Inter', sans-serif;
   font-size: 0.55rem;

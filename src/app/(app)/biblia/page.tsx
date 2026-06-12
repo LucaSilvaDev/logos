@@ -852,7 +852,7 @@ export default function BibliaPage() {
             </div>
 
             <div className={cn(
-              "bible-text leading-[2.2]",
+              "bible-text",
               fontSize === "sm" && "bible-text-sm",
               fontSize === "lg" && "bible-text-lg",
             )}>
@@ -860,17 +860,13 @@ export default function BibliaPage() {
                 const key     = `${book.id}-${chapter}-${v.number}`
                 const hlEntry = highlighted[key]
                 const hlCls   = hlEntry ? `hl-${hlEntry.color}` : ""
-                // Stagger first 16 verses; remainder all enter at the same cap delay
                 const enterDelay = Math.min(index, 15) * 30
                 return (
-                  <span key={v.number}>
+                  <span key={v.number} className="bible-verse-row">
                     {v.heading && (
                       <span
                         className="verse-enter bible-section-heading"
-                        style={{
-                          animationDelay: `${enterDelay}ms`,
-                          marginTop: index === 0 ? "0.6em" : undefined,
-                        }}
+                        style={{ animationDelay: `${enterDelay}ms` }}
                       >
                         {v.heading}
                       </span>
@@ -891,8 +887,7 @@ export default function BibliaPage() {
                           <span className="inline-block w-1 h-1 rounded-full bg-[#c9a654] ml-0.5 opacity-70 translate-y-[-1px]" />
                         )}
                       </sup>
-                      <span>{v.text}</span>
-                      {" "}
+                      {v.text}
                     </span>
                   </span>
                 )
