@@ -278,10 +278,25 @@ export default function BibliaPage() {
     return () => document.removeEventListener("keydown", onKey)
   }, [focusMode, chapterNoteOpen, noteVerse, selectedVerses, showChapterModal, showBookModal, compareOpen])
 
-  // Persist reading position
+  // J/K keyboard shortcuts for chapter navigation (desktop)
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      const tag = (e.target as HTMLElement)?.tagName
+      if (tag === "INPUT" || tag === "TEXTAREA") return
+      if ((e.target as HTMLElement)?.isContentEditable) return
+      if (showBookModal || showChapterModal || noteVerse !== null || chapterNoteOpen || compareOpen) return
+      if (e.key === "j") goChapter(1)
+      if (e.key === "k") goChapter(-1)
+    }
+    document.addEventListener("keydown", onKey)
+    return () => document.removeEventListener("keydown", onKey)
+  }, [showBookModal, showChapterModal, noteVerse, chapterNoteOpen, compareOpen, book, chapter])
+
+  // Persist reading position and notify Topbar
   useEffect(() => {
     try {
       localStorage.setItem("selah-bible-pos", JSON.stringify({ bookId: book.id, chapter, version }))
+      window.dispatchEvent(new CustomEvent("selah-bible-pos"))
     } catch { /* ignore */ }
   }, [book, chapter, version])
 
@@ -449,11 +464,6 @@ export default function BibliaPage() {
 
   function changeBook(b: typeof BOOKS[0]) {
     setBook(b); setChapter(1); setDirection("next"); setAnimKey(k => k + 1)
-  }
-
-  function openStudyNote(verseNumber: number) {
-    const bookName = BOOK_ID_NAMES[book.id] ?? book.name
-    router.push(`/estudo/nova?book=${encodeURIComponent(bookName)}&chapter=${chapter}&verse=${verseNumber}`)
   }
 
   function openNote(verseNumber: number) {
@@ -749,7 +759,7 @@ export default function BibliaPage() {
 
       {/* Chapter navigation */}
       <div className="flex items-center gap-1">
-        <button onClick={() => goChapter(-1)}
+        <button onClick={() => goChapter(-1)} title="Capítulo anterior (K)"
           className="w-6 h-6 flex items-center justify-center text-[#3d3a55] hover:text-[#c9a654] transition-colors duration-200 rounded-lg hover:bg-[#1a1928]">
           <ChevronLeft className="w-3.5 h-3.5" />
         </button>
@@ -760,7 +770,7 @@ export default function BibliaPage() {
           <span className="font-serif text-xs">Cap. {chapter}</span>
           <ChevronDown className="w-3 h-3 text-[#3d3a55] group-hover:text-[#55524a] transition-colors" />
         </button>
-        <button onClick={() => goChapter(1)}
+        <button onClick={() => goChapter(1)} title="Próximo capítulo (J)"
           className="w-6 h-6 flex items-center justify-center text-[#3d3a55] hover:text-[#c9a654] transition-colors duration-200 rounded-lg hover:bg-[#1a1928]">
           <ChevronRight className="w-3.5 h-3.5" />
         </button>
