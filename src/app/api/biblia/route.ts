@@ -134,6 +134,28 @@ function parseBibliaOnlineHtml(html: string): { number: number; text: string; he
       // Prose: split by bookmark anchors — each marks the start of a new verse
       const segments = pContent.split(/<span\b[^>]*\bclass="bv"[^>]*><\/span>/gi)
 
+      // Segment 0: text BEFORE the first bv marker — continuation of the verse
+      // whose number is given by the span's own data-v (e.g. <span data-v=".1." class="t">)
+      // or falls back to the first number in the paragraph's data-v attribute.
+      const seg0 = segments[0]
+      if (seg0) {
+        const tRe0 = /<span\b[^>]*\bclass="t"[^>]*>([\s\S]*?)<\/span>/gi
+        let tm0: RegExpExecArray | null
+        while ((tm0 = tRe0.exec(seg0)) !== null) {
+          const t = decodeEntities(tm0[1].replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim()
+          if (!t) continue
+          // Prefer the span's own data-v, fall back to paragraph data-v
+          const spanDV = tm0[0].match(/\bdata-v="([^"]+)"/)
+          const dvSrc  = spanDV ? spanDV[1] : dataV
+          const nm     = dvSrc.match(/\.(\d+)\./)
+          if (!nm) continue
+          const num = parseInt(nm[1])
+          if (!num || num <= 0) continue
+          if (!verseMap.has(num)) verseMap.set(num, [])
+          verseMap.get(num)!.push(t)
+        }
+      }
+
       for (let i = 1; i < segments.length; i++) {
         const seg = segments[i]
 
