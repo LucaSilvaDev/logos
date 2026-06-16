@@ -4,9 +4,12 @@ import bcrypt from "bcryptjs"
 import { z } from "zod"
 
 const schema = z.object({
-  email: z.string().email(),
-  token: z.string().min(1),
-  password: z.string().min(8),
+  email: z.string().email().toLowerCase(),
+  token: z.string().min(1).max(128),
+  password: z.string().min(8).max(100).refine(
+    (p) => Buffer.byteLength(p, "utf8") <= 72,
+    { message: "Senha muito longa (máximo 72 bytes)." },
+  ),
 })
 
 export async function POST(req: Request) {

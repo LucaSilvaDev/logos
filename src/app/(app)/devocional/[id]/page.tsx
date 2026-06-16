@@ -13,7 +13,7 @@ export default async function DevocionalDetailPage({ params }: { params: Promise
   const session = await auth()
   const userId = session!.user!.id!
 
-  const devotional = await db.devotional.findUnique({ where: { id, userId } })
+  const devotional = await db.devotional.findFirst({ where: { id, userId } })
   if (!devotional) notFound()
 
   const tags = devotional.tags ? devotional.tags.split(",").filter(Boolean) : []

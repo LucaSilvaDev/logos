@@ -1,12 +1,19 @@
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 import { Resend } from "resend"
+import { z } from "zod"
 import crypto from "crypto"
+
+const schema = z.object({
+  email: z.string().email().toLowerCase().max(254),
+})
 
 export async function POST(req: Request) {
   const resend = new Resend(process.env.RESEND_API_KEY)
-  const { email } = await req.json()
-  if (!email) return NextResponse.json({ error: "Email obrigatório" }, { status: 400 })
+  const body = await req.json().catch(() => null)
+  const parsed = schema.safeParse(body)
+  if (!parsed.success) return NextResponse.json({ ok: true })
+  const { email } = parsed.data
 
   const user = await db.user.findUnique({ where: { email } })
   // Não revela se o email existe ou não (segurança)
