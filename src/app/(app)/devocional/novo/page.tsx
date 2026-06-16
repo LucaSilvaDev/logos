@@ -1,15 +1,12 @@
-﻿"use client"
+"use client"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { useEditor, EditorContent } from "@tiptap/react"
-import StarterKit from "@tiptap/starter-kit"
-import Placeholder from "@tiptap/extension-placeholder"
-import Highlight from "@tiptap/extension-highlight"
-import Link from "@tiptap/extension-link"
-import Typography from "@tiptap/extension-typography"
+import { EditorContent } from "@tiptap/react"
 import { Save, ArrowLeft, BookOpen, Tag } from "lucide-react"
 import { EditorToolbar } from "@/components/EditorToolbar"
+import { useRichEditor } from "@/hooks/useRichEditor"
+import { submitJson } from "@/hooks/useResourceEditor"
 
 export default function NovoDevocionaPage() {
   const router = useRouter()
@@ -17,40 +14,25 @@ export default function NovoDevocionaPage() {
   const [bibleRef, setBibleRef] = useState("")
   const [tags, setTags] = useState("")
   const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
 
-  const editor = useEditor({
-    immediatelyRender: false,
-    extensions: [
-      StarterKit,
-      Placeholder.configure({ placeholder: "Escreva sua meditação..." }),
-      Highlight.configure({ multicolor: false }),
-      Link.configure({ openOnClick: false }),
-      Typography,
-    ],
-    editorProps: {
-      attributes: { class: "tiptap min-h-[320px] focus:outline-none" },
-    },
-  })
+  const editor = useRichEditor({ placeholder: "Escreva sua meditação...", link: true, editorClassName: "tiptap min-h-[320px] focus:outline-none" })
 
   async function save() {
     if (!title.trim() || !editor) return
     setSaving(true)
+    setSaveError(null)
     try {
-      const res = await fetch("/api/devocional", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: title.trim(),
-          content: editor.getHTML(),
-          bibleRef: bibleRef.trim() || null,
-          tags: tags.split(",").map(t => t.trim()).filter(Boolean).join(","),
-          mood: null,
-        }),
+      const data = await submitJson("/api/devocional", "POST", {
+        title: title.trim(),
+        content: editor.getHTML(),
+        bibleRef: bibleRef.trim() || null,
+        tags: tags.split(",").map(t => t.trim()).filter(Boolean).join(","),
+        mood: null,
       })
-      if (res.ok) {
-        const data = await res.json()
-        router.push(`/devocional/${data.id}`)
-      }
+      router.push(`/devocional/${data.id}`)
+    } catch (e) {
+      setSaveError(e instanceof Error ? e.message : "Erro ao salvar")
     } finally {
       setSaving(false)
     }
@@ -70,6 +52,8 @@ export default function NovoDevocionaPage() {
           {saving ? "Salvando..." : "Salvar"}
         </button>
       </div>
+
+      {saveError && <p className="text-sm text-[#c97a7a]">{saveError}</p>}
 
       <input
         value={title}

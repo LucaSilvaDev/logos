@@ -1,24 +1,78 @@
 type Book = [string, number] // [name, chapters]
 
-const AT: Book[] = [
-  ["Gênesis", 50], ["Êxodo", 40], ["Levítico", 27], ["Números", 36], ["Deuteronômio", 34],
-  ["Josué", 24], ["Juízes", 21], ["Rute", 4], ["1 Samuel", 31], ["2 Samuel", 24],
-  ["1 Reis", 22], ["2 Reis", 25], ["1 Crônicas", 29], ["2 Crônicas", 36], ["Esdras", 10],
-  ["Neemias", 13], ["Ester", 10], ["Jó", 42], ["Salmos", 150], ["Provérbios", 31],
-  ["Eclesiastes", 12], ["Cânticos", 8], ["Isaías", 66], ["Jeremias", 52], ["Lamentações", 5],
-  ["Ezequiel", 48], ["Daniel", 12], ["Oséias", 14], ["Joel", 3], ["Amós", 9],
-  ["Obadias", 1], ["Jonas", 4], ["Miquéias", 7], ["Naum", 3], ["Habacuque", 3],
-  ["Sofonias", 3], ["Ageu", 2], ["Zacarias", 14], ["Malaquias", 4],
+// Canonical 66-book list — single source of truth for id/name/chapters/testament.
+// AT/NT/BOOK_CHAPTERS/BOOK_ID_NAMES/ALL_BOOK_NAMES below are all derived from this.
+export const BOOKS: { id: string; name: string; chapters: number; testament: "AT" | "NT" }[] = [
+  { id: "GEN", name: "Gênesis", chapters: 50, testament: "AT" },
+  { id: "EXO", name: "Êxodo", chapters: 40, testament: "AT" },
+  { id: "LEV", name: "Levítico", chapters: 27, testament: "AT" },
+  { id: "NUM", name: "Números", chapters: 36, testament: "AT" },
+  { id: "DEU", name: "Deuteronômio", chapters: 34, testament: "AT" },
+  { id: "JOS", name: "Josué", chapters: 24, testament: "AT" },
+  { id: "JDG", name: "Juízes", chapters: 21, testament: "AT" },
+  { id: "RUT", name: "Rute", chapters: 4, testament: "AT" },
+  { id: "1SA", name: "1 Samuel", chapters: 31, testament: "AT" },
+  { id: "2SA", name: "2 Samuel", chapters: 24, testament: "AT" },
+  { id: "1KI", name: "1 Reis", chapters: 22, testament: "AT" },
+  { id: "2KI", name: "2 Reis", chapters: 25, testament: "AT" },
+  { id: "1CH", name: "1 Crônicas", chapters: 29, testament: "AT" },
+  { id: "2CH", name: "2 Crônicas", chapters: 36, testament: "AT" },
+  { id: "EZR", name: "Esdras", chapters: 10, testament: "AT" },
+  { id: "NEH", name: "Neemias", chapters: 13, testament: "AT" },
+  { id: "EST", name: "Ester", chapters: 10, testament: "AT" },
+  { id: "JOB", name: "Jó", chapters: 42, testament: "AT" },
+  { id: "PSA", name: "Salmos", chapters: 150, testament: "AT" },
+  { id: "PRO", name: "Provérbios", chapters: 31, testament: "AT" },
+  { id: "ECC", name: "Eclesiastes", chapters: 12, testament: "AT" },
+  { id: "SNG", name: "Cânticos", chapters: 8, testament: "AT" },
+  { id: "ISA", name: "Isaías", chapters: 66, testament: "AT" },
+  { id: "JER", name: "Jeremias", chapters: 52, testament: "AT" },
+  { id: "LAM", name: "Lamentações", chapters: 5, testament: "AT" },
+  { id: "EZK", name: "Ezequiel", chapters: 48, testament: "AT" },
+  { id: "DAN", name: "Daniel", chapters: 12, testament: "AT" },
+  { id: "HOS", name: "Oséias", chapters: 14, testament: "AT" },
+  { id: "JOL", name: "Joel", chapters: 3, testament: "AT" },
+  { id: "AMO", name: "Amós", chapters: 9, testament: "AT" },
+  { id: "OBA", name: "Obadias", chapters: 1, testament: "AT" },
+  { id: "JON", name: "Jonas", chapters: 4, testament: "AT" },
+  { id: "MIC", name: "Miquéias", chapters: 7, testament: "AT" },
+  { id: "NAH", name: "Naum", chapters: 3, testament: "AT" },
+  { id: "HAB", name: "Habacuque", chapters: 3, testament: "AT" },
+  { id: "ZEP", name: "Sofonias", chapters: 3, testament: "AT" },
+  { id: "HAG", name: "Ageu", chapters: 2, testament: "AT" },
+  { id: "ZEC", name: "Zacarias", chapters: 14, testament: "AT" },
+  { id: "MAL", name: "Malaquias", chapters: 4, testament: "AT" },
+  { id: "MAT", name: "Mateus", chapters: 28, testament: "NT" },
+  { id: "MRK", name: "Marcos", chapters: 16, testament: "NT" },
+  { id: "LUK", name: "Lucas", chapters: 24, testament: "NT" },
+  { id: "JHN", name: "João", chapters: 21, testament: "NT" },
+  { id: "ACT", name: "Atos", chapters: 28, testament: "NT" },
+  { id: "ROM", name: "Romanos", chapters: 16, testament: "NT" },
+  { id: "1CO", name: "1 Coríntios", chapters: 16, testament: "NT" },
+  { id: "2CO", name: "2 Coríntios", chapters: 13, testament: "NT" },
+  { id: "GAL", name: "Gálatas", chapters: 6, testament: "NT" },
+  { id: "EPH", name: "Efésios", chapters: 6, testament: "NT" },
+  { id: "PHP", name: "Filipenses", chapters: 4, testament: "NT" },
+  { id: "COL", name: "Colossenses", chapters: 4, testament: "NT" },
+  { id: "1TH", name: "1 Tessalonicenses", chapters: 5, testament: "NT" },
+  { id: "2TH", name: "2 Tessalonicenses", chapters: 3, testament: "NT" },
+  { id: "1TI", name: "1 Timóteo", chapters: 6, testament: "NT" },
+  { id: "2TI", name: "2 Timóteo", chapters: 4, testament: "NT" },
+  { id: "TIT", name: "Tito", chapters: 3, testament: "NT" },
+  { id: "PHM", name: "Filemom", chapters: 1, testament: "NT" },
+  { id: "HEB", name: "Hebreus", chapters: 13, testament: "NT" },
+  { id: "JAS", name: "Tiago", chapters: 5, testament: "NT" },
+  { id: "1PE", name: "1 Pedro", chapters: 5, testament: "NT" },
+  { id: "2PE", name: "2 Pedro", chapters: 3, testament: "NT" },
+  { id: "1JN", name: "1 João", chapters: 5, testament: "NT" },
+  { id: "2JN", name: "2 João", chapters: 1, testament: "NT" },
+  { id: "3JN", name: "3 João", chapters: 1, testament: "NT" },
+  { id: "JUD", name: "Judas", chapters: 1, testament: "NT" },
+  { id: "REV", name: "Apocalipse", chapters: 22, testament: "NT" },
 ]
 
-const NT: Book[] = [
-  ["Mateus", 28], ["Marcos", 16], ["Lucas", 24], ["João", 21], ["Atos", 28],
-  ["Romanos", 16], ["1 Coríntios", 16], ["2 Coríntios", 13], ["Gálatas", 6],
-  ["Efésios", 6], ["Filipenses", 4], ["Colossenses", 4], ["1 Tessalonicenses", 5],
-  ["2 Tessalonicenses", 3], ["1 Timóteo", 6], ["2 Timóteo", 4], ["Tito", 3],
-  ["Filemom", 1], ["Hebreus", 13], ["Tiago", 5], ["1 Pedro", 5], ["2 Pedro", 3],
-  ["1 João", 5], ["2 João", 1], ["3 João", 1], ["Judas", 1], ["Apocalipse", 22],
-]
+const AT: Book[] = BOOKS.filter(b => b.testament === "AT").map(b => [b.name, b.chapters])
+const NT: Book[] = BOOKS.filter(b => b.testament === "NT").map(b => [b.name, b.chapters])
 
 export const PLAN_CONFIG: Record<string, { label: string; days: number; books: Book[] }> = {
   "1y":    { label: "Bíblia — 1 Ano",              days: 365, books: [...AT, ...NT] },
@@ -41,36 +95,11 @@ function chapterToRef(books: Book[], globalIdx: number): { book: string; ch: num
   return { book: last[0], ch: last[1] }
 }
 
-export const BOOK_CHAPTERS: Record<string, number> = {
-  GEN:50,  EXO:40,  LEV:27,  NUM:36,  DEU:34,  JOS:24,  JDG:21,  RUT:4,
-  "1SA":31,"2SA":24,"1KI":22,"2KI":25,"1CH":29,"2CH":36, EZR:10, NEH:13,
-  EST:10,  JOB:42,  PSA:150, PRO:31,  ECC:12,  SNG:8,   ISA:66,  JER:52,
-  LAM:5,   EZK:48,  DAN:12,  HOS:14,  JOL:3,   AMO:9,   OBA:1,   JON:4,
-  MIC:7,   NAH:3,   HAB:3,   ZEP:3,   HAG:2,   ZEC:14,  MAL:4,
-  MAT:28,  MRK:16,  LUK:24,  JHN:21,  ACT:28,  ROM:16,
-  "1CO":16,"2CO":13, GAL:6,  EPH:6,   PHP:4,   COL:4,
-  "1TH":5, "2TH":3, "1TI":6,"2TI":4,  TIT:3,   PHM:1,   HEB:13,
-  JAS:5,   "1PE":5, "2PE":3, "1JN":5, "2JN":1, "3JN":1, JUD:1,   REV:22,
-}
+export const BOOK_CHAPTERS: Record<string, number> = Object.fromEntries(BOOKS.map(b => [b.id, b.chapters]))
 
-export const BOOK_ID_NAMES: Record<string, string> = {
-  GEN: "Gênesis",  EXO: "Êxodo",       LEV: "Levítico",     NUM: "Números",       DEU: "Deuteronômio",
-  JOS: "Josué",    JDG: "Juízes",       RUT: "Rute",         "1SA": "1 Samuel",    "2SA": "2 Samuel",
-  "1KI": "1 Reis", "2KI": "2 Reis",     "1CH": "1 Crônicas", "2CH": "2 Crônicas",  EZR: "Esdras",
-  NEH: "Neemias",  EST: "Ester",        JOB: "Jó",           PSA: "Salmos",        PRO: "Provérbios",
-  ECC: "Eclesiastes", SNG: "Cânticos",  ISA: "Isaías",       JER: "Jeremias",      LAM: "Lamentações",
-  EZK: "Ezequiel", DAN: "Daniel",       HOS: "Oséias",       JOL: "Joel",          AMO: "Amós",
-  OBA: "Obadias",  JON: "Jonas",        MIC: "Miquéias",     NAH: "Naum",          HAB: "Habacuque",
-  ZEP: "Sofonias", HAG: "Ageu",         ZEC: "Zacarias",     MAL: "Malaquias",
-  MAT: "Mateus",   MRK: "Marcos",       LUK: "Lucas",        JHN: "João",          ACT: "Atos",
-  ROM: "Romanos",  "1CO": "1 Coríntios","2CO": "2 Coríntios", GAL: "Gálatas",      EPH: "Efésios",
-  PHP: "Filipenses", COL: "Colossenses","1TH": "1 Tessalonicenses", "2TH": "2 Tessalonicenses",
-  "1TI": "1 Timóteo", "2TI": "2 Timóteo", TIT: "Tito",       PHM: "Filemom",       HEB: "Hebreus",
-  JAS: "Tiago",    "1PE": "1 Pedro",    "2PE": "2 Pedro",    "1JN": "1 João",      "2JN": "2 João",
-  "3JN": "3 João", JUD: "Judas",        REV: "Apocalipse",
-}
+export const BOOK_ID_NAMES: Record<string, string> = Object.fromEntries(BOOKS.map(b => [b.id, b.name]))
 
-export const ALL_BOOK_NAMES: string[] = [...AT, ...NT].map(([name]) => name)
+export const ALL_BOOK_NAMES: string[] = BOOKS.map(b => b.name)
 
 export function getPassage(planType: string, day: number): string {
   const config = PLAN_CONFIG[planType]

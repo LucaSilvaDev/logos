@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation"
 import { useMemo } from "react"
+import DOMPurify from "isomorphic-dompurify"
 
 // Maps Portuguese book abbreviations to USFM IDs
 const BOOK_ABBR: Record<string, string> = {
@@ -51,7 +52,7 @@ function processHtml(html: string): string {
     return `<a href="/estudo?q=${encodeURIComponent(title)}" class="note-link">[[${title}]]</a>`
   })
 
-  return out
+  return DOMPurify.sanitize(out, { ADD_ATTR: ["data-bible-pos"] })
 }
 
 interface Props {

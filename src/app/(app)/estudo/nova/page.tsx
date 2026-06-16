@@ -1,16 +1,13 @@
-﻿"use client"
+"use client"
 
 import { useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { useEditor, EditorContent } from "@tiptap/react"
-import StarterKit from "@tiptap/starter-kit"
-import Placeholder from "@tiptap/extension-placeholder"
-import Highlight from "@tiptap/extension-highlight"
-import Typography from "@tiptap/extension-typography"
+import { EditorContent } from "@tiptap/react"
 import { Save, ArrowLeft } from "lucide-react"
 import { EditorToolbar } from "@/components/EditorToolbar"
 import { ALL_BOOK_NAMES } from "@/lib/reading-plan"
-import { cn } from "@/lib/utils"
+import { useRichEditor } from "@/hooks/useRichEditor"
+import { submitJson } from "@/hooks/useResourceEditor"
 
 const NOTE_TYPES = [
   { id: "exegesis",     label: "Exegese" },
@@ -34,36 +31,24 @@ export default function NovaNotaPage() {
   const [type, setType] = useState("exegesis")
   const [tags, setTags] = useState("")
   const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
 
-  const editor = useEditor({
-    immediatelyRender: false,
-    extensions: [
-      StarterKit,
-      Placeholder.configure({ placeholder: "Escreva sua análise exegética, teológica ou aplicação..." }),
-      Highlight.configure({ multicolor: false }),
-      Typography,
-    ],
-    editorProps: { attributes: { class: "tiptap min-h-[300px] focus:outline-none" } },
-  })
+  const editor = useRichEditor({ placeholder: "Escreva sua análise exegética, teológica ou aplicação..." })
 
   async function save() {
     if (!title.trim() || !editor) return
     setSaving(true)
+    setSaveError(null)
     try {
-      const res = await fetch("/api/estudo", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title, content: editor.getHTML(), book,
-          chapter: chapter ? parseInt(chapter) : null,
-          verse: verse ? parseInt(verse) : null,
-          type, tags,
-        }),
+      const data = await submitJson("/api/estudo", "POST", {
+        title, content: editor.getHTML(), book,
+        chapter: chapter ? parseInt(chapter) : null,
+        verse: verse ? parseInt(verse) : null,
+        type, tags,
       })
-      if (res.ok) {
-        const data = await res.json()
-        router.push(`/estudo/${data.id}`)
-      }
+      router.push(`/estudo/${data.id}`)
+    } catch (e) {
+      setSaveError(e instanceof Error ? e.message : "Erro ao salvar")
     } finally {
       setSaving(false)
     }
@@ -81,6 +66,10 @@ export default function NovaNotaPage() {
           <Save className="w-3.5 h-3.5" /> {saving ? "Salvando..." : "Salvar"}
         </button>
       </div>
+
+      {saveError && (
+        <p className="text-sm text-[#c97a7a]">{saveError}</p>
+      )}
 
       <input value={title} onChange={e => setTitle(e.target.value)}
         placeholder="Título da nota..."

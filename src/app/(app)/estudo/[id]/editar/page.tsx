@@ -1,15 +1,13 @@
-﻿"use client"
+"use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { useRouter, useParams } from "next/navigation"
-import { useEditor, EditorContent } from "@tiptap/react"
-import StarterKit from "@tiptap/starter-kit"
-import Placeholder from "@tiptap/extension-placeholder"
-import Highlight from "@tiptap/extension-highlight"
-import Typography from "@tiptap/extension-typography"
+import { EditorContent } from "@tiptap/react"
 import { Save, ArrowLeft, Trash2 } from "lucide-react"
 import { EditorToolbar } from "@/components/EditorToolbar"
 import { ALL_BOOK_NAMES } from "@/lib/reading-plan"
+import { useRichEditor } from "@/hooks/useRichEditor"
+import { useResourceLoader, submitJson } from "@/hooks/useResourceEditor"
 
 const NOTE_TYPES = [
   { id: "exegesis",     label: "Exegese" },
@@ -18,6 +16,16 @@ const NOTE_TYPES = [
   { id: "word_study",   label: "Palavra" },
   { id: "cross_ref",    label: "Ref. Cruzada" },
 ]
+
+interface StudyNote {
+  title: string
+  book: string
+  chapter: number | null
+  verse: number | null
+  type: string
+  tags: string | null
+  content: string
+}
 
 export default function EditarNotaPage() {
   const router = useRouter()
@@ -31,45 +39,34 @@ export default function EditarNotaPage() {
   const [type, setType] = useState("exegesis")
   const [tags, setTags] = useState("")
   const [saving, setSaving] = useState(false)
+  const [saveError, setSaveError] = useState<string | null>(null)
 
-  const editor = useEditor({
-    immediatelyRender: false,
-    extensions: [
-      StarterKit,
-      Placeholder.configure({ placeholder: "Escreva sua análise..." }),
-      Highlight.configure({ multicolor: false }),
-      Typography,
-    ],
-    editorProps: { attributes: { class: "tiptap min-h-[300px] focus:outline-none" } },
+  const editor = useRichEditor({ placeholder: "Escreva sua análise..." })
+
+  const { loading, loadError } = useResourceLoader<StudyNote>(`/api/estudo/${id}`, d => {
+    setTitle(d.title)
+    setBook(d.book)
+    setChapter(d.chapter?.toString() ?? "")
+    setVerse(d.verse?.toString() ?? "")
+    setType(d.type)
+    setTags(d.tags ?? "")
+    editor?.commands.setContent(d.content)
   })
-
-  useEffect(() => {
-    fetch(`/api/estudo/${id}`).then(r => r.json()).then(d => {
-      setTitle(d.title)
-      setBook(d.book)
-      setChapter(d.chapter?.toString() ?? "")
-      setVerse(d.verse?.toString() ?? "")
-      setType(d.type)
-      setTags(d.tags ?? "")
-      editor?.commands.setContent(d.content)
-    })
-  }, [id, editor])
 
   async function save() {
     if (!title.trim() || !editor) return
     setSaving(true)
+    setSaveError(null)
     try {
-      await fetch(`/api/estudo/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title, content: editor.getHTML(), book,
-          chapter: chapter ? parseInt(chapter) : null,
-          verse: verse ? parseInt(verse) : null,
-          type, tags,
-        }),
+      await submitJson(`/api/estudo/${id}`, "PATCH", {
+        title, content: editor.getHTML(), book,
+        chapter: chapter ? parseInt(chapter) : null,
+        verse: verse ? parseInt(verse) : null,
+        type, tags,
       })
       router.push(`/estudo/${id}`)
+    } catch (e) {
+      setSaveError(e instanceof Error ? e.message : "Erro ao salvar")
     } finally {
       setSaving(false)
     }
@@ -77,8 +74,12 @@ export default function EditarNotaPage() {
 
   async function remove() {
     if (!confirm("Excluir esta nota?")) return
-    await fetch(`/api/estudo/${id}`, { method: "DELETE" })
-    router.push("/estudo")
+    try {
+      await submitJson(`/api/estudo/${id}`, "DELETE")
+      router.push("/estudo")
+    } catch (e) {
+      setSaveError(e instanceof Error ? e.message : "Erro ao excluir")
+    }
   }
 
   return (
@@ -101,33 +102,42 @@ export default function EditarNotaPage() {
         </div>
       </div>
 
-      <input value={title} onChange={e => setTitle(e.target.value)}
-        placeholder="Título da nota..."
-        className="w-full bg-transparent font-serif text-[#e2d9c5] text-2xl placeholder:text-[#3d3a55] outline-none border-b border-[#2e2b42] pb-3 focus:border-[#c9a654] transition-colors" />
+      {loadError && <p className="text-sm text-[#c97a7a]">Não foi possível carregar a nota: {loadError}</p>}
+      {saveError && <p className="text-sm text-[#c97a7a]">{saveError}</p>}
 
-      <div className="flex flex-wrap gap-2">
-        <select value={book} onChange={e => setBook(e.target.value)}
-          className="app-input px-3 py-1.5 text-sm">
-          {ALL_BOOK_NAMES.map(b => <option key={b} value={b}>{b}</option>)}
-        </select>
-        <input value={chapter} onChange={e => setChapter(e.target.value)} placeholder="Cap."
-          className="app-input w-16 px-3 py-1.5 text-sm" />
-        <input value={verse} onChange={e => setVerse(e.target.value)} placeholder="v."
-          className="app-input w-16 px-3 py-1.5 text-sm" />
-        <select value={type} onChange={e => setType(e.target.value)}
-          className="app-input px-3 py-1.5 text-sm">
-          {NOTE_TYPES.map(t => <option key={t.id} value={t.id}>{t.label}</option>)}
-        </select>
-        <input value={tags} onChange={e => setTags(e.target.value)} placeholder="Tags"
-          className="app-input flex-1 min-w-[120px] px-3 py-1.5 text-sm" />
-      </div>
+      {loading ? (
+        <p className="text-sm text-[#8a8375] font-serif">Carregando...</p>
+      ) : (
+        <>
+          <input value={title} onChange={e => setTitle(e.target.value)}
+            placeholder="Título da nota..."
+            className="w-full bg-transparent font-serif text-[#e2d9c5] text-2xl placeholder:text-[#3d3a55] outline-none border-b border-[#2e2b42] pb-3 focus:border-[#c9a654] transition-colors" />
 
-      <div className="card-soft overflow-hidden">
-        <EditorToolbar editor={editor} />
-        <div className="px-6 py-5 min-h-[320px]">
-          <EditorContent editor={editor} />
-        </div>
-      </div>
+          <div className="flex flex-wrap gap-2">
+            <select value={book} onChange={e => setBook(e.target.value)}
+              className="app-input px-3 py-1.5 text-sm">
+              {ALL_BOOK_NAMES.map(b => <option key={b} value={b}>{b}</option>)}
+            </select>
+            <input value={chapter} onChange={e => setChapter(e.target.value)} placeholder="Cap."
+              className="app-input w-16 px-3 py-1.5 text-sm" />
+            <input value={verse} onChange={e => setVerse(e.target.value)} placeholder="v."
+              className="app-input w-16 px-3 py-1.5 text-sm" />
+            <select value={type} onChange={e => setType(e.target.value)}
+              className="app-input px-3 py-1.5 text-sm">
+              {NOTE_TYPES.map(t => <option key={t.id} value={t.id}>{t.label}</option>)}
+            </select>
+            <input value={tags} onChange={e => setTags(e.target.value)} placeholder="Tags"
+              className="app-input flex-1 min-w-[120px] px-3 py-1.5 text-sm" />
+          </div>
+
+          <div className="card-soft overflow-hidden">
+            <EditorToolbar editor={editor} />
+            <div className="px-6 py-5 min-h-[320px]">
+              <EditorContent editor={editor} />
+            </div>
+          </div>
+        </>
+      )}
     </div>
   )
 }

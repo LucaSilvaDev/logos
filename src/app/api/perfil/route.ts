@@ -24,7 +24,9 @@ export async function PATCH(req: Request) {
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const body = await req.json()
-  const data = schema.parse(body)
+  const parsed = schema.safeParse(body)
+  if (!parsed.success) return NextResponse.json({ error: "Invalid data" }, { status: 400 })
+  const data = parsed.data
 
   const profile = await db.userProfile.upsert({
     where:  { userId: session.user.id },
