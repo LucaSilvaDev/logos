@@ -3,6 +3,7 @@ import { db } from "@/lib/db"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft, BookOpen, Pencil, Calendar } from "lucide-react"
+import { PdfDownloadButton } from "@/components/PdfDownloadButton"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import { BiblicalContent } from "@/components/BiblicalContent"
@@ -31,10 +32,13 @@ export default async function StudyNoteDetailPage({ params }: { params: Promise<
           className="flex items-center gap-1.5 text-[#55524a] hover:text-[#8a8375] text-sm transition-colors font-serif">
           <ArrowLeft className="w-4 h-4" /> Estudo
         </Link>
-        <Link href={`/estudo/${id}/editar`}
-          className="flex items-center gap-1.5 text-xs text-[#55524a] hover:text-[#8a8375] transition-colors font-serif">
-          <Pencil className="w-3.5 h-3.5" /> Editar
-        </Link>
+        <div className="flex items-center gap-3">
+          <PdfDownloadButton href={`/api/estudo/${id}/pdf`} />
+          <Link href={`/estudo/${id}/editar`}
+            className="flex items-center gap-1.5 text-xs text-[#55524a] hover:text-[#8a8375] transition-colors font-serif">
+            <Pencil className="w-3.5 h-3.5" /> Editar
+          </Link>
+        </div>
       </div>
 
       <div>

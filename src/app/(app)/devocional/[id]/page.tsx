@@ -5,7 +5,7 @@ import Link from "next/link"
 import { ArrowLeft, BookOpen, Tag, Calendar, Pencil } from "lucide-react"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
-import { PrintButton } from "@/components/PrintButton"
+import { PdfDownloadButton } from "@/components/PdfDownloadButton"
 import { BiblicalContent } from "@/components/BiblicalContent"
 
 export default async function DevocionalDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -27,7 +27,7 @@ export default async function DevocionalDetailPage({ params }: { params: Promise
           <ArrowLeft className="w-4 h-4" /> Devocionais
         </Link>
         <div className="flex items-center gap-3">
-          <PrintButton />
+          <PdfDownloadButton href={`/api/devocional/${id}/pdf`} />
           <Link href={`/devocional/${id}/editar`}
             className="flex items-center gap-1.5 text-xs text-[#55524a] hover:text-[#8a8375] transition-colors font-serif">
             <Pencil className="w-3.5 h-3.5" /> Editar

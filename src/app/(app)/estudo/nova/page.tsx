@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { EditorContent } from "@tiptap/react"
+import { RichEditorContent } from "@/components/editor/RichEditorContent"
 import { Save, ArrowLeft } from "lucide-react"
 import { EditorToolbar } from "@/components/EditorToolbar"
 import { ALL_BOOK_NAMES } from "@/lib/reading-plan"
@@ -95,7 +95,7 @@ export default function NovaNotaPage() {
       <div className="card-soft overflow-hidden">
         <EditorToolbar editor={editor} />
         <div className="px-6 py-5 min-h-[320px]">
-          <EditorContent editor={editor} />
+          <RichEditorContent editor={editor} />
         </div>
       </div>
     </div>

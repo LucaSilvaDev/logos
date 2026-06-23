@@ -4,13 +4,14 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { cn } from "@/lib/utils"
 import {
-  BookOpen, LayoutDashboard, NotebookPen, Search,
+  BookOpen, LayoutDashboard, NotebookPen, Search, ScanSearch,
   Clock, Church, Flame, Library, Heart, X, UserCircle,
   ChevronsLeft, ChevronsRight, Brain, Map,
 } from "lucide-react"
 
 const navItems = [
   { href: "/dashboard",   icon: LayoutDashboard, label: "Início" },
+  { href: "/busca",       icon: ScanSearch,       label: "Busca" },
   { href: "/biblia",      icon: BookOpen,         label: "Bíblia" },
   { href: "/progresso",   icon: Map,              label: "Progresso" },
   { href: "/plano",       icon: Clock,            label: "Plano de Leitura" },

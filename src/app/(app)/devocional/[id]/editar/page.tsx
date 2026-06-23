@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter, useParams } from "next/navigation"
-import { EditorContent } from "@tiptap/react"
+import { RichEditorContent } from "@/components/editor/RichEditorContent"
 import { Save, ArrowLeft, BookOpen, Tag, Trash2 } from "lucide-react"
 import { EditorToolbar } from "@/components/EditorToolbar"
 import { useRichEditor } from "@/hooks/useRichEditor"
@@ -110,7 +110,7 @@ export default function EditarDevocionalPage() {
           <div className="card-soft overflow-hidden">
             <EditorToolbar editor={editor} />
             <div className="px-6 py-5 min-h-[320px]">
-              <EditorContent editor={editor} />
+              <RichEditorContent editor={editor} />
             </div>
           </div>
         </>

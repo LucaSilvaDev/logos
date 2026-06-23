@@ -11,16 +11,33 @@ interface SavedPos {
   version: string
 }
 
+function readLocalPos(): SavedPos | null {
+  try {
+    const raw = localStorage.getItem("selah-bible-pos")
+    if (!raw) return null
+    const p = JSON.parse(raw)
+    if (p?.bookId && p?.chapter) return p
+  } catch { /* ignore */ }
+  return null
+}
+
 export function ContinueReading() {
   const [pos, setPos] = useState<SavedPos | null>(null)
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem("selah-bible-pos")
-      if (!raw) return
-      const p = JSON.parse(raw)
-      if (p?.bookId && p?.chapter) setPos(p)
-    } catch { /* ignore */ }
+    // Show localStorage immediately to avoid flicker
+    setPos(readLocalPos())
+
+    // Then sync with server (authoritative across devices)
+    fetch("/api/biblia/last-read")
+      .then(r => r.ok ? r.json() : null)
+      .then((data: SavedPos | null) => {
+        if (data?.bookId && data?.chapter) {
+          setPos(data)
+          localStorage.setItem("selah-bible-pos", JSON.stringify(data))
+        }
+      })
+      .catch(() => { /* keep localStorage value */ })
   }, [])
 
   if (!pos) return null
