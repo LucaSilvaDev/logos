@@ -13,7 +13,17 @@ function cacheVerses(book: string, chapter: number, version: string, verses: { n
     version,
     text:    v.text,
   }))
-  db.bibleVerse.createMany({ data }).catch(() => {})
+  db.bibleVerse.createMany({ data, skipDuplicates: true } as Parameters<typeof db.bibleVerse.createMany>[0]).catch(() => {})
+}
+
+async function readFromCache(book: string, chapter: number, version: string) {
+  const rows = await db.bibleVerse.findMany({
+    where: { book, chapter, version },
+    orderBy: { verse: "asc" },
+    select: { verse: true, text: true },
+  })
+  if (rows.length === 0) return null
+  return rows.map(r => ({ number: r.verse, text: r.text }))
 }
 
 // ─── YouVersion Platform (NVI, NVT) ──────────────────────────────────────────
@@ -152,9 +162,18 @@ export async function GET(req: Request) {
   const chapter = searchParams.get("chapter") ?? "1"
   const version = searchParams.get("version") ?? "nvi"
 
+  // YouVersion versions never use cache (always fresh, stable API)
   if (version in YV_VERSION_IDS) {
     return fetchFromYouVersion(bookId, chapter, version)
   }
+
+  // For other versions: serve from DB cache when available
+  try {
+    const cached = await readFromCache(bookId, parseInt(chapter), version)
+    if (cached) {
+      return NextResponse.json({ verses: cached, version, book: bookId, chapter: parseInt(chapter), cached: true })
+    }
+  } catch { /* cache miss — fall through to API */ }
 
   return fetchFromAbibliaDigital(bookId, chapter, version)
 }
