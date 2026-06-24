@@ -92,112 +92,69 @@ function decodeEntities(s: string): string {
 }
 
 function parseBibliaOnlineHtml(html: string): { number: number; text: string; heading?: string }[] {
-  // bibliaonline.com.br structure (redesigned 2025):
-  //   Heading:     <div data-section="" data-v=".1.2...N." ...><span data-v=".1." ...>Heading</span></div>
-  //   Verse break: <span data-vb="" data-v=".N." ...></span>
-  //   Verse num:   <span data-vn="" data-v=".N." ...>N<!-- --> </span>
-  //   Verse text:  <span data-v=".N." ...>actual text</span>  (no data-vb, no data-vn)
-  //   PLACEHOLDER_DO_NOT_MATCH← bookmark anchor, marks verse start
-  //   <span class="v">N</span>          ← verse number label
-  //   <span class="t">verse text</span> ← actual text (may be multiple spans per verse)
-  // Section headings: <div data-v=".N.M..." class="s l0"> or "s l1"
-  //   The first verse number in data-v is the verse the heading precedes.
+  // bibliaonline.com.br structure (2025):
+  //   Heading:    <div data-section="" data-v=".1.2...N." ...><span data-v=".1." ...>Text</span></div>
+  //   Verse para: <p data-v=".1.2.3." ...>
+  //     <span data-vb="" data-v=".1." ...></span>            ← verse start marker (empty)
+  //     <span data-vn="" data-v=".1." ...>1<!-- --> </span>  ← verse number label
+  //     <span data-v=".1." class="inline">text</span>        ← verse text (may repeat)
+  //     <button data-note="" ...>*</button>                   ← footnote marker (ignore)
+  //   </p>
 
   // ── Step 1: Extract section headings ────────────────────────────────────
   const headingMap = new Map<number, string>()
-  const hdRe = /<div\b[^>]*\bdata-v="([^"]+)"[^>]*\bclass="([^"]*)"[^>]*>([\s\S]*?)<\/div>/gi
+  const hdRe = /<div\b[^>]*\bdata-section=""[^>]*\bdata-v="([^"]+)"[^>]*>([\s\S]*?)<\/div>/gi
   let hm: RegExpExecArray | null
   while ((hm = hdRe.exec(html)) !== null) {
-    const cls = hm[2]
-    if (!cls.split(/\s+/).includes("s")) continue
-    const nums = [...hm[1].matchAll(/(\d+)/g)].map(n => parseInt(n[1]))
-    if (nums.length === 0) continue
-    const text = decodeEntities(hm[3].replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim()
-    if (text) headingMap.set(nums[0], text)
+    const inner = hm[2].match(/<span\b[^>]*\bdata-v="\.(\d+)\."[^>]*>([\s\S]*?)<\/span>/)
+    if (!inner) continue
+    const num  = parseInt(inner[1])
+    const text = decodeEntities(inner[2].replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim()
+    if (num > 0 && text) headingMap.set(num, text)
   }
 
   // ── Step 2: Parse verse paragraphs ──────────────────────────────────────
-  // bibliaonline.com.br uses two distinct structures:
-  //   • Prose: one <p data-v=".3.4.5."> may contain multiple verses, each
-  //     preceded by <span class="bv"> + <span class="v">N</span>.
-  //   • Poetry/quotation: each line is its own <p data-v=".49.">, only the
-  //     first line has the bv marker; the rest are plain continuation <p>s.
-  // We handle both: bv-paragraphs use the split approach; continuation
-  // paragraphs fall back to data-v for the verse number.
   const verseMap = new Map<number, string[]>()
   const pRe = /<p\b[^>]*\bdata-v="([^"]+)"[^>]*>([\s\S]*?)<\/p>/gi
   let m: RegExpExecArray | null
 
   while ((m = pRe.exec(html)) !== null) {
-    const dataV   = m[1]
     const pContent = m[2]
-    const hasBV   = /<span\b[^>]*\bclass="bv"/.test(pContent)
 
-    if (hasBV) {
-      // Prose: split by bookmark anchors — each marks the start of a new verse
-      const segments = pContent.split(/<span\b[^>]*\bclass="bv"[^>]*><\/span>/gi)
+    // Split paragraph by verse-break markers (data-vb="" — empty span)
+    const segments = pContent.split(/<span\b[^>]*\bdata-vb=""[^>]*><\/span>/i)
+    // segments[0] is before the first verse; segments[1..] each start a new verse
 
-      // Segment 0: text BEFORE the first bv marker — continuation of the verse
-      // whose number is given by the span's own data-v (e.g. <span data-v=".1." class="t">)
-      // or falls back to the first number in the paragraph's data-v attribute.
-      const seg0 = segments[0]
-      if (seg0) {
-        const tRe0 = /<span\b[^>]*\bclass="t"[^>]*>([\s\S]*?)<\/span>/gi
-        let tm0: RegExpExecArray | null
-        while ((tm0 = tRe0.exec(seg0)) !== null) {
-          const t = decodeEntities(tm0[1].replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim()
-          if (!t) continue
-          // Prefer the span's own data-v, fall back to paragraph data-v
-          const spanDV = tm0[0].match(/\bdata-v="([^"]+)"/)
-          const dvSrc  = spanDV ? spanDV[1] : dataV
-          const nm     = dvSrc.match(/\.(\d+)\./)
-          if (!nm) continue
-          const num = parseInt(nm[1])
-          if (!num || num <= 0) continue
-          if (!verseMap.has(num)) verseMap.set(num, [])
-          verseMap.get(num)!.push(t)
-        }
-      }
+    for (let i = 1; i < segments.length; i++) {
+      const seg = segments[i]
 
-      for (let i = 1; i < segments.length; i++) {
-        const seg = segments[i]
-
-        const numMatch = seg.match(/<span\b[^>]*\bclass="v"[^>]*>([\s\S]*?)<\/span>/)
-        if (!numMatch) continue
-        const numStr = numMatch[1].replace(/<!--[\s\S]*?-->/g, "").replace(/<[^>]+>/g, "").trim()
-        const num = parseInt(numStr)
-        if (!num || num <= 0) continue
-
-        const textHtml = seg.replace(/<span\b[^>]*\bclass="v"[^>]*>[\s\S]*?<\/span>/, "")
-        const text = decodeEntities(textHtml.replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim()
-        if (!text) continue
-
-        if (!verseMap.has(num)) verseMap.set(num, [])
-        verseMap.get(num)!.push(text)
-      }
-    } else {
-      // Poetry continuation: no bv marker — verse number comes from data-v
-      const dvMatch = dataV.match(/\.(\d+)\./)
-      if (!dvMatch) continue
-      const num = parseInt(dvMatch[1])
+      // Verse number lives in the data-vn span — capture it from data-v attribute
+      const vnMatch = seg.match(/<span\b[^>]*\bdata-vn=""[^>]*\bdata-v="\.(\d+)\."/)
+                   ?? seg.match(/<span\b[^>]*\bdata-v="\.(\d+)\."[^>]*\bdata-vn=""/)
+      if (!vnMatch) continue
+      const num = parseInt(vnMatch[1])
       if (!num || num <= 0) continue
 
-      // Collect all <span class="t"> text lines from this paragraph
-      const tRe = /<span\b[^>]*\bclass="t"[^>]*>([\s\S]*?)<\/span>/gi
+      // Remove the data-vn span entirely, then collect text from data-v spans
+      const afterNum = seg.replace(/<span\b[^>]*\bdata-vn=""[^>]*>[\s\S]*?<\/span>/, "")
+
+      const textParts: string[] = []
+      const tRe = /<span\b[^>]*\bdata-v="[^"]*"[^>]*>([\s\S]*?)<\/span>/gi
       let tm: RegExpExecArray | null
-      const lineTexts: string[] = []
-      while ((tm = tRe.exec(pContent)) !== null) {
+      while ((tm = tRe.exec(afterNum)) !== null) {
         const t = decodeEntities(tm[1].replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim()
-        if (t) lineTexts.push(t)
+        if (t) textParts.push(t)
       }
-      // Fallback: if no class="t" spans found, try extracting any text content
-      if (lineTexts.length === 0) {
-        const raw = decodeEntities(pContent.replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim()
-        if (raw) lineTexts.push(raw)
+
+      // Fallback: strip all tags and use raw text
+      if (textParts.length === 0) {
+        const raw = decodeEntities(afterNum.replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim()
+        if (raw) textParts.push(raw)
       }
-      if (lineTexts.length === 0) continue
+
+      if (textParts.length === 0) continue
       if (!verseMap.has(num)) verseMap.set(num, [])
-      for (const t of lineTexts) verseMap.get(num)!.push(t)
+      verseMap.get(num)!.push(textParts.join(" "))
     }
   }
 
