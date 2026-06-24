@@ -302,11 +302,20 @@ export function PerfilClient({ userName, userEmail, userImage }: Props) {
             <label className="text-xs text-[#55524a]">Horário do lembrete</label>
             <input
               type="time"
+              step="3600"
               value={dailyReminderTime}
-              onChange={e => setDailyReminderTime(e.target.value)}
+              onChange={e => {
+                const val = e.target.value
+                if (val) {
+                  const [hh] = val.split(":")
+                  setDailyReminderTime(`${hh}:00`)
+                } else {
+                  setDailyReminderTime("")
+                }
+              }}
               className="app-input px-4 py-2 text-sm w-40"
             />
-            <p className="text-[#3d3a55] text-[10px]">Horário local · salvo com o perfil</p>
+            <p className="text-[#3d3a55] text-[10px]">Horário local · apenas horas cheias</p>
           </div>
         )}
       </section>

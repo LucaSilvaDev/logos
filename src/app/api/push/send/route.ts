@@ -14,10 +14,8 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 
-  const now = new Date()
-  const hh  = now.getUTCHours().toString().padStart(2, "0")
-  const mm  = now.getUTCMinutes().toString().padStart(2, "0")
-  const time = `${hh}:${mm}`
+  const now  = new Date()
+  const time = `${now.getUTCHours().toString().padStart(2, "0")}:00`
 
   const profiles = await db.userProfile.findMany({
     where: { dailyReminderTime: time },
