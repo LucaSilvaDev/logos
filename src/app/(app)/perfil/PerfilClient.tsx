@@ -25,6 +25,27 @@ const VERSIONS = [
   { id: "nvt", label: "NVT" },
 ]
 
+function urlBase64ToUint8Array(base64String: string): Uint8Array {
+  const padding = "=".repeat((4 - (base64String.length % 4)) % 4)
+  const base64  = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/")
+  const raw     = window.atob(base64)
+  return Uint8Array.from([...raw].map(c => c.charCodeAt(0)))
+}
+
+function localTimeToUtc(localHHMM: string): string {
+  const [hh, mm] = localHHMM.split(":").map(Number)
+  const d = new Date()
+  d.setHours(hh, mm, 0, 0)
+  return `${d.getUTCHours().toString().padStart(2, "0")}:${d.getUTCMinutes().toString().padStart(2, "0")}`
+}
+
+function utcTimeToLocal(utcHHMM: string): string {
+  const [hh, mm] = utcHHMM.split(":").map(Number)
+  const d = new Date()
+  d.setUTCHours(hh, mm, 0, 0)
+  return `${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}`
+}
+
 function useNotification() {
   const [permission, setPermission] = useState<NotificationPermission>("default")
   const [subscribed, setSubscribed] = useState(false)
@@ -43,9 +64,10 @@ function useNotification() {
     const existing = await reg.pushManager.getSubscription()
     if (existing) { setSubscribed(true); return }
 
+    const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? ""
     const sub = await reg.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY,
+      applicationServerKey: urlBase64ToUint8Array(vapidKey),
     })
 
     await fetch("/api/push/subscribe", {
@@ -99,7 +121,7 @@ export function PerfilClient({ userName, userEmail, userImage }: Props) {
       if (d.calvinPoints)        setCalvinPoints(d.calvinPoints)
       if (d.eschatologyPosition) setEschatologyPosition(d.eschatologyPosition)
       if (d.preferredVersions)   setPreferredVersions(d.preferredVersions.split(",").filter(Boolean))
-      if (d.dailyReminderTime)   setDailyReminderTime(d.dailyReminderTime)
+      if (d.dailyReminderTime)   setDailyReminderTime(utcTimeToLocal(d.dailyReminderTime))
     })
   }, [])
 
@@ -119,7 +141,7 @@ export function PerfilClient({ userName, userEmail, userImage }: Props) {
         calvinPoints,
         eschatologyPosition,
         preferredVersions: preferredVersions.join(","),
-        dailyReminderTime: dailyReminderTime || null,
+        dailyReminderTime: dailyReminderTime ? localTimeToUtc(dailyReminderTime) : null,
       }),
     })
     setSaving(false)
@@ -284,7 +306,7 @@ export function PerfilClient({ userName, userEmail, userImage }: Props) {
               onChange={e => setDailyReminderTime(e.target.value)}
               className="app-input px-4 py-2 text-sm w-40"
             />
-            <p className="text-[#3d3a55] text-[10px]">Horário local · salvo junto com o perfil</p>
+            <p className="text-[#3d3a55] text-[10px]">Horário local · salvo com o perfil</p>
           </div>
         )}
       </section>
