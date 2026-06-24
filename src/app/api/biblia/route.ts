@@ -23,6 +23,7 @@ async function readFromCache(book: string, chapter: number, version: string) {
     select: { verse: true, text: true },
   })
   if (rows.length === 0) return null
+  if (rows.some(r => !r.text || r.text.trim() === "")) return null
   return rows.map(r => ({ number: r.verse, text: r.text }))
 }
 
