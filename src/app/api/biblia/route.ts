@@ -2,6 +2,8 @@ import { NextResponse } from "next/server"
 import { ApiClient, BibleClient } from "@youversion/platform-core"
 import { db } from "@/lib/db"
 
+export const dynamic = "force-dynamic"
+
 function cacheVerses(book: string, chapter: number, version: string, verses: { number: number; text: string }[]) {
   const data = verses.map(v => ({
     id:      `${version}-${book}-${chapter}-${v.number}`,
