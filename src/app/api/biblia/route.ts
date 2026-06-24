@@ -92,9 +92,12 @@ function decodeEntities(s: string): string {
 }
 
 function parseBibliaOnlineHtml(html: string): { number: number; text: string; heading?: string }[] {
-  // bibliaonline.com.br groups pericope verses into a single <p data-v=".1.2.3.4.">.
-  // Inside each <p>, individual verse texts live in sibling spans:
-  //   <span class="bv"></span>          ← bookmark anchor, marks verse start
+  // bibliaonline.com.br structure (redesigned 2025):
+  //   Heading:     <div data-section="" data-v=".1.2...N." ...><span data-v=".1." ...>Heading</span></div>
+  //   Verse break: <span data-vb="" data-v=".N." ...></span>
+  //   Verse num:   <span data-vn="" data-v=".N." ...>N<!-- --> </span>
+  //   Verse text:  <span data-v=".N." ...>actual text</span>  (no data-vb, no data-vn)
+  //   PLACEHOLDER_DO_NOT_MATCH← bookmark anchor, marks verse start
   //   <span class="v">N</span>          ← verse number label
   //   <span class="t">verse text</span> ← actual text (may be multiple spans per verse)
   // Section headings: <div data-v=".N.M..." class="s l0"> or "s l1"
@@ -182,16 +185,25 @@ function parseBibliaOnlineHtml(html: string): { number: number; text: string; he
       // Collect all <span class="t"> text lines from this paragraph
       const tRe = /<span\b[^>]*\bclass="t"[^>]*>([\s\S]*?)<\/span>/gi
       let tm: RegExpExecArray | null
-      if (!verseMap.has(num)) verseMap.set(num, [])
+      const lineTexts: string[] = []
       while ((tm = tRe.exec(pContent)) !== null) {
         const t = decodeEntities(tm[1].replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim()
-        if (t) verseMap.get(num)!.push(t)
+        if (t) lineTexts.push(t)
       }
+      // Fallback: if no class="t" spans found, try extracting any text content
+      if (lineTexts.length === 0) {
+        const raw = decodeEntities(pContent.replace(/<[^>]+>/g, " ")).replace(/\s+/g, " ").trim()
+        if (raw) lineTexts.push(raw)
+      }
+      if (lineTexts.length === 0) continue
+      if (!verseMap.has(num)) verseMap.set(num, [])
+      for (const t of lineTexts) verseMap.get(num)!.push(t)
     }
   }
 
   // ── Step 3: Build result, attaching headings to the first verse of each section
   return Array.from(verseMap.entries())
+    .filter(([, parts]) => parts.length > 0)
     .map(([number, parts]) => ({
       number,
       text: parts.join(" "),
