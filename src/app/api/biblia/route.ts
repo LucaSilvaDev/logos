@@ -26,13 +26,15 @@ async function readFromCache(book: string, chapter: number, version: string) {
   return rows.map(r => ({ number: r.verse, text: r.text }))
 }
 
-// ─── YouVersion Platform (NVI, NVT) ──────────────────────────────────────────
+// ─── YouVersion Platform (NVI, NAA, NVT) ─────────────────────────────────────
 // platform.youversion.com — licenciamento acelerado PT-BR
 //   129  = NVI (Nova Versão Internacional — BR)
+//   1840 = NAA (Nova Almeida Atualizada)
 //   1930 = NVT (Nova Versão Transformadora)
 
 const YV_VERSION_IDS: Record<string, number> = {
   nvi: 129,
+  naa: 1840,
   nvt: 1930,
 }
 
