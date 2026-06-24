@@ -19,7 +19,7 @@ export interface Verse { number: number; text: string; endNumber?: number; headi
 export interface HlEntry { id: string; color: string }
 export type BibleVersion = "nvi" | "naa" | "nvt"
 export type FontSize = "sm" | "md" | "lg"
-export type ApiError = "ERROR" | "AUTH_REQUIRED" | "RATE_LIMIT" | null
+export type ApiError = "ERROR" | "AUTH_REQUIRED" | "RATE_LIMIT" | "NOT_LICENSED" | null
 
 export function readSavedPos() {
   try {

@@ -207,8 +207,9 @@ export function useBiblePage() {
     try {
       const res  = await fetch(`/api/biblia?book=${book.id}&chapter=${chapter}&version=${version}`)
       const data = await res.json()
-      if (data.error === "AUTH_REQUIRED") { setApiError("AUTH_REQUIRED"); return }
+      if (data.error === "AUTH_REQUIRED")  { setApiError("AUTH_REQUIRED");  return }
       if (data.error === "RATE_LIMIT")    { setApiError("RATE_LIMIT");    return }
+      if (data.error === "NOT_LICENSED")  { setApiError("NOT_LICENSED");  return }
       if (!res.ok || data.error)          { setApiDetail(data.detail ?? data.error ?? `HTTP ${res.status}`); setApiError("ERROR"); return }
       setVerses((data.verses ?? []).map((v: Verse) => ({ number: v.number, text: v.text, endNumber: v.endNumber, heading: v.heading })))
     } catch { setApiError("ERROR") }

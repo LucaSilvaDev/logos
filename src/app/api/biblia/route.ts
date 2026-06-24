@@ -83,6 +83,17 @@ async function fetchFromYouVersion(bookId: string, chapter: string, version: str
     cacheVerses(bookId, parseInt(chapter), version, verses)
     return NextResponse.json({ verses, version, book: bookId, chapter: parseInt(chapter) })
   } catch (err) {
+    // 403 = version not licensed for this book — try DB cache before failing
+    if ((err as { status?: number }).status === 403) {
+      try {
+        const cached = await readFromCache(bookId, parseInt(chapter), version)
+        if (cached) {
+          return NextResponse.json({ verses: cached, version, book: bookId, chapter: parseInt(chapter), cached: true })
+        }
+      } catch { /* cache miss */ }
+      console.error("[biblia/youversion] Not licensed:", { version, bookId, chapter })
+      return NextResponse.json({ error: "NOT_LICENSED", version, book: bookId }, { status: 403 })
+    }
     console.error("[biblia/youversion] Error:", err)
     return NextResponse.json({ error: "NETWORK_ERROR" }, { status: 502 })
   }

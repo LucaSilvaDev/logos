@@ -42,10 +42,24 @@ export function BibleReadingArea({
         {apiError === "AUTH_REQUIRED" && (
           <div className="text-center py-16 space-y-3">
             <AlertCircle className="w-6 h-6 text-[#c9a654] opacity-40 mx-auto" />
-            <p className="font-serif text-[#c9c0a8] text-base">Token não carregado</p>
+            <p className="font-serif text-[#c9c0a8] text-base">Chave de API não configurada</p>
             <p className="text-[#55524a] text-sm leading-relaxed max-w-sm mx-auto">
-              Reinicie o servidor: <code className="text-[#8a8375] font-mono text-xs">Ctrl+C → npm run dev</code>
+              Verifique as variáveis de ambiente no servidor.
             </p>
+          </div>
+        )}
+
+        {apiError === "NOT_LICENSED" && (
+          <div className="text-center py-16 space-y-3">
+            <AlertCircle className="w-6 h-6 text-[#c9a654] opacity-40 mx-auto" />
+            <p className="font-serif text-[#c9c0a8] text-base">Versão não disponível para este livro</p>
+            <p className="text-[#55524a] text-sm leading-relaxed max-w-sm mx-auto">
+              A licença desta versão não cobre este livro. Aceite a licença completa em{" "}
+              <span className="text-[#8a8375] font-mono text-xs">platform.youversion.com</span>
+            </p>
+            <button onClick={fetchVerses} className="text-xs text-[#c9a654] hover:opacity-80 transition-opacity mt-2 block mx-auto">
+              Tentar novamente
+            </button>
           </div>
         )}
 
