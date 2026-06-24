@@ -16,12 +16,14 @@ function cacheVerses(book: string, chapter: number, version: string, verses: { n
   db.bibleVerse.createMany({ data }).catch(() => {})
 }
 
-// ─── YouVersion Platform (NVI) ────────────────────────────────────────────────
+// ─── YouVersion Platform (NVI, NVT) ──────────────────────────────────────────
 // platform.youversion.com — licenciamento acelerado PT-BR
-//   129 = NVI (Nova Versão Internacional — BR)
+//   129  = NVI (Nova Versão Internacional — BR)
+//   1930 = NVT (Nova Versão Transformadora)
 
 const YV_VERSION_IDS: Record<string, number> = {
   nvi: 129,
+  nvt: 1930,
 }
 
 let yvClient: BibleClient | null = null
@@ -103,13 +105,23 @@ async function fetchFromAbibliaDigital(bookId: string, chapter: string, version:
   const hasToken = Boolean(token && token.length > 10 && token !== "COLE_AQUI_SEU_TOKEN")
   const url      = `https://www.abibliadigital.com.br/api/verses/${version}/${encodeURIComponent(abbr)}/${chapter}`
 
-  const headers: HeadersInit = {
-    "Accept": "application/json",
-    ...(hasToken && { "Authorization": `Bearer ${token}` }),
-  }
+  // Try with token first; if rejected, retry without (token may be expired)
+  const tryFetch = async (withToken: boolean) =>
+    fetch(url, {
+      headers: {
+        "Accept": "application/json",
+        ...(withToken && hasToken && { "Authorization": `Bearer ${token}` }),
+      },
+      cache: "no-store",
+    })
 
   try {
-    const res = await fetch(url, { headers, cache: "no-store" })
+    let res = await tryFetch(true)
+
+    // Token rejected — retry without auth
+    if ((res.status === 401 || res.status === 403) && hasToken) {
+      res = await tryFetch(false)
+    }
 
     if (res.status === 429) return NextResponse.json({ error: "RATE_LIMIT" }, { status: 429 })
     if (res.status === 401 || res.status === 403) return NextResponse.json({ error: "AUTH_REQUIRED", version }, { status: 401 })
