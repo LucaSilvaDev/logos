@@ -104,48 +104,54 @@ const ABBR_MAP: Record<string, string> = {
 }
 
 function parseBibliaOnlineHtml(html: string): { number: number; text: string }[] {
-  const verses: { number: number; text: string }[] = []
-
-  // Verse starts are marked by: data-vb="" data-v=".N."
-  const verseStartRe = /data-vb="" data-v="\.(\d+)\."/g
+  // Match ALL data-v=".N." occurrences — both verse starts (data-vb="") and
+  // continuation paragraphs (data-vb="N"). Continuations share the same verse number
+  // and their text gets merged into that verse.
+  const verseRe = /data-v="\.(\d+)\."/g
   const starts: { num: number; idx: number }[] = []
   let m: RegExpExecArray | null
-  verseStartRe.lastIndex = 0
-  while ((m = verseStartRe.exec(html)) !== null) {
+  verseRe.lastIndex = 0
+  while ((m = verseRe.exec(html)) !== null) {
     starts.push({ num: parseInt(m[1]), idx: m.index })
   }
+  if (starts.length === 0) return []
+
+  const verseMap = new Map<number, string[]>()
 
   for (let i = 0; i < starts.length; i++) {
     const segStart = starts[i].idx
     const segEnd   = i + 1 < starts.length ? starts[i + 1].idx : html.length
     let   segment  = html.slice(segStart, segEnd)
 
-    // The regex match starts mid-tag (after <span ) — skip to past the first closing >
+    // Skip past the first closing > (we started mid-tag)
     segment = segment.replace(/^[^>]*>/, "")
     // Remove footnote buttons
     segment = segment.replace(/<button[^>]*data-note[^>]*>[\s\S]*?<\/button>/gi, "")
-    // Remove verse-number display spans (data-vn)
-    segment = segment.replace(/<span[^>]*data-vn=""[^>]*>[\s\S]*?<\/span>/gi, "")
-    // Remove HTML comments (React hydration markers like <!-- -->)
+    // Remove ALL verse-number display spans (data-vn with any value)
+    segment = segment.replace(/<span[^>]*data-vn[^>]*>[\s\S]*?<\/span>/gi, "")
+    // Remove HTML comments
     segment = segment.replace(/<!--[\s\S]*?-->/g, "")
     // Strip all remaining tags
     segment = segment.replace(/<[^>]+>/g, " ")
-    // Remove incomplete tag at segment boundary (e.g. "<span" cut off)
+    // Remove incomplete tag at segment boundary
     segment = segment.replace(/<[^>]*$/, "")
-    // Decode common HTML entities
+    // Decode HTML entities
     segment = segment.replace(/&quot;/g, '"').replace(/&#39;/g, "'")
       .replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&nbsp;/g, " ")
-    // Remove copyright notice that appears after the last verse
+    // Remove copyright notices
     segment = segment.replace(/\s*Copyright[©®].*$/i, "").replace(/\s*Nova Almeida Atualizada[©®].*$/i, "")
-    // Collapse whitespace
     const text = segment.replace(/\s+/g, " ").trim()
 
-    if (starts[i].num > 0 && text.length > 0) {
-      verses.push({ number: starts[i].num, text })
+    const num = starts[i].num
+    if (num > 0 && text.length > 0) {
+      if (!verseMap.has(num)) verseMap.set(num, [])
+      verseMap.get(num)!.push(text)
     }
   }
 
-  return verses
+  return Array.from(verseMap.entries())
+    .sort(([a], [b]) => a - b)
+    .map(([number, parts]) => ({ number, text: parts.join(" ") }))
 }
 
 async function fetchFromBibliaOnline(bookId: string, chapter: string, version: string) {
