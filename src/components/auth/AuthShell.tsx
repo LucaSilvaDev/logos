@@ -1,5 +1,4 @@
 import Link from "next/link"
-import { BookOpen } from "lucide-react"
 
 export function AuthShell({
   kicker,
@@ -14,18 +13,12 @@ export function AuthShell({
 }) {
   return (
     <main className="auth-page">
-      <div className="auth-orb auth-orb-1" aria-hidden />
-      <div className="auth-orb auth-orb-2" aria-hidden />
-
       <div className="auth-inner">
         <nav className="auth-nav animate-fade-up">
-          <Link href="/" className="flex items-center gap-2 min-w-0">
-            <BookOpen className="w-4 h-4 text-[#c9a654] shrink-0" strokeWidth={1.6} />
-            <span className="font-display text-[13px] tracking-[0.22em] uppercase text-[#1a1614]">
-              Selah
-            </span>
+          <Link href="/" className="text-[16px] text-[#17191c]">
+            Selah
           </Link>
-          <span className="text-[11px] text-[#66635f] tracking-wide truncate">
+          <span className="text-[14px] text-[#979799] truncate">
             Pausa · Medita · Contempla
           </span>
         </nav>

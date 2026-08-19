@@ -79,18 +79,22 @@ export default async function DashboardPage() {
   ]
 
   return (
-    <div className="max-w-3xl mx-auto px-5 py-10 md:py-14 space-y-12">
+    <div className="max-w-5xl mx-auto px-5 py-10 md:py-16 space-y-16">
 
-      <header className="space-y-5">
+      <header className="space-y-6 max-w-2xl">
         <p className="home-kicker animate-fade-up">
           {format(new Date(), "EEEE, d 'de' MMMM", { locale: ptBR })}
         </p>
         <h1 className="home-title animate-fade-up delay-60">
           {greeting()}, {firstName}.
         </h1>
-        <div className="flex flex-wrap gap-2 animate-fade-up delay-140">
-          {quickActions.map(({ href, icon: Icon, label }) => (
-            <Link key={href} href={href} className="pill-action">
+        <div className="flex flex-wrap gap-2 stagger-in">
+          {quickActions.map(({ href, icon: Icon, label }, i) => (
+            <Link
+              key={href}
+              href={href}
+              className={i === 0 ? "pill-action pill-action-fill" : "pill-action"}
+            >
               <Icon className="w-3.5 h-3.5" />
               {label}
             </Link>
@@ -100,51 +104,51 @@ export default async function DashboardPage() {
 
       <ContinueReading />
 
-      <section className="grid grid-cols-1 md:grid-cols-5 gap-4 animate-fade-up delay-140">
+      <section className="grid grid-cols-1 md:grid-cols-5 gap-4 stagger-in">
         <Link href="/biblia" className="quote-card quote-card-accent md:col-span-3 group">
           <p className="home-kicker mb-4">Versículo do dia</p>
-          <blockquote className="font-serif text-[1.35rem] leading-snug italic text-inherit">
+          <blockquote className="font-serif text-[1.5rem] leading-snug italic">
             &ldquo;{verse.text}&rdquo;
           </blockquote>
-          <p className="mt-5 text-sm font-medium">{verse.ref} →</p>
+          <p className="mt-5 text-[16px]">{verse.ref} →</p>
         </Link>
 
         <div className="quote-card md:col-span-2">
           <p className="home-kicker mb-4">Nuvem de testemunhas</p>
-          <blockquote className="font-serif text-[1.05rem] leading-relaxed italic opacity-90">
+          <blockquote className="text-[18px] leading-relaxed">
             &ldquo;{quote.content}&rdquo;
           </blockquote>
-          <p className="mt-4 text-sm">{quote.author}</p>
-          {quote.source && <p className="text-xs opacity-50 mt-1">{quote.source}</p>}
+          <p className="mt-4 text-[15px]">{quote.author}</p>
+          {quote.source && <p className="text-[14px] text-[#979799] mt-1">{quote.source}</p>}
         </div>
       </section>
 
       <section className="animate-fade-up delay-220">
-        <p className="home-kicker mb-6">01 · Progresso</p>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-8">
-          <Link href="/progresso" className="group">
+        <p className="home-kicker mb-6">Progresso</p>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 stagger-in">
+          <Link href="/progresso" className="artifact-card">
             <p className="home-stat">{biblePercent}%</p>
             <p className="home-stat-label">Bíblia · {totalChaptersRead} cap.</p>
           </Link>
-          <div>
+          <div className="artifact-card">
             <p className="home-stat flex items-center gap-2">
               {streak}
-              {streak >= 3 && <Flame className="w-4 h-4 text-[#c9a654]" />}
+              {streak >= 3 && <Flame className="w-4 h-4" />}
             </p>
             <p className="home-stat-label">dias seguidos</p>
           </div>
           {totalPlanDays ? (
-            <Link href="/plano" className="group">
+            <Link href="/plano" className="artifact-card">
               <p className="home-stat">{completedDays}/{totalPlanDays}</p>
               <p className="home-stat-label">plano</p>
             </Link>
           ) : (
-            <Link href="/plano" className="group">
+            <Link href="/plano" className="artifact-card">
               <p className="home-stat">—</p>
               <p className="home-stat-label">escolher plano →</p>
             </Link>
           )}
-          <div>
+          <div className="artifact-card">
             <p className="home-stat">{highlightCount}</p>
             <p className="home-stat-label">grifos · {studyCount} notas</p>
           </div>
@@ -154,25 +158,25 @@ export default async function DashboardPage() {
       {recentDevotionals.length > 0 && (
         <section className="animate-fade-up delay-220">
           <div className="flex items-baseline justify-between mb-4">
-            <p className="home-kicker">02 · Devocionais</p>
-            <Link href="/devocional" className="text-sm opacity-60 hover:opacity-100 transition-opacity">
+            <p className="home-kicker">Devocionais</p>
+            <Link href="/devocional" className="text-link">
               Ver todos →
             </Link>
           </div>
-          <div className="divide-y divide-[rgba(26,22,20,0.1)]">
+          <div className="grid gap-3 stagger-in">
             {recentDevotionals.map((d) => (
               <Link
                 key={d.id}
                 href={`/devocional/${d.id}`}
-                className="flex items-baseline justify-between gap-4 py-4 group"
+                className="mist-row"
               >
                 <div>
-                  <p className="text-[15px] group-hover:opacity-70 transition-opacity">{d.title}</p>
+                  <p className="text-[17px]">{d.title}</p>
                   {d.bibleRef && (
-                    <p className="font-serif italic text-sm opacity-50 mt-0.5">{d.bibleRef}</p>
+                    <p className="font-serif italic text-[15px] text-[#777b86] mt-0.5">{d.bibleRef}</p>
                   )}
                 </div>
-                <span className="text-xs opacity-40 shrink-0">
+                <span className="text-[14px] text-[#979799] shrink-0">
                   {format(new Date(d.createdAt), "d MMM", { locale: ptBR })}
                 </span>
               </Link>

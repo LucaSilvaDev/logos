@@ -1,10 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600&family=Cinzel:wght@400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;1,8..60,400;1,8..60,500&family=Inter:wght@400;500&display=swap');
 @import "tailwindcss";
 
 @theme inline {
-  --font-sans:  'Inter', system-ui, sans-serif;
-  --font-serif: 'Lora', Georgia, serif;
-  --font-display: 'Cinzel', serif;
+  --font-sans:  'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-serif: 'Source Serif 4', 'Source Serif Pro', Georgia, ui-serif, serif;
+  --font-display: 'Inter', ui-sans-serif, system-ui, sans-serif;
 }
 
 /* ─── BASE ───────────────────────────────────────────────────────────────── */
@@ -21,10 +21,31 @@ html {
   -webkit-overflow-scrolling: touch;
 }
 
+:root {
+  --color-ink-black: #17191c;
+  --color-paper-white: #ffffff;
+  --color-mist-gray: #f2f2f3;
+  --color-fog-white: #fafafb;
+  --color-slate-gray: #777b86;
+  --color-ash-gray: #979799;
+  --color-smoke-gray: #a3a6af;
+  --color-blush-peach: #fbe1d1;
+  --color-sienna-brown: #5d2a1a;
+  --color-hairline: #ececec;
+  --shadow-artifact: 0 0 0 1px rgba(4, 23, 43, 0.05), 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  --shadow-artifact-hover: 0 0 0 1px rgba(4, 23, 43, 0.06), 0 28px 36px -8px rgba(0, 0, 0, 0.14), 0 12px 16px -8px rgba(0, 0, 0, 0.1);
+  --shadow-popover: oklab(0 0 0 / 0.05) 0px 0px 0px 1px, rgba(0, 0, 0, 0.08) 0px 4px 24px 0px;
+  --duration-fast: 120ms;
+  --duration-default: 200ms;
+  --duration-slow: 320ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+}
+
 body {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
-  background: #121214;
+  background: #17191c;
   color: #e2d9c5;
   /* Prevent rubber-band scroll on iOS at the body level */
   overscroll-behavior: none;
@@ -52,21 +73,12 @@ a, button, [role="button"], label, select, input, textarea {
   overscroll-behavior-y: contain;
 }
 
-/* ─── PALETA — BIBLIOTECA REFORMADA ──────────────────────────────────────── */
+/* ─── PALETA — STEEP (Refero 75fdb89f) ────────────────────────────────────── */
 /*
-  Background base   : #12111e — azul-ardósia profundo, como interior de templo à noite
-  Superfície         : #1a1928 — levemente mais claro
-  Superfície elevada : #211f31
-  Borda suave        : #2e2b42
-  Borda hover        : #3d3a55
-  Texto primário     : #e2d9c5 — creme quente, como papel bíblico
-  Texto secundário   : #8a8375 — cinza quente
-  Texto sutil        : #55524a
-  Ouro (acento)      : #c9a654 — iluminismo, manuscritos medievais
-  Ouro dim           : #7a6535
-  Prata              : #a09898 — neutro muted, grifos secundários
-  Verde              : #5a9e72
-  Vermelho           : #c96b5a
+  Primary: Steep — serif analytics on warm paper.
+  Preserve: paper #fff, ink CTA #17191c, peach #fbe1d1 once/page, 24px cards, 9999px pills.
+  Borrow: verse, plan and devotionals as floating product artifacts.
+  Reject: gold fills, beige CRM, Cinzel kickers, sidebar chrome, extra chroma.
 */
 
 /* ─── LAYOUT ─────────────────────────────────────────────────────────────── */
@@ -74,46 +86,87 @@ a, button, [role="button"], label, select, input, textarea {
 .bg-surface    { background: #1c1c1f; }
 .bg-raised     { background: #252528; }
 
-/* ─── SIDEBAR ────────────────────────────────────────────────────────────── */
-.sidebar {
-  background: #121214;
-  border-right: 1px solid rgba(255,255,255,0.05);
+/* ─── FLOATING TOP NAV — Steep artifact bar ──────────────────────────────── */
+.app-float-nav {
+  position: fixed;
+  top: calc(0.75rem + env(safe-area-inset-top));
+  left: 0.75rem;
+  right: 0.75rem;
+  z-index: 50;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px 0 18px;
+  border-radius: 20px;
+  background: #17191c;
+  box-shadow: var(--shadow-artifact);
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+.app-nav-link {
+  font-size: 15px;
+  font-weight: 400;
+  color: #a3a6af;
+  padding: 6px 10px;
+  border-radius: 9999px;
+  white-space: nowrap;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+.app-nav-link:hover { color: #ffffff; }
+.app-nav-link-active { color: #ffffff; }
+.app-nav-icon {
+  color: #a3a6af;
+  padding: 8px;
+  border-radius: 9999px;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+.app-nav-icon:hover { color: #ffffff; background: rgba(255,255,255,0.06); }
+.app-nav-link:focus-visible,
+.app-nav-icon:focus-visible {
+  outline: 2px solid #fbe1d1;
+  outline-offset: 2px;
 }
 
-/* Nav item — golden glow hover (not background change) */
-.nav-glow {
-  position: relative;
-  transition: color 0.25s ease, text-shadow 0.25s ease;
+.app-more-panel {
+  position: fixed;
+  top: calc(0.75rem + env(safe-area-inset-top) + 64px);
+  right: 0.75rem;
+  left: 0.75rem;
+  z-index: 49;
+  max-width: 420px;
+  margin-left: auto;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  padding: 12px;
+  border-radius: 20px;
+  background: #17191c;
+  box-shadow: var(--shadow-popover);
+  animation: moreIn 0.18s ease-out;
 }
-.nav-glow:hover {
-  color: #c9c0a8;
-  text-shadow: 0 0 20px rgba(201, 166, 84, 0.2);
+@keyframes moreIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
-.nav-glow-active {
-  color: #c9a654;
-  text-shadow: 0 0 24px rgba(201, 166, 84, 0.35);
+.app-more-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 16px;
+  font-size: 15px;
+  font-weight: 400;
+  color: #a3a6af;
+  transition: color 0.15s ease, background 0.15s ease;
 }
-.nav-tooltip {
-  background: #f7f6f3;
-  color: #1a1614;
-  border: 1px solid rgba(26, 22, 20, 0.1);
-}
-html:not([data-theme="light"]) .nav-tooltip {
-  background: #252528;
-  color: #e2d9c5;
-  border-color: rgba(255,255,255,0.08);
-}
+.app-more-item:hover { color: #ffffff; background: rgba(255,255,255,0.06); }
+.app-more-item-active { color: #ffffff; background: rgba(255,255,255,0.08); }
 
-/* ─── TOPBAR ─────────────────────────────────────────────────────────────── */
-.topbar {
-  background: #121214;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-  /* Push content below iPhone status bar / Dynamic Island */
-  padding-top: env(safe-area-inset-top);
-}
-/* Sidebar needs the same treatment on mobile overlay */
-.sidebar {
-  padding-top: env(safe-area-inset-top);
+body.nav-hidden .app-float-nav,
+body.nav-hidden .app-more-panel {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-120%);
 }
 
 /* ─── SUPERFÍCIES / CARDS ────────────────────────────────────────────────── */
@@ -146,11 +199,11 @@ html:not([data-theme="light"]) .nav-tooltip {
 /* ─── BOTÕES ─────────────────────────────────────────────────────────────── */
 /* Motion from eco-sim-agendamento: lift 1px, press scale 0.98 */
 .btn-gold {
-  background: linear-gradient(135deg, #c9a654 0%, #a8843c 100%);
-  color: #1a1410;
-  font-weight: 600;
+  background: #17191c;
+  color: #ffffff;
+  font-weight: 400;
   border: none;
-  border-radius: 8px;
+  border-radius: 9999px;
   transition: transform 0.2s ease-out, filter 0.2s ease-out, opacity 0.2s ease-out;
 }
 .btn-gold:hover { filter: brightness(1.08); transform: translateY(-1px); }
@@ -164,41 +217,15 @@ html:not([data-theme="light"]) .nav-tooltip {
 .btn-ghost:hover { color: #e2d9c5; background: #1c1c1f; transform: translateY(-1px); }
 .btn-ghost:active { transform: translateY(0) scale(0.98); }
 
-/* ─── PAPEL EDITORIAL (Antimetal + Steep) — auth / landing ───────────────── */
-/*
-  Primary: Antimetal — cream paper, bistre ink, serif 400, generous space.
-  Borrowed from Steep: 24px cards, ink pill CTA, peach-role reserved for gold wash.
-  Motion: eco-sim fade-up + orbs + button lift.
-  Selah gold #c9a654 is the only chromatic — never a large fill.
-*/
+/* ─── STEEP — auth / landing ─────────────────────────────────────────────── */
 .auth-page {
   position: relative;
   min-height: 100vh;
   overflow: hidden;
-  background: #d7d7d0;
-  color: #1a1614;
+  background: #ffffff;
+  color: #17191c;
 }
-.auth-orb {
-  pointer-events: none;
-  position: absolute;
-  border-radius: 50%;
-  background: rgba(201, 166, 84, 0.16);
-  filter: blur(64px);
-  animation: selahOrb 14s ease-in-out infinite;
-}
-.auth-orb-1 {
-  top: -8rem;
-  left: calc(50% - 14rem);
-  width: 28rem;
-  height: 28rem;
-}
-.auth-orb-2 {
-  right: -4rem;
-  bottom: -8rem;
-  width: 20rem;
-  height: 20rem;
-  animation-delay: -4s;
-}
+.auth-orb { display: none; }
 .auth-inner {
   position: relative;
   z-index: 1;
@@ -214,74 +241,75 @@ html:not([data-theme="light"]) .nav-tooltip {
   align-items: center;
   justify-content: space-between;
   height: 48px;
-  max-width: 28rem;
+  max-width: 1200px;
   margin: 0 auto;
   width: 100%;
-  padding: 0 12px 0 10px;
-  background: #f7f6f3;
-  border-radius: 9999px;
-  box-shadow: 0 0 0 1px rgba(26, 22, 20, 0.06);
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
 }
 .auth-hero {
   text-align: center;
   margin: 0 auto 40px;
-  max-width: 28rem;
+  max-width: 36rem;
 }
 .auth-kicker {
-  font-family: ui-monospace, "JetBrains Mono", monospace;
-  font-size: 11px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
   font-weight: 400;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: #c9a654;
+  letter-spacing: 0;
+  text-transform: none;
+  color: #979799;
   margin-bottom: 12px;
 }
 .auth-title {
-  font-family: "Lora", Georgia, serif;
+  font-family: 'Source Serif 4', Georgia, serif;
   font-weight: 400;
-  font-size: clamp(32px, 6vw, 44px);
-  line-height: 1.16;
-  letter-spacing: -0.025em;
-  color: #1a1614;
+  font-size: clamp(36px, 7vw, 64px);
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+  color: #17191c;
+  text-wrap: balance;
 }
 .auth-lede {
   margin: 16px auto 0;
-  max-width: 22rem;
-  font-size: 15px;
-  line-height: 1.6;
-  color: #66635f;
+  max-width: 26rem;
+  font-size: 17px;
+  line-height: 1.35;
+  color: #777b86;
 }
 .auth-card {
   width: 100%;
   max-width: 28rem;
   margin: 0 auto;
-  padding: 24px;
-  background: #f7f6f3;
+  padding: 24px 20px;
+  background: #f2f2f3;
   border-radius: 24px;
-  box-shadow: 0 0 0 1px rgba(26, 22, 20, 0.05);
+  box-shadow: none;
 }
 .auth-label {
   display: block;
   margin-bottom: 6px;
-  font-size: 12px;
-  font-weight: 500;
-  color: #66635f;
+  font-size: 14px;
+  font-weight: 400;
+  color: #979799;
 }
 .auth-field {
   width: 100%;
-  padding: 10px 12px;
-  font-size: 14px;
-  color: #1a1614;
-  background: #fdfcfa;
-  border: 1px solid rgba(26, 22, 20, 0.12);
+  padding: 16px;
+  font-size: 16px;
+  color: #17191c;
+  background: #ffffff;
+  border: 1px solid #ececec;
   border-radius: 16px;
   outline: none;
   transition: border-color 0.2s ease-out, box-shadow 0.2s ease-out;
 }
-.auth-field::placeholder { color: #a8a7a1; }
+.auth-field::placeholder { color: #a3a6af; }
 .auth-field:focus {
-  border-color: #1a1614;
-  box-shadow: 0 0 0 4px rgba(201, 166, 84, 0.18);
+  border-color: #17191c;
+  box-shadow: none;
 }
 .auth-divider {
   display: flex;
@@ -311,11 +339,11 @@ a.btn-pill-ghost { text-decoration: none; }
   gap: 8px;
   width: 100%;
   padding: 10px 20px;
-  font-size: 15px;
-  font-weight: 500;
-  color: #fdfcfa;
-  background: #1a1614;
-  border: none;
+  font-size: 16px;
+  font-weight: 400;
+  color: #ffffff;
+  background: #17191c;
+  border: 1px solid #ffffff;
   border-radius: 9999px;
   cursor: pointer;
   transition: transform 0.2s ease-out, filter 0.2s ease-out;
@@ -330,11 +358,11 @@ a.btn-pill-ghost { text-decoration: none; }
   gap: 10px;
   width: 100%;
   padding: 10px 20px;
-  font-size: 15px;
-  font-weight: 500;
-  color: #1a1614;
+  font-size: 16px;
+  font-weight: 400;
+  color: #17191c;
   background: transparent;
-  border: 1px solid #1a1614;
+  border: 1px solid #17191c;
   border-radius: 9999px;
   cursor: pointer;
   transition: transform 0.2s ease-out, background 0.2s ease-out;
@@ -360,11 +388,19 @@ a.btn-pill-ghost { text-decoration: none; }
 
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-up,
+  .stagger-in > *,
   .auth-orb,
   .btn-gold, .btn-ghost, .btn-ink, .btn-pill-ghost {
     animation: none !important;
     transition: none !important;
     transform: none !important;
+  }
+  .artifact-card:hover,
+  .quote-card:hover,
+  .mist-row:hover,
+  .pill-action:hover {
+    transform: none !important;
+    box-shadow: var(--shadow-artifact) !important;
   }
 }
 
@@ -415,12 +451,14 @@ a.btn-pill-ghost { text-decoration: none; }
   top: 0;
   left: 0;
   height: 2px;
-  background: linear-gradient(90deg, #c9a654, #e8c87a, #c9a654);
+  background: #17191c;
   z-index: 999;
   pointer-events: none;
   border-radius: 0 99px 99px 0;
-  transition: width 0.08s linear, opacity 0.3s;
+  transition: width 80ms linear, opacity var(--duration-default) var(--ease-out);
 }
+[data-theme="light"] .reading-progress-bar { background: #17191c; }
+:root:not([data-theme="light"]) .reading-progress-bar { background: #ffffff; }
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(5px); }
@@ -498,131 +536,249 @@ a.btn-pill-ghost { text-decoration: none; }
 }
 .modal-enter { animation: modalSlideUp 0.28s cubic-bezier(0.22, 1, 0.36, 1); }
 
-/* Virada de página — avançar capítulo (entra da direita) */
-@keyframes pageTurnNext {
-  0%   {
-    opacity: 0;
-    transform: perspective(1100px) rotateY(-28deg) translateX(60px) scale(0.97);
-    filter: brightness(0.45);
-    box-shadow: -12px 0 28px rgba(0,0,0,0.0);
-  }
-  30%  {
-    opacity: 0.7;
-    filter: brightness(0.75);
-    box-shadow: -16px 0 36px rgba(0,0,0,0.35);
-  }
-  65%  {
-    opacity: 1;
-    filter: brightness(0.95);
-    box-shadow: -6px 0 14px rgba(0,0,0,0.12);
-  }
-  100% {
-    opacity: 1;
-    transform: perspective(1100px) rotateY(0deg) translateX(0) scale(1);
-    filter: brightness(1);
-    box-shadow: 0 0 0 rgba(0,0,0,0);
-  }
+/* Capítulo — continuidade espacial, não virada de livro */
+@keyframes chapterNext {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
-/* Virada de página — voltar capítulo (entra da esquerda) */
-@keyframes pageTurnPrev {
-  0%   {
-    opacity: 0;
-    transform: perspective(1100px) rotateY(28deg) translateX(-60px) scale(0.97);
-    filter: brightness(0.45);
-    box-shadow: 12px 0 28px rgba(0,0,0,0.0);
-  }
-  30%  {
-    opacity: 0.7;
-    filter: brightness(0.75);
-    box-shadow: 16px 0 36px rgba(0,0,0,0.35);
-  }
-  65%  {
-    opacity: 1;
-    filter: brightness(0.95);
-    box-shadow: 6px 0 14px rgba(0,0,0,0.12);
-  }
-  100% {
-    opacity: 1;
-    transform: perspective(1100px) rotateY(0deg) translateX(0) scale(1);
-    filter: brightness(1);
-    box-shadow: 0 0 0 rgba(0,0,0,0);
-  }
+@keyframes chapterPrev {
+  from { opacity: 0; transform: translateX(-20px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
-.page-turn-next {
-  animation: pageTurnNext 0.52s cubic-bezier(0.25, 1, 0.4, 1);
-  transform-origin: left center;
-}
-.page-turn-prev {
-  animation: pageTurnPrev 0.52s cubic-bezier(0.25, 1, 0.4, 1);
-  transform-origin: right center;
-}
+.page-turn-next { animation: chapterNext var(--duration-slow) var(--ease-out); }
+.page-turn-prev { animation: chapterPrev var(--duration-slow) var(--ease-out); }
 @media (prefers-reduced-motion: reduce) {
-  .page-turn-next, .page-turn-prev { animation: none; opacity: 1; }
+  .page-turn-next, .page-turn-prev { animation: none; opacity: 1; transform: none; }
 }
 
-/* ─── ENTRADA ESCALONADA DOS VERSÍCULOS ──────────────────────────────────── */
-@keyframes verseEnter {
-  from { opacity: 0; transform: translateY(6px); }
-  to   { opacity: 1; transform: translateY(0); }
+/* ─── LEITOR BÍBLICO — Steep instrument, not a document ─────────────────── */
+.bible-float-bar {
+  position: sticky;
+  top: 0.65rem;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0.75rem 0.75rem;
+  padding: 8px 12px 8px 16px;
+  min-height: 52px;
+  border-radius: 20px;
+  background: #17191c;
+  color: #a3a6af;
+  box-shadow: var(--shadow-artifact);
 }
-.verse-enter {
-  opacity: 0;
-  animation: verseEnter 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+.bible-version {
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  border-radius: 9999px;
+  color: #a3a6af;
+  background: transparent;
+  border: none;
+  transition: color var(--duration-fast) var(--ease-out),
+              background var(--duration-fast) var(--ease-out),
+              transform var(--duration-fast) var(--ease-out);
 }
-@media (prefers-reduced-motion: reduce) {
-  .verse-enter { animation: none; opacity: 1; transform: none; }
+.bible-version:hover { color: #ffffff; }
+.bible-version:active { transform: scale(0.98); }
+.bible-version-active {
+  background: #ffffff;
+  color: #17191c;
 }
+.bible-ctrl {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 9999px;
+  color: #a3a6af;
+  transition: color var(--duration-fast) var(--ease-out),
+              background var(--duration-fast) var(--ease-out),
+              transform var(--duration-fast) var(--ease-out);
+}
+.bible-ctrl:hover { color: #ffffff; background: rgba(255,255,255,0.06); }
+.bible-ctrl:active { transform: scale(0.96); }
+.bible-ctrl-active { color: #ffffff; }
+.bible-ctrl-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 9999px;
+  color: inherit;
+  transition: background var(--duration-fast) var(--ease-out),
+              color var(--duration-fast) var(--ease-out);
+}
+.bible-ctrl-label:hover { background: rgba(255,255,255,0.06); color: #ffffff; }
 
-/* ─── TÍTULO DE SEÇÃO BÍBLICA ───────────────────────────────────────────── */
 .bible-section-heading {
-  display: block;
-  font-family: 'Lora', Georgia, serif;
-  font-size: 0.7rem;
+  grid-column: 1 / -1;
+  margin: 1.75rem 0 0.15rem;
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 0.95rem;
   font-style: italic;
-  color: #7a7368;
-  letter-spacing: 0.04em;
-  margin-top: 2.4em;
-  margin-bottom: 0.25em;
-  opacity: 0.9;
+  font-weight: 400;
+  color: #a3a6af;
   pointer-events: none;
   user-select: none;
 }
-[data-theme="light"] .bible-section-heading { color: #8a6848; }
-
-/* ─── TEXTO BÍBLICO ──────────────────────────────────────────────────────── */
 .bible-text {
-  font-family: 'EB Garamond', Georgia, serif;
-  font-size: 1.125rem;
+  font-family: "Source Serif 4", Georgia, serif;
+  font-optical-sizing: auto;
+  font-size: 1.2rem;
+  line-height: 1.65;
+  letter-spacing: -0.012em;
   color: #e2d9c5;
-  letter-spacing: 0.01em;
+  max-width: 42rem;
 }
-.bible-text-sm { font-size: 0.9375rem; }
-.bible-text-lg { font-size: 1.3125rem; }
-
-/* Each verse as its own block — breathing room between verses */
+.bible-text-sm { font-size: 1.05rem; line-height: 1.6; }
+.bible-text-lg { font-size: 1.4rem; line-height: 1.7; }
 .bible-verse-row {
-  display: block;
-  line-height: 1.85;
-  margin-bottom: 1.1em;
-  padding-left: 0.1em;
+  display: grid;
+  grid-template-columns: 2.4rem minmax(0, 1fr);
+  column-gap: 12px;
+  align-items: start;
+  margin: 0 -12px;
+  padding: 0.42rem 12px;
+  border-radius: 16px;
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: background var(--duration-fast) var(--ease-out);
 }
-.bible-verse-row:last-child { margin-bottom: 0; }
+.bible-verse-row,
+.bible-verse-row * {
+  user-select: none;
+  -webkit-user-select: none;
+}
+.bible-verse-row.is-selected {
+  background: rgba(255,255,255,0.06);
+}
 .verse-number {
-  font-family: 'Inter', sans-serif;
-  font-size: 0.55rem;
-  font-weight: 600;
-  color: #c9a654;
-  vertical-align: super;
-  margin-right: 3px;
-  opacity: 0.8;
-  letter-spacing: 0.05em;
+  grid-column: 1;
+  padding-top: 0.38em;
+  font-family: Inter, sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  text-align: right;
+  color: #777b86;
+  letter-spacing: 0;
+}
+.verse-body {
+  grid-column: 2;
+  min-width: 0;
+  border-radius: 4px;
+  transition: background-color var(--duration-default) var(--ease-out);
+}
+.bible-book-title {
+  position: relative;
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: clamp(2rem, 5vw, 2.75rem);
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: #e2d9c5;
+  text-wrap: balance;
+}
+.bible-chapter-meta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 12px;
+  font-family: Inter, sans-serif;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: #777b86;
+}
+.bible-chapter-track {
+  position: relative;
+  width: 88px;
+  height: 2px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: rgba(255,255,255,0.08);
+}
+.bible-chapter-track > span {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 100%;
+  border-radius: inherit;
+  background: #a3a6af;
+  transform-origin: left center;
+  transition: transform var(--duration-slow) var(--ease-out);
 }
 .chapter-heading {
-  font-family: 'Cinzel', serif;
-  color: #c9a654;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  font-size: 0.7rem;
+  font-family: "Source Serif 4", Georgia, serif;
+  color: inherit;
+  letter-spacing: -0.02em;
+  text-transform: none;
+  font-size: inherit;
+}
+
+@keyframes verseBarIn {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.bible-verse-bar {
+  position: fixed;
+  left: 0.75rem;
+  right: 0.75rem;
+  bottom: calc(0.75rem + env(safe-area-inset-bottom));
+  z-index: 300;
+  max-width: 40rem;
+  margin-inline: auto;
+  padding: 12px 12px 14px;
+  border-radius: 20px;
+  background: #17191c;
+  box-shadow: var(--shadow-artifact);
+  animation: verseBarIn var(--duration-slow) var(--ease-out);
+  transform-origin: bottom center;
+}
+.bible-verse-bar-ref {
+  font-family: "Source Serif 4", Georgia, serif;
+  font-size: 15px;
+  color: #ffffff;
+}
+.bible-verse-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+  padding: 8px 4px;
+  border-radius: 12px;
+  font-size: 11px;
+  color: #a3a6af;
+  transition: background var(--duration-fast) var(--ease-out),
+              color var(--duration-fast) var(--ease-out),
+              transform var(--duration-fast) var(--ease-out);
+}
+.bible-verse-action:hover { color: #ffffff; background: rgba(255,255,255,0.06); }
+.bible-verse-action:active { transform: scale(0.96); }
+.bible-focus-overlay { background: #17191c; }
+.bible-focus-exit {
+  width: 36px;
+  height: 36px;
+  background: #17191c;
+  box-shadow: var(--shadow-artifact);
+}
+@media (prefers-reduced-motion: reduce) {
+  .bible-verse-bar { animation: none; }
+}
+@media (hover: hover) and (pointer: fine) {
+  .bible-verse-row:hover:not(.is-selected) {
+    background: rgba(255,255,255,0.035);
+  }
+  [data-theme="light"] .bible-verse-row:hover:not(.is-selected) {
+    background: #fafafb;
+  }
 }
 
 /* ─── GRIFOS ─────────────────────────────────────────────────────────────── */
@@ -633,159 +789,285 @@ a.btn-pill-ghost { text-decoration: none; }
 .hl-red    { background: rgba(201, 107, 90, 0.28); border-radius: 2px; padding: 0 2px; transition: background-color 300ms ease, color 300ms ease; }
 .hl-purple { background: rgba(160, 120, 210, 0.25); border-radius: 2px; padding: 0 2px; transition: background-color 300ms ease, color 300ms ease; }
 
-/* ─── INÍCIO EDITORIAL ───────────────────────────────────────────────────── */
+/* ─── INÍCIO + PÁGINAS — Steep ───────────────────────────────────────────── */
+.page-kicker,
 .home-kicker {
-  font-family: ui-monospace, "JetBrains Mono", monospace;
-  font-size: 11px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: #c9a654;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: #979799;
 }
+.page-title,
 .home-title {
-  font-family: "Lora", Georgia, serif;
+  font-family: "Source Serif 4", Georgia, serif;
   font-weight: 400;
   font-size: clamp(2rem, 5vw, 2.75rem);
-  line-height: 1.15;
-  letter-spacing: -0.03em;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
   color: #e2d9c5;
+  text-wrap: balance;
 }
+.page-desc {
+  margin-top: 8px;
+  font-size: 15px;
+  color: #777b86;
+}
+.text-link {
+  font-size: 16px;
+  font-weight: 400;
+  color: inherit;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.text-link:hover { text-decoration: underline; }
 .pill-action {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 16px;
-  font-size: 13px;
-  font-weight: 500;
-  color: #8a8375;
-  border: 1px solid rgba(255,255,255,0.1);
+  padding: 8px 20px;
+  font-size: 15px;
+  font-weight: 400;
+  color: #17191c;
+  border: 1px solid #17191c;
   border-radius: 9999px;
   background: transparent;
-  transition: transform 0.2s ease-out, background 0.2s ease-out, color 0.2s ease-out, border-color 0.2s ease-out;
+  transition: transform var(--duration-fast) var(--ease-out), background var(--duration-fast) var(--ease-out);
 }
 .pill-action:hover {
-  color: #e2d9c5;
-  border-color: rgba(201,166,84,0.35);
-  transform: translateY(-1px);
+  background: rgba(23, 25, 28, 0.04);
+  transform: translateY(-2px);
+}
+.pill-action:active { transform: translateY(0) scale(0.98); }
+.pill-action-fill {
+  background: #17191c;
+  color: #ffffff;
+  border-color: #17191c;
 }
 .quote-card {
   display: block;
-  padding: 28px 24px;
+  padding: 32px 20px;
   border-radius: 24px;
-  background: rgba(28,28,30,0.7);
-  border: 1px solid rgba(255,255,255,0.06);
-  transition: transform 0.25s ease-out, box-shadow 0.25s ease-out;
+  background: #f2f2f3;
+  border: none;
+  transition: transform var(--duration-default) var(--ease-out), background var(--duration-fast) var(--ease-out);
 }
-.quote-card:hover { transform: translateY(-2px); }
+.quote-card:hover { transform: translateY(-3px); background: #fafafb; }
+.quote-card:active { transform: translateY(-1px) scale(0.995); }
 .quote-card-accent {
-  background: rgba(201, 166, 84, 0.12);
-  border-color: rgba(201, 166, 84, 0.18);
+  background: #fbe1d1;
+  color: #5d2a1a;
+  border: none;
 }
+.quote-card-accent:hover { background: #fbe1d1; }
+.quote-card-accent .home-kicker,
+.quote-card-accent .page-kicker { color: #5d2a1a; }
+
+html:not([data-theme="light"]) .quote-card {
+  background: #222428;
+}
+html:not([data-theme="light"]) .artifact-card {
+  background: #1c1c1f;
+}
+html:not([data-theme="light"]) .pill-action {
+  color: #e2d9c5;
+  border-color: #55585e;
+}
+html:not([data-theme="light"]) .mist-row {
+  background: #222428;
+}
+html:not([data-theme="light"]) .mist-row:hover { background: #2a2c32; }
+.artifact-card {
+  display: block;
+  padding: 20px 16px 16px;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: var(--shadow-artifact);
+  transition: transform var(--duration-default) var(--ease-out), box-shadow var(--duration-default) var(--ease-out);
+}
+.artifact-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-artifact-hover);
+}
+.artifact-card:active { transform: translateY(-1px) scale(0.99); }
+
+.mist-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px 20px;
+  border-radius: 24px;
+  background: #f2f2f3;
+  transition: transform var(--duration-default) var(--ease-out), background var(--duration-fast) var(--ease-out);
+}
+.mist-row:hover { transform: translateY(-2px); background: #fafafb; }
+.mist-row:active { transform: translateY(0) scale(0.995); }
+
+.stagger-in > * {
+  animation: selahFadeUp 0.55s var(--ease-out) both;
+}
+.stagger-in > *:nth-child(1) { animation-delay: 40ms; }
+.stagger-in > *:nth-child(2) { animation-delay: 90ms; }
+.stagger-in > *:nth-child(3) { animation-delay: 140ms; }
+.stagger-in > *:nth-child(4) { animation-delay: 190ms; }
+.stagger-in > *:nth-child(5) { animation-delay: 240ms; }
+.stagger-in > *:nth-child(6) { animation-delay: 290ms; }
+.stagger-in > *:nth-child(7) { animation-delay: 340ms; }
+.stagger-in > *:nth-child(8) { animation-delay: 390ms; }
 .home-stat {
-  font-family: "Lora", Georgia, serif;
-  font-size: 1.75rem;
-  font-weight: 400;
-  line-height: 1;
-  letter-spacing: -0.03em;
+  font-family: "Inter", sans-serif;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
   color: #e2d9c5;
 }
 .home-stat-label {
   margin-top: 6px;
-  font-size: 11px;
-  color: #55524a;
+  font-size: 14px;
+  color: #777b86;
 }
 
-/* ─── TEMA CLARO — Antimetal paper (não CRM bege) ────────────────────────── */
+/* ─── TEMA CLARO — Steep paper ───────────────────────────────────────────── */
 [data-theme="light"] body {
-  background: #d7d7d0;
-  color: #1a1614;
+  background: #ffffff;
+  color: #17191c;
 }
-[data-theme="light"] .bg-glass-base  { background: #d7d7d0; }
-[data-theme="light"] .bg-surface     { background: #f7f6f3; }
-[data-theme="light"] .bg-raised      { background: #fdfcfa; }
+[data-theme="light"] .bg-glass-base  { background: #ffffff; }
+[data-theme="light"] .bg-surface     { background: #f2f2f3; }
+[data-theme="light"] .bg-raised      { background: #ffffff; }
 
-[data-theme="light"] .sidebar {
-  background: #f7f6f3;
-  border-right: 1px solid rgba(26, 22, 20, 0.08);
-  box-shadow: none;
-  backdrop-filter: none;
+[data-theme="light"] .app-float-nav {
+  background: #ffffff;
+  color: #17191c;
+  box-shadow: var(--shadow-artifact);
 }
-[data-theme="light"] .topbar {
-  background: transparent;
-  border-bottom: 1px solid rgba(26, 22, 20, 0.06);
-  box-shadow: none;
-  backdrop-filter: none;
+[data-theme="light"] .app-nav-link { color: #777b86; }
+[data-theme="light"] .app-nav-link:hover { color: #17191c; background: transparent; }
+[data-theme="light"] .app-nav-link-active { color: #17191c; background: transparent; }
+[data-theme="light"] .app-nav-icon { color: #777b86; }
+[data-theme="light"] .app-nav-icon:hover { color: #17191c; background: #f2f2f3; }
+[data-theme="light"] .app-more-panel {
+  background: #ffffff;
+  box-shadow: var(--shadow-popover);
 }
+[data-theme="light"] .app-more-item { color: #777b86; }
+[data-theme="light"] .app-more-item:hover { color: #17191c; background: #f2f2f3; }
+[data-theme="light"] .app-more-item-active { color: #17191c; background: #f2f2f3; }
 [data-theme="light"] .card-soft {
-  background: #f7f6f3;
-  border: 1px solid rgba(26, 22, 20, 0.06);
+  background: #f2f2f3;
+  border: none;
   border-radius: 24px;
   box-shadow: none;
 }
 [data-theme="light"] .card-soft:hover {
-  background: #fdfcfa;
-  border-color: rgba(26, 22, 20, 0.1);
-  box-shadow: 0 20px 40px -24px rgba(26, 22, 20, 0.18);
+  background: #f2f2f3;
+  border-color: transparent;
+  box-shadow: none;
 }
 [data-theme="light"] .surface,
 [data-theme="light"] .surface-raised {
-  background: #f7f6f3;
-  border-color: rgba(26, 22, 20, 0.08);
+  background: #f2f2f3;
+  border-color: transparent;
   box-shadow: none;
+  border-radius: 24px;
 }
 [data-theme="light"] .glass-card {
-  background: #f7f6f3;
-  border-color: rgba(26, 22, 20, 0.08);
+  background: #ffffff;
+  border-color: #ececec;
+  box-shadow: var(--shadow-artifact);
 }
 [data-theme="light"] .app-input {
-  background: #fdfcfa;
-  border-color: rgba(26, 22, 20, 0.12);
-  color: #1a1614;
+  background: #ffffff;
+  border-color: #ececec;
+  color: #17191c;
+  border-radius: 16px;
 }
-[data-theme="light"] .app-input:focus  { border-color: #1a1614; }
-[data-theme="light"] .app-input::placeholder { color: #a8a7a1; }
+[data-theme="light"] .app-input:focus  { border-color: #17191c; }
+[data-theme="light"] .app-input::placeholder { color: #a3a6af; }
 
-[data-theme="light"] .home-title { color: #1a1614; }
-[data-theme="light"] .home-stat { color: #1a1614; }
-[data-theme="light"] .home-stat-label { color: #66635f; }
+[data-theme="light"] .home-title,
+[data-theme="light"] .page-title { color: #17191c; }
+[data-theme="light"] .home-stat { color: #17191c; }
+[data-theme="light"] .home-stat-label { color: #777b86; }
 [data-theme="light"] .pill-action {
-  color: #53504c;
-  border-color: rgba(26, 22, 20, 0.14);
+  color: #17191c;
+  border-color: #17191c;
 }
 [data-theme="light"] .pill-action:hover {
-  color: #1a1614;
-  border-color: #1a1614;
-  background: #fdfcfa;
+  color: #17191c;
+  border-color: #17191c;
+  background: rgba(23, 25, 28, 0.04);
+}
+[data-theme="light"] .pill-action-fill {
+  background: #17191c;
+  color: #ffffff;
 }
 [data-theme="light"] .quote-card {
-  background: #f7f6f3;
-  border-color: rgba(26, 22, 20, 0.06);
+  background: #f2f2f3;
+  border: none;
 }
 [data-theme="light"] .quote-card-accent {
-  background: rgba(201, 166, 84, 0.22);
-  border-color: transparent;
+  background: #fbe1d1;
+  color: #5d2a1a;
+}
+[data-theme="light"] .artifact-card {
+  background: #ffffff;
 }
 
-[data-theme="light"] .nav-glow { color: #66635f; text-shadow: none; }
-[data-theme="light"] .nav-glow:hover { color: #1a1614; text-shadow: none; background: rgba(26,22,20,0.04); }
-[data-theme="light"] .nav-glow-active {
-  color: #fdfcfa;
-  text-shadow: none;
-  background: #1a1614;
-}
-[data-theme="light"] .nav-glow-active .w-4 { color: #c9a654; }
+[data-theme="light"] .liquid-orb-1,
+[data-theme="light"] .liquid-orb-2,
+[data-theme="light"] .liquid-orb-3 { display: none; }
+
 
 [data-theme="light"] .bottom-nav {
-  background: rgba(247, 246, 243, 0.92) !important;
-  border: 1px solid rgba(26, 22, 20, 0.08) !important;
-  box-shadow: 0 8px 32px rgba(26, 22, 20, 0.08) !important;
+  background: #ffffff;
+  border: none;
+  box-shadow: var(--shadow-artifact);
+}
+[data-theme="light"] .bottom-nav-item { color: #a3a6af; }
+[data-theme="light"] .bottom-nav-item-active {
+  color: #17191c;
+  background: #f2f2f3;
 }
 
 /* Texto bíblico e prose */
-[data-theme="light"] .bible-text      { color: #1e140a; }
-[data-theme="light"] .verse-number    { color: #7a4f0a; }
-[data-theme="light"] .chapter-heading { color: #7a4f0a; }
-.chapter-watermark                    { opacity: 0.022; }
-[data-theme="light"] .chapter-watermark { opacity: 0.07; }
+[data-theme="light"] .bible-float-bar {
+  background: #ffffff;
+  color: #777b86;
+}
+[data-theme="light"] .bible-version:hover,
+[data-theme="light"] .bible-ctrl:hover,
+[data-theme="light"] .bible-ctrl-label:hover {
+  color: #17191c;
+  background: #f2f2f3;
+}
+[data-theme="light"] .bible-version-active {
+  background: #17191c;
+  color: #ffffff;
+}
+[data-theme="light"] .bible-ctrl-active { color: #17191c; }
+[data-theme="light"] .bible-text { color: #17191c; }
+[data-theme="light"] .verse-number { color: #979799; }
+[data-theme="light"] .bible-book-title,
+[data-theme="light"] .chapter-heading { color: #17191c; }
+[data-theme="light"] .bible-section-heading { color: #777b86; }
+[data-theme="light"] .bible-verse-row.is-selected { background: #f2f2f3; }
+[data-theme="light"] .bible-chapter-track { background: #ececec; }
+[data-theme="light"] .bible-chapter-track > span { background: #17191c; }
+[data-theme="light"] .bible-verse-bar { background: #ffffff; }
+[data-theme="light"] .bible-verse-bar-ref { color: #17191c; }
+[data-theme="light"] .bible-verse-action { color: #777b86; }
+[data-theme="light"] .bible-verse-action:hover {
+  color: #17191c;
+  background: #f2f2f3;
+}
+[data-theme="light"] .bible-focus-overlay { background: #ffffff; }
+[data-theme="light"] .bible-focus-exit { background: #ffffff; }
+.chapter-watermark { opacity: 0.045; }
+[data-theme="light"] .chapter-watermark { opacity: 0.08; }
 [data-theme="light"] .prose-devotional { color: #2a1810; }
 [data-theme="light"] .tiptap          { color: #2a1810; }
 
@@ -805,7 +1087,7 @@ a.btn-pill-ghost { text-decoration: none; }
 [data-theme="light"] .text-\[\#55524a\] { color: #66635f; }
 [data-theme="light"] .text-\[\#3d3a55\] { color: #a8a7a1; }
 [data-theme="light"] .text-\[\#2e2b42\] { color: #a8a7a1; }
-[data-theme="light"] .text-\[\#c9a654\] { color: #c9a654; }
+[data-theme="light"] .text-\[\#c9a654\] { color: #777b86; }
 [data-theme="light"] .text-\[\#5a9e72\] { color: #1e5c38; }
 [data-theme="light"] .text-\[\#c96b5a\] { color: #8b2a1c; }
 [data-theme="light"] .text-\[\#6b9cca\] { color: #7a4f0a; }
@@ -813,10 +1095,10 @@ a.btn-pill-ghost { text-decoration: none; }
 [data-theme="light"] .text-\[\#d4cbb8\] { color: #2a1810; }
 
 /* Overrides Tailwind hardcoded — fundo */
-[data-theme="light"] .bg-\[\#12111e\]   { background: #d7d7d0; }
-[data-theme="light"] .bg-\[\#0e0d19\]   { background: #d7d7d0; }
-[data-theme="light"] .bg-\[\#1a1928\]   { background: #f7f6f3; }
-[data-theme="light"] .bg-\[\#211f31\]   { background: #fdfcfa; }
+[data-theme="light"] .bg-\[\#12111e\]   { background: #ffffff; }
+[data-theme="light"] .bg-\[\#0e0d19\]   { background: #ffffff; }
+[data-theme="light"] .bg-\[\#1a1928\]   { background: #f2f2f3; }
+[data-theme="light"] .bg-\[\#211f31\]   { background: #ffffff; }
 [data-theme="light"] .bg-\[\#2e2b42\]   { background: rgba(163,128,80,0.15); }
 [data-theme="light"] .bg-\[\#c9a65420\] { background: rgba(122,79,10,0.12); }
 [data-theme="light"] .bg-\[\#c9a65415\] { background: rgba(122,79,10,0.1); }
@@ -837,9 +1119,9 @@ a.btn-pill-ghost { text-decoration: none; }
 [data-theme="light"] .divide-\[\#1e1c2e\] > * + * { border-color: rgba(163,128,80,0.15); }
 
 /* Fundos com opacidade — barra de controles da Bíblia */
-[data-theme="light"] .bg-\[\#12111e\]\/95 { background: rgba(215,215,208,0.97) !important; }
-[data-theme="light"] .bg-\[\#12111e\]\/90 { background: rgba(215,215,208,0.95) !important; }
-[data-theme="light"] .bg-\[\#0e0d19\]\/95 { background: rgba(215,215,208,0.97) !important; }
+[data-theme="light"] .bg-\[\#12111e\]\/95 { background: rgba(244,244,245,0.97) !important; }
+[data-theme="light"] .bg-\[\#12111e\]\/90 { background: rgba(244,244,245,0.95) !important; }
+[data-theme="light"] .bg-\[\#0e0d19\]\/95 { background: rgba(244,244,245,0.97) !important; }
 
 /* Fundos overlay — sidebar backdrop, modal de livros */
 [data-theme="light"] .bg-black\/50 { background: rgba(30,20,10,0.18) !important; }
@@ -944,12 +1226,44 @@ a.btn-pill-ghost { text-decoration: none; }
 }
 
 /* ─── BOTTOM NAV — floating glass pill ──────────────────────────────────── */
-/* Dark styles are applied inline in BottomNav.tsx for performance */
-/* Light theme override */
-/* Mobile only — hidden on desktop via media query */
 .bottom-nav {
+  position: fixed;
+  bottom: calc(0.7rem + env(safe-area-inset-bottom));
+  left: 0.75rem;
+  right: 0.75rem;
+  z-index: 50;
+  height: 58px;
   display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 4px;
+  border-radius: 16px;
+  background: rgba(18, 18, 20, 0.78);
+  backdrop-filter: blur(28px) saturate(1.5);
+  -webkit-backdrop-filter: blur(28px) saturate(1.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.38);
   transition: opacity 0.22s ease, transform 0.22s ease;
+}
+.bottom-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-width: 56px;
+  padding: 6px 8px;
+  border-radius: 10px;
+  color: rgba(226, 217, 197, 0.42);
+  transition: color 0.15s ease, background 0.15s ease;
+}
+.bottom-nav-item span {
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+.bottom-nav-item-active {
+  color: #c9a654;
+  background: rgba(201, 166, 84, 0.1);
 }
 @media (min-width: 768px) {
   .bottom-nav { display: none; }
@@ -1064,23 +1378,9 @@ body.verse-bar-open .bottom-nav {
   animation-delay: -18s;
 }
 
-[data-theme="light"] .liquid-orb-1 {
-  background: radial-gradient(ellipse at 40% 40%,
-    rgba(180, 130, 40, 0.10) 0%,
-    rgba(180, 130, 40, 0.04) 45%,
-    transparent 70%);
-}
-[data-theme="light"] .liquid-orb-2 {
-  background: radial-gradient(ellipse at 55% 60%,
-    rgba(180, 130, 40, 0.05) 0%,
-    rgba(180, 130, 40, 0.01) 50%,
-    transparent 72%);
-}
-[data-theme="light"] .liquid-orb-3 {
-  background: radial-gradient(ellipse at 50% 50%,
-    rgba(180, 130, 40, 0.05) 0%,
-    transparent 65%);
-}
+[data-theme="light"] .liquid-orb-1,
+[data-theme="light"] .liquid-orb-2,
+[data-theme="light"] .liquid-orb-3 { display: none; }
 
 /* ─── LANDING PAGE ───────────────────────────────────────────────────────── */
 .landing-glow {
@@ -1315,7 +1615,7 @@ body.verse-bar-open .bottom-nav {
 
 /* ─── IMPRESSÃO / PDF ────────────────────────────────────────────────────── */
 @media print {
-  .sidebar, .topbar, header nav, footer,
+  .app-float-nav, .app-more-panel, .bottom-nav, .sidebar, .topbar, header nav, footer,
   a[href="/devocional"], button { display: none !important; }
   body { background: #fff !important; color: #1a1a1a !important; }
   .card-soft { background: #fff !important; border: none !important; box-shadow: none !important; }

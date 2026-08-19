@@ -40,35 +40,25 @@ export default async function PlanoPage() {
       <div className="max-w-xl mx-auto px-2 py-8 space-y-8">
 
         <div className="space-y-1">
-          <p className="candle-enter candle-delay-0 font-display text-[9px] text-[#55524a] uppercase tracking-[0.25em]">
-            Disciplina Espiritual
-          </p>
-          <h1 className="candle-enter candle-delay-1 font-serif text-3xl text-[#e2d9c5] font-normal">
-            Plano de Leitura
-          </h1>
-          <p className="candle-enter candle-delay-2 text-[#55524a] text-xs">
-            Escolha um plano para começar
-          </p>
+          <p className="page-kicker">Disciplina espiritual</p>
+          <h1 className="page-title">Plano de Leitura</h1>
+          <p className="page-desc">Escolha um plano para começar</p>
         </div>
 
         <div className="candle-enter candle-delay-2 h-px bg-[#2e2b42] opacity-40" />
 
-        <div className="space-y-2">
-          {PLANS.map((plan, i) => (
-            <PlanSetup key={plan.id} plan={plan} delay={380 + i * 110} />
+        <div className="stagger-in space-y-2">
+          {PLANS.map((plan) => (
+            <PlanSetup key={plan.id} plan={plan} />
           ))}
         </div>
 
-        <div
-          className="candle-enter relative pl-6 pr-4 py-4"
-          style={{ animationDelay: `${380 + PLANS.length * 110}ms` }}
-        >
-          <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-[#c9a654] opacity-30" />
-          <p className="font-serif text-[#8a8375] text-sm leading-relaxed italic">
+        <div className="quote-card quote-card-accent animate-fade-up delay-220">
+          <p className="font-serif text-[18px] leading-relaxed italic">
             &ldquo;Bem-aventurado o homem que não anda no conselho dos ímpios...
             antes tem prazer na lei do Senhor, e medita na sua lei de dia e de noite.&rdquo;
           </p>
-          <p className="text-[#c9a654] text-xs mt-2 font-serif">Salmos 1:1–2</p>
+          <p className="mt-3 text-[14px]">Salmos 1:1–2</p>
         </div>
 
       </div>
@@ -96,17 +86,17 @@ export default async function PlanoPage() {
   return (
     <div className="max-w-xl mx-auto px-2 py-8 space-y-8">
 
-      <div className="candle-enter candle-delay-0 flex items-end justify-between">
+      <div className="flex items-end justify-between">
         <div>
-          <p className="font-display text-[9px] text-[#55524a] uppercase tracking-[0.25em] mb-1">Disciplina Espiritual</p>
-          <h1 className="font-serif text-3xl text-[#e2d9c5] font-normal">Plano de Leitura</h1>
-          <p className="text-[#55524a] text-xs mt-1">
+          <p className="page-kicker mb-1">Disciplina espiritual</p>
+          <h1 className="page-title">Plano de Leitura</h1>
+          <p className="page-desc">
             {planLabel} · Dia {dayOfPlan} de {planDays}
           </p>
         </div>
         <div className="text-right">
-          <p className="font-serif text-3xl text-[#e2d9c5]">{completedPct}<span className="text-base text-[#55524a]">%</span></p>
-          <p className="text-[#3d3a55] text-[10px] uppercase tracking-wider font-display">concluído</p>
+          <p className="home-stat">{completedPct}<span className="text-[15px] text-[#777b86]">%</span></p>
+          <p className="home-stat-label">concluído</p>
         </div>
       </div>
 

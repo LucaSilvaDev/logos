@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react"
 import Link from "next/link"
-import { ScanSearch, BookOpen, NotebookPen, Search, Heart, Loader2, X } from "lucide-react"
+import { BookOpen, NotebookPen, Search, Heart, Loader2, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { SearchResult } from "@/app/api/search/route"
 
@@ -72,13 +72,9 @@ export default function BuscaPage() {
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 md:py-12">
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-8">
-        <ScanSearch className="w-5 h-5 text-[#c9a654] opacity-60 shrink-0" />
-        <div>
-          <h1 className="font-display text-[#e2d9c5] text-lg tracking-[0.15em] uppercase">Busca</h1>
-          <p className="text-[#55524a] text-[11px] mt-0.5 font-sans">Devocionais · Estudos · Orações · Versículos</p>
-        </div>
+      <div className="mb-8">
+        <p className="page-kicker">Devocionais · Estudos · Orações · Versículos</p>
+        <h1 className="page-title">Busca</h1>
       </div>
 
       {/* Search input */}

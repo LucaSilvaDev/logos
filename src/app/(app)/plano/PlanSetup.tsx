@@ -11,7 +11,7 @@ interface Plan {
   [key: string]: unknown
 }
 
-export default function PlanSetup({ plan, delay = 0 }: { plan: Plan; delay?: number }) {
+export default function PlanSetup({ plan }: { plan: Plan }) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
 
@@ -33,14 +33,13 @@ export default function PlanSetup({ plan, delay = 0 }: { plan: Plan; delay?: num
     <button
       onClick={selectPlan}
       disabled={loading}
-      className="candle-flame flame-hover card-soft w-full px-5 py-4 text-left group flex items-center justify-between disabled:opacity-50"
-      style={{ animationDelay: `${delay}ms` }}
+      className="mist-row w-full text-left group disabled:opacity-50"
     >
       <div>
-        <p className="font-serif text-[#c9c0a8] text-base group-hover:text-[#e2d9c5] transition-colors">{plan.label}</p>
-        <p className="text-[#55524a] text-xs mt-0.5">{plan.desc}</p>
+        <p className="text-[17px] text-[#17191c]">{plan.label}</p>
+        <p className="text-[14px] text-[#777b86] mt-0.5">{plan.desc}</p>
       </div>
-      <span className="text-[#3d3a55] group-hover:text-[#c9a654] text-xs transition-colors font-serif">
+      <span className="text-[14px] text-[#979799] group-hover:text-[#17191c] transition-colors">
         {loading ? "…" : "Selecionar →"}
       </span>
     </button>

@@ -1,6 +1,7 @@
 ﻿import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import Link from "next/link"
+import { PageHeader, PageActionLink } from "@/components/layout/PageHeader"
 import { Plus, FileText } from "lucide-react"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
@@ -121,17 +122,12 @@ export default async function EstudoPage() {
   return (
     <div className="max-w-3xl mx-auto px-2 py-8 space-y-8 animate-page-in">
 
-      <div className="flex items-end justify-between">
-        <div>
-          <p className="font-display text-[9px] text-[#55524a] uppercase tracking-[0.25em] mb-1">Aprofundamento</p>
-          <h1 className="font-serif text-3xl text-[#e2d9c5] font-normal">Estudo</h1>
-          <p className="text-[#55524a] text-xs mt-1">{notes.length} nota{notes.length !== 1 ? "s" : ""}</p>
-        </div>
-        <Link href="/estudo/nova"
-          className="flex items-center gap-1.5 text-sm text-[#c9a654] hover:opacity-80 transition-opacity font-serif">
-          <Plus className="w-4 h-4" /> Nova nota
-        </Link>
-      </div>
+      <PageHeader
+        kicker="Aprofundamento"
+        title="Estudo"
+        description={`${notes.length} nota${notes.length !== 1 ? "s" : ""}`}
+        action={<PageActionLink href="/estudo/nova">Nova nota →</PageActionLink>}
+      />
 
       <div className="h-px bg-[#2e2b42]" />
 

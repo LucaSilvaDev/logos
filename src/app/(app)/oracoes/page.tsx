@@ -1,5 +1,6 @@
 ﻿import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
+import { PageHeader, PageActionLink } from "@/components/layout/PageHeader"
 import { Heart, Plus, CheckCircle2, Lock } from "lucide-react"
 import Link from "next/link"
 import { format } from "date-fns"
@@ -76,19 +77,12 @@ export default async function OracoesPage() {
   return (
     <div className="max-w-2xl mx-auto px-2 py-8 space-y-8">
 
-      <div className="flex items-end justify-between">
-        <div>
-          <p className="candle-enter candle-delay-0 font-display text-[9px] text-[#55524a] uppercase tracking-[0.25em] mb-1">Comunhão com Deus</p>
-          <h1 className="candle-enter candle-delay-1 font-serif text-3xl text-[#e2d9c5] font-normal">Orações</h1>
-          <p className="candle-enter candle-delay-2 text-[#55524a] text-xs mt-1">
-            {personal.length} ativa{personal.length !== 1 ? "s" : ""} · {answeredTotal} respondida{answeredTotal !== 1 ? "s" : ""}
-          </p>
-        </div>
-        <Link href="/oracoes/nova"
-          className="candle-enter candle-delay-2 flex items-center gap-1.5 text-sm text-[#c9a654] hover:opacity-80 transition-opacity font-serif">
-          <Plus className="w-4 h-4" /> Nova oração
-        </Link>
-      </div>
+      <PageHeader
+        kicker="Comunhão com Deus"
+        title="Orações"
+        description={`${personal.length} ativa${personal.length !== 1 ? "s" : ""} · ${answeredTotal} respondida${answeredTotal !== 1 ? "s" : ""}`}
+        action={<PageActionLink href="/oracoes/nova">Nova oração →</PageActionLink>}
+      />
 
       <div className="candle-enter candle-delay-2 h-px bg-[#2e2b42] opacity-40" />
 

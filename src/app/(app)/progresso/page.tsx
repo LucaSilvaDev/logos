@@ -1,8 +1,8 @@
 import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { BOOK_CHAPTERS, BOOK_ID_NAMES } from "@/lib/reading-plan"
+import { PageHeader } from "@/components/layout/PageHeader"
 import Link from "next/link"
-import { ChevronLeft } from "lucide-react"
 
 export const metadata = { title: "Progresso — Selah" }
 
@@ -81,16 +81,10 @@ export default async function ProgressoPage() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
 
-      {/* Header */}
-      <div className="flex items-center gap-3">
-        <Link href="/dashboard" className="text-[#3d3a55] hover:text-[#8a8375] transition-colors">
-          <ChevronLeft className="w-4 h-4" />
-        </Link>
-        <div>
-          <p className="font-display text-[9px] text-[#c9a654] uppercase tracking-[0.25em]">Jornada</p>
-          <h1 className="font-serif text-[#c9c0a8] text-lg">Progresso da Bíblia</h1>
-        </div>
-      </div>
+      <PageHeader
+        kicker="Jornada"
+        title="Progresso da Bíblia"
+      />
 
       {/* Overall progress */}
       <div className="card-soft px-6 py-5 space-y-3">

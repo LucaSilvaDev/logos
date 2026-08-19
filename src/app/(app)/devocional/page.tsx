@@ -1,7 +1,8 @@
 ﻿import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
 import Link from "next/link"
-import { Plus, NotebookPen } from "lucide-react"
+import { PageHeader, PageActionLink } from "@/components/layout/PageHeader"
+import { NotebookPen } from "lucide-react"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
 
@@ -36,20 +37,12 @@ export default async function DevocionalPage({
   return (
     <div className="max-w-2xl mx-auto px-2 py-8 space-y-8">
 
-      <div className="flex items-end justify-between">
-        <div>
-          <p className="candle-enter candle-delay-0 font-display text-[9px] text-[#55524a] uppercase tracking-[0.25em] mb-1">Registro Espiritual</p>
-          <h1 className="candle-enter candle-delay-1 font-serif text-3xl text-[#e2d9c5] font-normal">Devocional</h1>
-          <p className="candle-enter candle-delay-2 text-[#55524a] text-xs mt-1">
-            {filtered.length} entrada{filtered.length !== 1 ? "s" : ""}
-            {activeTag && <span className="ml-1 text-[#c9a654] opacity-70">· #{activeTag}</span>}
-          </p>
-        </div>
-        <Link href="/devocional/novo"
-          className="candle-enter candle-delay-2 flex items-center gap-1.5 text-sm text-[#c9a654] hover:opacity-80 transition-opacity font-serif">
-          <Plus className="w-4 h-4" /> Nova entrada
-        </Link>
-      </div>
+      <PageHeader
+        kicker="Registro espiritual"
+        title="Devocional"
+        description={`${filtered.length} entrada${filtered.length !== 1 ? "s" : ""}${activeTag ? ` · #${activeTag}` : ""}`}
+        action={<PageActionLink href="/devocional/novo">Nova entrada →</PageActionLink>}
+      />
 
       {/* Tag filter */}
       {allTags.length > 0 && (

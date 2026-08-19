@@ -2,9 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import { usePathname } from "next/navigation"
-import { cn } from "@/lib/utils"
-import { Sidebar } from "@/components/layout/Sidebar"
-import { Topbar } from "@/components/layout/Topbar"
+import { AppNav } from "@/components/layout/AppNav"
 import { BottomNav } from "@/components/layout/BottomNav"
 
 interface AppShellProps {
@@ -14,14 +12,9 @@ interface AppShellProps {
 }
 
 export function AppShell({ children, userName, userImage }: AppShellProps) {
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
-  const [theme, setTheme] = useState<"dark" | "light">("dark")
+  const [moreOpen, setMoreOpen] = useState(false)
+  const [theme, setTheme] = useState<"dark" | "light">("light")
   const pathname = usePathname()
-
-  const savedBeforeReadRef = useRef<boolean | null>(null)
-  const collapsedRef = useRef(sidebarCollapsed)
-  collapsedRef.current = sidebarCollapsed
 
   const mainRef = useRef<HTMLElement>(null)
   const lastScrollY = useRef(0)
@@ -29,35 +22,21 @@ export function AppShell({ children, userName, userImage }: AppShellProps) {
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("selah-theme")
-    if (savedTheme === "light") setTheme("light")
-    const savedCollapsed = localStorage.getItem("selah-sidebar-collapsed")
-    if (savedCollapsed === "1") setSidebarCollapsed(true)
+    if (savedTheme === "dark") {
+      setTheme("dark")
+      document.documentElement.removeAttribute("data-theme")
+    } else {
+      setTheme("light")
+      document.documentElement.setAttribute("data-theme", "light")
+    }
   }, [])
 
-  // Auto-collapse sidebar on reading routes
-  useEffect(() => {
-    const isReadingRoute = pathname.startsWith("/biblia") || pathname.startsWith("/memorizar")
-    if (isReadingRoute) {
-      if (savedBeforeReadRef.current === null) {
-        savedBeforeReadRef.current = collapsedRef.current
-        setSidebarCollapsed(true)
-      }
-    } else {
-      if (savedBeforeReadRef.current !== null) {
-        const prev = savedBeforeReadRef.current
-        savedBeforeReadRef.current = null
-        setSidebarCollapsed(prev)
-      }
-    }
-  }, [pathname])
-
-  // Show nav when route changes (navigated to new page)
   useEffect(() => {
     document.body.classList.remove("nav-hidden")
     lastScrollY.current = 0
+    setMoreOpen(false)
   }, [pathname])
 
-  // Scroll-based hide/show — hide on scroll down, show on scroll up
   useEffect(() => {
     const el = mainRef.current
     if (!el) return
@@ -70,13 +49,11 @@ export function AppShell({ children, userName, userImage }: AppShellProps) {
         const currentY = el.scrollTop
         const delta = currentY - lastScrollY.current
 
-        // Need at least 8px movement to trigger, avoids jitter
         if (Math.abs(delta) > 8) {
           if (delta > 0 && currentY > 60) {
-            // Scrolling down — hide nav
             document.body.classList.add("nav-hidden")
+            setMoreOpen(false)
           } else {
-            // Scrolling up — show nav
             document.body.classList.remove("nav-hidden")
           }
           lastScrollY.current = currentY
@@ -88,15 +65,6 @@ export function AppShell({ children, userName, userImage }: AppShellProps) {
     el.addEventListener("scroll", onScroll, { passive: true })
     return () => el.removeEventListener("scroll", onScroll)
   }, [])
-
-  function toggleCollapse() {
-    const next = !sidebarCollapsed
-    setSidebarCollapsed(next)
-    localStorage.setItem("selah-sidebar-collapsed", next ? "1" : "0")
-    if (savedBeforeReadRef.current !== null) {
-      savedBeforeReadRef.current = next
-    }
-  }
 
   function toggleTheme() {
     const next = theme === "dark" ? "light" : "dark"
@@ -122,30 +90,30 @@ export function AppShell({ children, userName, userImage }: AppShellProps) {
       <div className="liquid-orb-2" />
       <div className="liquid-orb-3" />
 
-      <Sidebar
-        open={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
-        collapsed={sidebarCollapsed}
-        onToggleCollapse={toggleCollapse}
+      <AppNav
+        userName={userName}
+        userImage={userImage}
+        theme={theme}
+        moreOpen={moreOpen}
+        onToggleMore={() => setMoreOpen(v => !v)}
+        onCloseMore={() => setMoreOpen(false)}
+        onToggleTheme={toggleTheme}
       />
 
       <div className="flex flex-col flex-1 min-w-0 relative z-10">
-        <Topbar
-          userName={userName}
-          userImage={userImage}
-          theme={theme}
-          onToggleSidebar={() => setSidebarOpen(s => !s)}
-          onToggleTheme={toggleTheme}
-        />
-
-        {/* pb accounts for floating nav height (60px) + gap + safe area */}
-        <main ref={mainRef} className="flex-1 overflow-y-auto pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0">
-          <div key={pathname} className={cn("h-full", pathname !== "/dashboard" && "animate-page-in")}>
+        <main
+          ref={mainRef}
+          className="flex-1 overflow-y-auto pt-[calc(4.5rem+env(safe-area-inset-top))] pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-8"
+        >
+          <div key={pathname} className="h-full animate-page-in">
             {children}
           </div>
         </main>
 
-        <BottomNav onOpenSidebar={() => setSidebarOpen(true)} />
+        <BottomNav
+          moreOpen={moreOpen}
+          onToggleMore={() => setMoreOpen(v => !v)}
+        />
       </div>
     </div>
   )

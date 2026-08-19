@@ -5,7 +5,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#121214",
+  themeColor: "#ffffff",
 }
 
 export const metadata: Metadata = {
@@ -24,7 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="pt-BR" className="h-full" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{
-          __html: `try{var t=localStorage.getItem('selah-theme');if(t==='light')document.documentElement.setAttribute('data-theme','light');}catch(e){}
+          __html: `try{var t=localStorage.getItem('selah-theme');if(t!=='dark')document.documentElement.setAttribute('data-theme','light');}catch(e){}
 if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js')}`
         }} />
 

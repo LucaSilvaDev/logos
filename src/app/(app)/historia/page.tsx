@@ -63,9 +63,9 @@ export default function HistoriaPage() {
     <div className="max-w-2xl mx-auto px-2 py-8 space-y-6">
 
       <div>
-        <p className="candle-enter candle-delay-0 font-display text-[9px] text-[#55524a] uppercase tracking-[0.25em] mb-1">Fides et Historia</p>
-        <h1 className="candle-enter candle-delay-1 font-serif text-3xl text-[#e2d9c5] font-normal">História da Igreja</h1>
-        <p className="candle-enter candle-delay-2 text-[#55524a] text-xs mt-1">33 d.C. → Hoje · {TIMELINE.length} eventos</p>
+        <p className="page-kicker mb-1">Fides et Historia</p>
+        <h1 className="page-title">História da Igreja</h1>
+        <p className="page-desc">33 d.C. → Hoje · {TIMELINE.length} eventos</p>
       </div>
 
       <div className="candle-enter candle-delay-2 h-px bg-[#2e2b42]" />

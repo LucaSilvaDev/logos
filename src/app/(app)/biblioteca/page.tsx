@@ -109,9 +109,9 @@ export default function BibliotecaPage() {
     <div className="max-w-3xl mx-auto px-2 py-8 space-y-12">
 
       <div>
-        <p className="candle-enter candle-delay-0 font-display text-[9px] text-[#55524a] uppercase tracking-[0.25em] mb-1">Teologia Reformada</p>
-        <h1 className="candle-enter candle-delay-1 font-serif text-3xl text-[#e2d9c5] font-normal">Biblioteca</h1>
-        <p className="candle-enter candle-delay-2 text-[#55524a] text-xs mt-1">Credo · TULIP · Westminster · Catecismo · Citações Reformadas</p>
+        <p className="page-kicker mb-1">Teologia reformada</p>
+        <h1 className="page-title">Biblioteca</h1>
+        <p className="page-desc">Credo · TULIP · Westminster · Catecismo · Citações</p>
       </div>
 
       <div className="candle-enter candle-delay-2 h-px bg-[#2e2b42]" />

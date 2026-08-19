@@ -62,13 +62,13 @@ export default async function EscatologiaPage() {
 
       <div className="flex items-end justify-between">
         <div>
-          <p className="candle-enter candle-delay-0 font-display text-[9px] text-[#55524a] uppercase tracking-[0.25em] mb-1">Profecia Bíblica</p>
-          <h1 className="candle-enter candle-delay-1 font-serif text-3xl text-[#e2d9c5] font-normal">Escatologia</h1>
-          <p className="candle-enter candle-delay-2 text-[#55524a] text-xs mt-1">Relógio Profético · {totalProphetic} capítulos</p>
+          <p className="page-kicker mb-1">Profecia bíblica</p>
+          <h1 className="page-title">Escatologia</h1>
+          <p className="page-desc">Relógio profético · {totalProphetic} capítulos</p>
         </div>
-        <div className="candle-enter candle-delay-2 text-right">
-          <p className="font-serif text-3xl text-[#e2d9c5]">{pct}<span className="text-base text-[#55524a]">%</span></p>
-          <p className="text-[#3d3a55] text-[10px] uppercase tracking-wider font-display">{studied}/{totalProphetic}</p>
+        <div className="text-right">
+          <p className="home-stat">{pct}<span className="text-[15px] text-[#777b86]">%</span></p>
+          <p className="home-stat-label">{studied}/{totalProphetic}</p>
         </div>
       </div>
 

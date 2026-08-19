@@ -169,8 +169,8 @@ export function PerfilClient({ userName, userEmail, userImage }: Props) {
           <ChevronLeft className="w-4 h-4" />
         </Link>
         <div>
-          <p className="font-display text-[9px] text-[#c9a654] uppercase tracking-[0.25em]">Configurações</p>
-          <h1 className="font-serif text-[#c9c0a8] text-lg">Perfil</h1>
+          <p className="page-kicker">Configurações</p>
+          <h1 className="page-title">Perfil</h1>
         </div>
       </div>
 

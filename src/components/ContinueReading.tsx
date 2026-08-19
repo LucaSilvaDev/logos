@@ -46,24 +46,24 @@ export function ContinueReading() {
   const href = `/biblia?book=${pos.bookId}&chapter=${pos.chapter}&version=${pos.version ?? "nvi"}`
 
   return (
-    <Link href={href} className="quote-card group animate-fade-up delay-140">
+    <Link href={href} className="artifact-card group animate-fade-up delay-140">
       <div className="flex items-center justify-between mb-5">
         <p className="home-kicker">Continue onde parou</p>
         <ChevronRight className="w-4 h-4 opacity-30 group-hover:opacity-80 group-hover:translate-x-0.5 transition-all" />
       </div>
       <div className="flex items-end justify-between gap-4">
         <div>
-          <p className="font-serif text-2xl leading-none tracking-tight">{bookName}</p>
-          <p className="mt-2 text-sm opacity-55">
+          <p className="font-serif text-[26px] leading-none tracking-tight">{bookName}</p>
+          <p className="mt-2 text-[15px] text-[#777b86]">
             Capítulo {pos.chapter} de {totalChaps}
-            <span className="ml-2 text-[11px] tracking-wider">{versionLabel}</span>
+            <span className="ml-2 text-[14px] text-[#979799]">{versionLabel}</span>
           </p>
         </div>
-        <p className="font-serif text-sm tabular-nums opacity-40">{Math.round(progress * 100)}%</p>
+        <p className="text-[20px] font-medium tabular-nums">{Math.round(progress * 100)}%</p>
       </div>
-      <div className="mt-5 h-px bg-current/10 overflow-hidden">
+      <div className="mt-5 h-px bg-[#ececec] overflow-hidden">
         <div
-          className="h-px bg-[#c9a654] transition-all duration-700"
+          className="h-px bg-[#5d2a1a] transition-all duration-700"
           style={{ width: `${progress * 100}%` }}
         />
       </div>
