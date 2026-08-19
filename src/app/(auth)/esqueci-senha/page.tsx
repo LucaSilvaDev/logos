@@ -2,7 +2,8 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { BookOpen, Loader2 } from "lucide-react"
+import { Loader2 } from "lucide-react"
+import { AuthShell } from "@/components/auth/AuthShell"
 
 export default function EsqueciSenhaPage() {
   const [email, setEmail] = useState("")
@@ -29,60 +30,53 @@ export default function EsqueciSenhaPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#12111e] flex items-center justify-center p-4">
-      <div className="w-full max-w-sm">
-        <div className="text-center mb-10">
-          <BookOpen className="w-8 h-8 text-[#c9a654] opacity-60 mx-auto mb-4" />
-          <h1 className="font-display text-[#e2d9c5] text-lg tracking-widest uppercase">Selah</h1>
-          <p className="text-[#55524a] text-xs mt-1 tracking-wider">Redefinir senha</p>
+    <AuthShell
+      kicker="Senha"
+      title="Enviamos o caminho de volta."
+      lede="Digite o email da conta. Se existir, o link chega em seguida."
+    >
+      {sent ? (
+        <div className="text-center space-y-4">
+          <p className="text-sm leading-relaxed text-[#66635f]">
+            Se este email estiver cadastrado, você receberá um link para redefinir sua senha.
+          </p>
+          <Link href="/entrar" className="btn-ink">
+            Voltar ao login →
+          </Link>
         </div>
-
-        {sent ? (
-          <div className="text-center space-y-4">
-            <p className="text-[#c9c0a8] text-sm leading-relaxed">
-              Se este email estiver cadastrado, você receberá um link para redefinir sua senha em breve.
+      ) : (
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {error && (
+            <p className="text-sm text-[#c96b5a] bg-[#c96b5a]/8 border border-[#c96b5a]/20 rounded-2xl px-3 py-2">
+              {error}
             </p>
-            <Link href="/entrar" className="text-[#c9a654] text-sm hover:opacity-80 transition-opacity">
+          )}
+
+          <div>
+            <label className="auth-label">Email</label>
+            <input
+              type="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              required
+              placeholder="seu@email.com"
+              autoComplete="email"
+              className="auth-field"
+            />
+          </div>
+
+          <button type="submit" disabled={loading} className="btn-ink">
+            {loading && <Loader2 className="w-4 h-4 animate-spin" />}
+            {loading ? "Enviando…" : "Enviar link →"}
+          </button>
+
+          <p className="text-center text-sm text-[#66635f]">
+            <Link href="/entrar" className="text-[#1a1614] underline-offset-4 hover:underline">
               Voltar ao login
             </Link>
-          </div>
-        ) : (
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <p className="text-[#8a8375] text-sm leading-relaxed mb-6">
-              Digite seu email e enviaremos um link para redefinir sua senha.
-            </p>
-
-            {error && <p className="text-[#c96b5a] text-xs text-center">{error}</p>}
-
-            <div className="space-y-1">
-              <label className="text-[10px] text-[#3d3a55] uppercase tracking-wider font-display">Email</label>
-              <input
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                required
-                placeholder="seu@email.com"
-                className="app-input w-full px-3 py-2.5 text-sm"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-2.5 btn-gold text-sm flex items-center justify-center gap-2 disabled:opacity-50 mt-2"
-            >
-              {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-              Enviar link de redefinição
-            </button>
-
-            <p className="text-center text-xs text-[#3d3a55] mt-4">
-              <Link href="/entrar" className="text-[#c9a654] hover:opacity-80 transition-opacity">
-                Voltar ao login
-              </Link>
-            </p>
-          </form>
-        )}
-      </div>
-    </div>
+          </p>
+        </form>
+      )}
+    </AuthShell>
   )
 }

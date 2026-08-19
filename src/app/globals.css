@@ -93,6 +93,16 @@ a, button, [role="button"], label, select, input, textarea {
   color: #c9a654;
   text-shadow: 0 0 24px rgba(201, 166, 84, 0.35);
 }
+.nav-tooltip {
+  background: #f7f6f3;
+  color: #1a1614;
+  border: 1px solid rgba(26, 22, 20, 0.1);
+}
+html:not([data-theme="light"]) .nav-tooltip {
+  background: #252528;
+  color: #e2d9c5;
+  border-color: rgba(255,255,255,0.08);
+}
 
 /* ─── TOPBAR ─────────────────────────────────────────────────────────────── */
 .topbar {
@@ -134,21 +144,229 @@ a, button, [role="button"], label, select, input, textarea {
 }
 
 /* ─── BOTÕES ─────────────────────────────────────────────────────────────── */
+/* Motion from eco-sim-agendamento: lift 1px, press scale 0.98 */
 .btn-gold {
   background: linear-gradient(135deg, #c9a654 0%, #a8843c 100%);
   color: #1a1410;
   font-weight: 600;
   border: none;
   border-radius: 8px;
-  transition: opacity 0.15s;
+  transition: transform 0.2s ease-out, filter 0.2s ease-out, opacity 0.2s ease-out;
 }
-.btn-gold:hover { opacity: 0.9; }
+.btn-gold:hover { filter: brightness(1.08); transform: translateY(-1px); }
+.btn-gold:active { transform: translateY(0) scale(0.98); }
+.btn-gold:disabled { opacity: 0.6; pointer-events: none; transform: none; }
 .btn-ghost {
   color: #8a8375;
   border-radius: 6px;
-  transition: all 0.15s;
+  transition: color 0.2s ease-out, background 0.2s ease-out, transform 0.2s ease-out;
 }
-.btn-ghost:hover { color: #e2d9c5; background: #1c1c1f; }
+.btn-ghost:hover { color: #e2d9c5; background: #1c1c1f; transform: translateY(-1px); }
+.btn-ghost:active { transform: translateY(0) scale(0.98); }
+
+/* ─── PAPEL EDITORIAL (Antimetal + Steep) — auth / landing ───────────────── */
+/*
+  Primary: Antimetal — cream paper, bistre ink, serif 400, generous space.
+  Borrowed from Steep: 24px cards, ink pill CTA, peach-role reserved for gold wash.
+  Motion: eco-sim fade-up + orbs + button lift.
+  Selah gold #c9a654 is the only chromatic — never a large fill.
+*/
+.auth-page {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  background: #d7d7d0;
+  color: #1a1614;
+}
+.auth-orb {
+  pointer-events: none;
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(201, 166, 84, 0.16);
+  filter: blur(64px);
+  animation: selahOrb 14s ease-in-out infinite;
+}
+.auth-orb-1 {
+  top: -8rem;
+  left: calc(50% - 14rem);
+  width: 28rem;
+  height: 28rem;
+}
+.auth-orb-2 {
+  right: -4rem;
+  bottom: -8rem;
+  width: 20rem;
+  height: 20rem;
+  animation-delay: -4s;
+}
+.auth-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 20px 40px;
+}
+.auth-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  max-width: 28rem;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 12px 0 10px;
+  background: #f7f6f3;
+  border-radius: 9999px;
+  box-shadow: 0 0 0 1px rgba(26, 22, 20, 0.06);
+}
+.auth-hero {
+  text-align: center;
+  margin: 0 auto 40px;
+  max-width: 28rem;
+}
+.auth-kicker {
+  font-family: ui-monospace, "JetBrains Mono", monospace;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #c9a654;
+  margin-bottom: 12px;
+}
+.auth-title {
+  font-family: "Lora", Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(32px, 6vw, 44px);
+  line-height: 1.16;
+  letter-spacing: -0.025em;
+  color: #1a1614;
+}
+.auth-lede {
+  margin: 16px auto 0;
+  max-width: 22rem;
+  font-size: 15px;
+  line-height: 1.6;
+  color: #66635f;
+}
+.auth-card {
+  width: 100%;
+  max-width: 28rem;
+  margin: 0 auto;
+  padding: 24px;
+  background: #f7f6f3;
+  border-radius: 24px;
+  box-shadow: 0 0 0 1px rgba(26, 22, 20, 0.05);
+}
+.auth-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #66635f;
+}
+.auth-field {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 14px;
+  color: #1a1614;
+  background: #fdfcfa;
+  border: 1px solid rgba(26, 22, 20, 0.12);
+  border-radius: 16px;
+  outline: none;
+  transition: border-color 0.2s ease-out, box-shadow 0.2s ease-out;
+}
+.auth-field::placeholder { color: #a8a7a1; }
+.auth-field:focus {
+  border-color: #1a1614;
+  box-shadow: 0 0 0 4px rgba(201, 166, 84, 0.18);
+}
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 20px 0;
+}
+.auth-divider span {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #a8a7a1;
+  white-space: nowrap;
+}
+.auth-divider::before,
+.auth-divider::after {
+  content: "";
+  flex: 1;
+  border-top: 1px dashed rgba(26, 22, 20, 0.14);
+}
+a.btn-ink,
+a.btn-pill-ghost { text-decoration: none; }
+.btn-ink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 20px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #fdfcfa;
+  background: #1a1614;
+  border: none;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: transform 0.2s ease-out, filter 0.2s ease-out;
+}
+.btn-ink:hover { filter: brightness(1.12); transform: translateY(-1px); }
+.btn-ink:active { transform: translateY(0) scale(0.98); }
+.btn-ink:disabled { opacity: 0.6; pointer-events: none; transform: none; }
+.btn-pill-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 20px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #1a1614;
+  background: transparent;
+  border: 1px solid #1a1614;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: transform 0.2s ease-out, background 0.2s ease-out;
+}
+.btn-pill-ghost:hover { background: rgba(26, 22, 20, 0.04); transform: translateY(-1px); }
+.btn-pill-ghost:active { transform: translateY(0) scale(0.98); }
+.btn-pill-ghost:disabled { opacity: 0.6; pointer-events: none; }
+
+@keyframes selahFadeUp {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes selahOrb {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%      { transform: translate(6%, -8%) scale(1.08); }
+}
+.animate-fade-up {
+  animation: selahFadeUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.delay-60  { animation-delay: 60ms; }
+.delay-140 { animation-delay: 140ms; }
+.delay-220 { animation-delay: 220ms; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up,
+  .auth-orb,
+  .btn-gold, .btn-ghost, .btn-ink, .btn-pill-ghost {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+}
 
 /* ─── ALIAS (compatibilidade com código existente) ───────────────────────── */
 .bg-glass-base { background: #121214; }
@@ -415,66 +633,151 @@ a, button, [role="button"], label, select, input, textarea {
 .hl-red    { background: rgba(201, 107, 90, 0.28); border-radius: 2px; padding: 0 2px; transition: background-color 300ms ease, color 300ms ease; }
 .hl-purple { background: rgba(160, 120, 210, 0.25); border-radius: 2px; padding: 0 2px; transition: background-color 300ms ease, color 300ms ease; }
 
-/* ─── TEMA CLARO — pergaminho claro, cards elevados acima do fundo ────────── */
-[data-theme="light"] body {
-  background: #E8D5BC;
-  color: #1e140a;
+/* ─── INÍCIO EDITORIAL ───────────────────────────────────────────────────── */
+.home-kicker {
+  font-family: ui-monospace, "JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #c9a654;
 }
-[data-theme="light"] .bg-glass-base  { background: #E8D5BC; }
-[data-theme="light"] .bg-surface     { background: #F8EED8; }
-[data-theme="light"] .bg-raised      { background: #FDFAF3; }
+.home-title {
+  font-family: "Lora", Georgia, serif;
+  font-weight: 400;
+  font-size: clamp(2rem, 5vw, 2.75rem);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  color: #e2d9c5;
+}
+.pill-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #8a8375;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 9999px;
+  background: transparent;
+  transition: transform 0.2s ease-out, background 0.2s ease-out, color 0.2s ease-out, border-color 0.2s ease-out;
+}
+.pill-action:hover {
+  color: #e2d9c5;
+  border-color: rgba(201,166,84,0.35);
+  transform: translateY(-1px);
+}
+.quote-card {
+  display: block;
+  padding: 28px 24px;
+  border-radius: 24px;
+  background: rgba(28,28,30,0.7);
+  border: 1px solid rgba(255,255,255,0.06);
+  transition: transform 0.25s ease-out, box-shadow 0.25s ease-out;
+}
+.quote-card:hover { transform: translateY(-2px); }
+.quote-card-accent {
+  background: rgba(201, 166, 84, 0.12);
+  border-color: rgba(201, 166, 84, 0.18);
+}
+.home-stat {
+  font-family: "Lora", Georgia, serif;
+  font-size: 1.75rem;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: #e2d9c5;
+}
+.home-stat-label {
+  margin-top: 6px;
+  font-size: 11px;
+  color: #55524a;
+}
+
+/* ─── TEMA CLARO — Antimetal paper (não CRM bege) ────────────────────────── */
+[data-theme="light"] body {
+  background: #d7d7d0;
+  color: #1a1614;
+}
+[data-theme="light"] .bg-glass-base  { background: #d7d7d0; }
+[data-theme="light"] .bg-surface     { background: #f7f6f3; }
+[data-theme="light"] .bg-raised      { background: #fdfcfa; }
 
 [data-theme="light"] .sidebar {
-  background: rgba(220, 198, 168, 0.86);
-  backdrop-filter: blur(40px) saturate(1.6);
+  background: #f7f6f3;
+  border-right: 1px solid rgba(26, 22, 20, 0.08);
   box-shadow: none;
+  backdrop-filter: none;
 }
 [data-theme="light"] .topbar {
-  background: rgba(232, 214, 186, 0.84);
-  backdrop-filter: blur(28px) saturate(1.6);
+  background: transparent;
+  border-bottom: 1px solid rgba(26, 22, 20, 0.06);
   box-shadow: none;
+  backdrop-filter: none;
 }
 [data-theme="light"] .card-soft {
-  background: linear-gradient(160deg, rgba(244,232,212,0.88), rgba(238,224,202,0.80));
-  border-color: rgba(180,142,88,0.2);
-  box-shadow: 0 3px 16px rgba(110,75,20,0.1), 0 1px 3px rgba(110,75,20,0.06), inset 0 1px 0 rgba(255,255,255,0.5);
+  background: #f7f6f3;
+  border: 1px solid rgba(26, 22, 20, 0.06);
+  border-radius: 24px;
+  box-shadow: none;
 }
 [data-theme="light"] .card-soft:hover {
-  background: linear-gradient(160deg, rgba(248,237,218,0.92), rgba(242,228,208,0.86));
-  border-color: rgba(180,142,88,0.3);
-  box-shadow: 0 6px 24px rgba(110,75,20,0.14), 0 2px 6px rgba(110,75,20,0.08), inset 0 1px 0 rgba(255,255,255,0.6);
+  background: #fdfcfa;
+  border-color: rgba(26, 22, 20, 0.1);
+  box-shadow: 0 20px 40px -24px rgba(26, 22, 20, 0.18);
 }
-[data-theme="light"] .surface {
-  background: linear-gradient(160deg, rgba(246,234,214,0.92), rgba(240,226,206,0.85));
-  border-color: rgba(180,142,88,0.18);
-  box-shadow: 0 4px 22px rgba(110,75,20,0.09), inset 0 1px 0 rgba(255,255,255,0.45);
-}
+[data-theme="light"] .surface,
 [data-theme="light"] .surface-raised {
-  background: linear-gradient(160deg, rgba(250,238,220,0.95), rgba(244,232,212,0.90));
-  border-color: rgba(180,142,88,0.22);
-  box-shadow: 0 6px 28px rgba(110,75,20,0.11), inset 0 1px 0 rgba(255,255,255,0.55);
+  background: #f7f6f3;
+  border-color: rgba(26, 22, 20, 0.08);
+  box-shadow: none;
 }
 [data-theme="light"] .glass-card {
-  background: #EFE0C4;
-  border-color: rgba(163, 128, 80, 0.22);
+  background: #f7f6f3;
+  border-color: rgba(26, 22, 20, 0.08);
 }
 [data-theme="light"] .app-input {
-  background: rgba(248, 236, 214, 0.6);
-  border-color: rgba(163, 128, 80, 0.3);
-  color: #1e140a;
+  background: #fdfcfa;
+  border-color: rgba(26, 22, 20, 0.12);
+  color: #1a1614;
 }
-[data-theme="light"] .app-input:focus  { border-color: #7a4f0a; }
-[data-theme="light"] .app-input::placeholder { color: #b09878; }
+[data-theme="light"] .app-input:focus  { border-color: #1a1614; }
+[data-theme="light"] .app-input::placeholder { color: #a8a7a1; }
 
-/* Navegação */
-[data-theme="light"] .nav-glow { color: #8a6848; }
-[data-theme="light"] .nav-glow:hover {
-  color: #1e140a;
-  text-shadow: 0 0 20px rgba(122, 79, 10, 0.25);
+[data-theme="light"] .home-title { color: #1a1614; }
+[data-theme="light"] .home-stat { color: #1a1614; }
+[data-theme="light"] .home-stat-label { color: #66635f; }
+[data-theme="light"] .pill-action {
+  color: #53504c;
+  border-color: rgba(26, 22, 20, 0.14);
 }
+[data-theme="light"] .pill-action:hover {
+  color: #1a1614;
+  border-color: #1a1614;
+  background: #fdfcfa;
+}
+[data-theme="light"] .quote-card {
+  background: #f7f6f3;
+  border-color: rgba(26, 22, 20, 0.06);
+}
+[data-theme="light"] .quote-card-accent {
+  background: rgba(201, 166, 84, 0.22);
+  border-color: transparent;
+}
+
+[data-theme="light"] .nav-glow { color: #66635f; text-shadow: none; }
+[data-theme="light"] .nav-glow:hover { color: #1a1614; text-shadow: none; background: rgba(26,22,20,0.04); }
 [data-theme="light"] .nav-glow-active {
-  color: #7a4f0a;
-  text-shadow: 0 0 24px rgba(122, 79, 10, 0.35);
+  color: #fdfcfa;
+  text-shadow: none;
+  background: #1a1614;
+}
+[data-theme="light"] .nav-glow-active .w-4 { color: #c9a654; }
+
+[data-theme="light"] .bottom-nav {
+  background: rgba(247, 246, 243, 0.92) !important;
+  border: 1px solid rgba(26, 22, 20, 0.08) !important;
+  box-shadow: 0 8px 32px rgba(26, 22, 20, 0.08) !important;
 }
 
 /* Texto bíblico e prose */
@@ -492,17 +795,17 @@ a, button, [role="button"], label, select, input, textarea {
 [data-theme="light"] .hl-blue   { background: rgba(130, 120, 110, 0.18); }
 
 /* Badges */
-[data-theme="light"] .badge      { background: #eddbc4; border-color: rgba(163,128,80,0.3); color: #8a6848; }
-[data-theme="light"] .badge-gold { background: #f0dfc0; border-color: rgba(122,79,10,0.4); color: #7a4f0a; }
+[data-theme="light"] .badge      { background: #f7f6f3; border-color: rgba(26,22,20,0.1); color: #66635f; }
+[data-theme="light"] .badge-gold { background: rgba(201,166,84,0.18); border-color: transparent; color: #1a1614; }
 
 /* Overrides Tailwind hardcoded — texto */
-[data-theme="light"] .text-\[\#e2d9c5\] { color: #1e140a; }
-[data-theme="light"] .text-\[\#c9c0a8\] { color: #3d2518; }
-[data-theme="light"] .text-\[\#8a8375\] { color: #5c4530; }
-[data-theme="light"] .text-\[\#55524a\] { color: #8a6848; }
-[data-theme="light"] .text-\[\#3d3a55\] { color: #b09878; }
-[data-theme="light"] .text-\[\#2e2b42\] { color: #c0a070; }
-[data-theme="light"] .text-\[\#c9a654\] { color: #7a4f0a; }
+[data-theme="light"] .text-\[\#e2d9c5\] { color: #1a1614; }
+[data-theme="light"] .text-\[\#c9c0a8\] { color: #2a2724; }
+[data-theme="light"] .text-\[\#8a8375\] { color: #53504c; }
+[data-theme="light"] .text-\[\#55524a\] { color: #66635f; }
+[data-theme="light"] .text-\[\#3d3a55\] { color: #a8a7a1; }
+[data-theme="light"] .text-\[\#2e2b42\] { color: #a8a7a1; }
+[data-theme="light"] .text-\[\#c9a654\] { color: #c9a654; }
 [data-theme="light"] .text-\[\#5a9e72\] { color: #1e5c38; }
 [data-theme="light"] .text-\[\#c96b5a\] { color: #8b2a1c; }
 [data-theme="light"] .text-\[\#6b9cca\] { color: #7a4f0a; }
@@ -510,16 +813,16 @@ a, button, [role="button"], label, select, input, textarea {
 [data-theme="light"] .text-\[\#d4cbb8\] { color: #2a1810; }
 
 /* Overrides Tailwind hardcoded — fundo */
-[data-theme="light"] .bg-\[\#12111e\]   { background: #E8D5BC; }
-[data-theme="light"] .bg-\[\#0e0d19\]   { background: #DCC9AC; }
-[data-theme="light"] .bg-\[\#1a1928\]   { background: #F0E3CE; }
-[data-theme="light"] .bg-\[\#211f31\]   { background: #F5EAD8; }
+[data-theme="light"] .bg-\[\#12111e\]   { background: #d7d7d0; }
+[data-theme="light"] .bg-\[\#0e0d19\]   { background: #d7d7d0; }
+[data-theme="light"] .bg-\[\#1a1928\]   { background: #f7f6f3; }
+[data-theme="light"] .bg-\[\#211f31\]   { background: #fdfcfa; }
 [data-theme="light"] .bg-\[\#2e2b42\]   { background: rgba(163,128,80,0.15); }
 [data-theme="light"] .bg-\[\#c9a65420\] { background: rgba(122,79,10,0.12); }
 [data-theme="light"] .bg-\[\#c9a65415\] { background: rgba(122,79,10,0.1); }
 [data-theme="light"] .bg-\[\#c9a65412\] { background: rgba(122,79,10,0.08); }
 [data-theme="light"] .bg-\[\#c9a65410\] { background: rgba(122,79,10,0.07); }
-[data-theme="light"] .hover\:bg-\[\#1a1928\]:hover { background: #EAD9C0; }
+[data-theme="light"] .hover\:bg-\[\#1a1928\]:hover { background: rgba(26,22,20,0.05); }
 
 /* Overrides Tailwind hardcoded — borda */
 [data-theme="light"] .border-\[\#2e2b42\]  { border-color: rgba(163,128,80,0.25); }
@@ -534,9 +837,9 @@ a, button, [role="button"], label, select, input, textarea {
 [data-theme="light"] .divide-\[\#1e1c2e\] > * + * { border-color: rgba(163,128,80,0.15); }
 
 /* Fundos com opacidade — barra de controles da Bíblia */
-[data-theme="light"] .bg-\[\#12111e\]\/95 { background: rgba(232,213,188,0.97) !important; }
-[data-theme="light"] .bg-\[\#12111e\]\/90 { background: rgba(232,213,188,0.95) !important; }
-[data-theme="light"] .bg-\[\#0e0d19\]\/95 { background: rgba(220,198,168,0.97) !important; }
+[data-theme="light"] .bg-\[\#12111e\]\/95 { background: rgba(215,215,208,0.97) !important; }
+[data-theme="light"] .bg-\[\#12111e\]\/90 { background: rgba(215,215,208,0.95) !important; }
+[data-theme="light"] .bg-\[\#0e0d19\]\/95 { background: rgba(215,215,208,0.97) !important; }
 
 /* Fundos overlay — sidebar backdrop, modal de livros */
 [data-theme="light"] .bg-black\/50 { background: rgba(30,20,10,0.18) !important; }
@@ -643,12 +946,6 @@ a, button, [role="button"], label, select, input, textarea {
 /* ─── BOTTOM NAV — floating glass pill ──────────────────────────────────── */
 /* Dark styles are applied inline in BottomNav.tsx for performance */
 /* Light theme override */
-[data-theme="light"] .bottom-nav {
-  background: rgba(248, 244, 236, 0.88) !important;
-  border: 1px solid rgba(180, 150, 80, 0.18) !important;
-  box-shadow: 0 8px 40px rgba(100, 70, 10, 0.18), 0 1px 0 rgba(255,255,255,0.7) inset !important;
-}
-
 /* Mobile only — hidden on desktop via media query */
 .bottom-nav {
   display: flex;

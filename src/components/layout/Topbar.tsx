@@ -105,11 +105,11 @@ export function Topbar({ userName, userImage, theme, onToggleSidebar, onToggleTh
                 {biblePos.bookName} <span className="text-[#55524a]">cap.</span> {biblePos.chapter}
               </span>
             </div>
-          ) : (
+          ) : pathname !== "/dashboard" ? (
             <span className="font-display text-[#8a8375] text-[11px] tracking-[0.2em] uppercase">
               {title}
             </span>
-          )}
+          ) : null}
           {/* Mobile: always show plain title */}
           {isBible && biblePos && (
             <span className="md:hidden font-display text-[#8a8375] text-[11px] tracking-[0.2em] uppercase">

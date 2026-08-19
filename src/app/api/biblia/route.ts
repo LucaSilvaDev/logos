@@ -4,7 +4,19 @@ import { db } from "@/lib/db"
 
 export const dynamic = "force-dynamic"
 
-function cacheVerses(book: string, chapter: number, version: string, verses: { number: number; text: string }[]) {
+type Verse = { number: number; text: string }
+
+function jsonChapter(
+  verses: Verse[],
+  version: string,
+  book: string,
+  chapter: number,
+  extra?: Record<string, unknown>,
+) {
+  return NextResponse.json({ verses, version, book, chapter, ...extra })
+}
+
+function cacheVerses(book: string, chapter: number, version: string, verses: Verse[]) {
   const data = verses.map(v => ({
     id:      `${version}-${book}-${chapter}-${v.number}`,
     book,
@@ -27,11 +39,29 @@ async function readFromCache(book: string, chapter: number, version: string) {
   return rows.map(r => ({ number: r.verse, text: r.text }))
 }
 
+async function tryCache(bookId: string, chapter: string, version: string) {
+  const chapterNum = parseInt(chapter, 10)
+  if (!Number.isFinite(chapterNum) || chapterNum < 1) return null
+  try {
+    const cached = await readFromCache(bookId, chapterNum, version)
+    if (cached) return jsonChapter(cached, version, bookId, chapterNum, { cached: true, source: "cache" })
+  } catch (err) {
+    console.error("[biblia/cache] read failed", err)
+  }
+  return null
+}
+
 // ─── YouVersion Platform (NVI) ────────────────────────────────────────────────
 // platform.youversion.com — NVI aprovado (id=129)
-// NVT (1930) e NAA (1840): licença pendente de aprovação → usar bibliaonline
+// NVT e NAA: licença pendente → bibliaonline.com.br
+// YouVersion usa NAM para Naum; o app usa NAH em todo o restante.
 
 const YV_NVI_ID = 129
+const YV_BOOK_ALIAS: Record<string, string> = { NAH: "NAM" }
+
+function toYouVersionUsfm(bookId: string, chapter: string) {
+  return `${YV_BOOK_ALIAS[bookId] ?? bookId}.${chapter}`
+}
 
 let yvClient: BibleClient | null = null
 function getYVClient(): BibleClient {
@@ -42,8 +72,8 @@ function getYVClient(): BibleClient {
 }
 
 // Parses YouVersion HTML: <span class="yv-v" v="N"></span><span class="yv-vlbl">N</span>TEXT
-function parseYVHtml(html: string): { number: number; text: string }[] {
-  const verses: { number: number; text: string }[] = []
+function parseYVHtml(html: string): Verse[] {
+  const verses: Verse[] = []
   const marker = /<span class="yv-v" v="(\d+)"><\/span><span class="yv-vlbl">\d+<\/span>/g
   const parts = html.split(marker)
   for (let i = 1; i < parts.length; i += 2) {
@@ -61,9 +91,10 @@ async function fetchFromYouVersion(bookId: string, chapter: string) {
     return NextResponse.json({ error: "AUTH_REQUIRED", version: "nvi" }, { status: 401 })
   }
 
+  const usfm = toYouVersionUsfm(bookId, chapter)
+
   try {
     const client  = getYVClient()
-    const usfm    = `${bookId}.${chapter}`
     const passage = await client.getPassage(YV_NVI_ID, usfm, "html")
     const content = (passage as { content?: string }).content ?? ""
     const verses  = parseYVHtml(content)
@@ -74,16 +105,16 @@ async function fetchFromYouVersion(bookId: string, chapter: string) {
     }
 
     cacheVerses(bookId, parseInt(chapter), "nvi", verses)
-    return NextResponse.json({ verses, version: "nvi", book: bookId, chapter: parseInt(chapter) })
+    return jsonChapter(verses, "nvi", bookId, parseInt(chapter), { source: "youversion" })
   } catch (err) {
     console.error("[biblia/youversion] Error:", err)
     return NextResponse.json({ error: "NETWORK_ERROR" }, { status: 502 })
   }
 }
 
-// ─── BibliaOnline (NVT, NAA) ──────────────────────────────────────────────────
-// Scraping de www.bibliaonline.com.br — suporta NVT e NAA nativamente
-// Estrutura atual (2026): data-vb="" data-v=".N." marca início de versículo
+// ─── BibliaOnline (NVT, NAA, fallback NVI) ────────────────────────────────────
+// Scraping de www.bibliaonline.com.br
+// Estrutura: data-vb="" data-v=".N." marca início de versículo
 
 const ABBR_MAP: Record<string, string> = {
   GEN: "gn",    EXO: "ex",    LEV: "lv",    NUM: "nm",    DEU: "dt",
@@ -103,10 +134,7 @@ const ABBR_MAP: Record<string, string> = {
   JUD: "jd",    REV: "ap",
 }
 
-function parseBibliaOnlineHtml(html: string): { number: number; text: string }[] {
-  // Match ALL data-v=".N." occurrences — both verse starts (data-vb="") and
-  // continuation paragraphs (data-vb="N"). Continuations share the same verse number
-  // and their text gets merged into that verse.
+function parseBibliaOnlineHtml(html: string): Verse[] {
   const verseRe = /data-v="\.(\d+)\."/g
   const starts: { num: number; idx: number }[] = []
   let m: RegExpExecArray | null
@@ -123,22 +151,14 @@ function parseBibliaOnlineHtml(html: string): { number: number; text: string }[]
     const segEnd   = i + 1 < starts.length ? starts[i + 1].idx : html.length
     let   segment  = html.slice(segStart, segEnd)
 
-    // Skip past the first closing > (we started mid-tag)
     segment = segment.replace(/^[^>]*>/, "")
-    // Remove footnote buttons
     segment = segment.replace(/<button[^>]*data-note[^>]*>[\s\S]*?<\/button>/gi, "")
-    // Remove ALL verse-number display spans (data-vn with any value)
     segment = segment.replace(/<span[^>]*data-vn[^>]*>[\s\S]*?<\/span>/gi, "")
-    // Remove HTML comments
     segment = segment.replace(/<!--[\s\S]*?-->/g, "")
-    // Strip all remaining tags
     segment = segment.replace(/<[^>]+>/g, " ")
-    // Remove incomplete tag at segment boundary
     segment = segment.replace(/<[^>]*$/, "")
-    // Decode HTML entities
     segment = segment.replace(/&quot;/g, '"').replace(/&#39;/g, "'")
       .replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&nbsp;/g, " ")
-    // Remove copyright notices
     segment = segment.replace(/\s*Copyright[©®].*$/i, "").replace(/\s*Nova Almeida Atualizada[©®].*$/i, "")
     const text = segment.replace(/\s+/g, " ").trim()
 
@@ -180,88 +200,37 @@ async function fetchFromBibliaOnline(bookId: string, chapter: string, version: s
     }
 
     cacheVerses(bookId, parseInt(chapter), version, verses)
-    return NextResponse.json({ verses, version, book: bookId, chapter: parseInt(chapter) })
+    return jsonChapter(verses, version, bookId, parseInt(chapter), { source: "bibliaonline" })
   } catch (err) {
     console.error("[biblia/bibliaonline] Network error:", err)
     return NextResponse.json({ error: "NETWORK_ERROR" }, { status: 502 })
   }
 }
 
-// ─── AbibliaDigital (outras versões) ─────────────────────────────────────────
-
-async function fetchFromAbibliaDigital(bookId: string, chapter: string, version: string) {
-  const abbr = ABBR_MAP[bookId]
-  if (!abbr) return NextResponse.json({ error: "Livro inválido" }, { status: 400 })
-
-  const token    = process.env.BIBLE_API_TOKEN
-  const hasToken = Boolean(token && token.length > 10 && token !== "COLE_AQUI_SEU_TOKEN")
-  const url      = `https://www.abibliadigital.com.br/api/verses/${version}/${encodeURIComponent(abbr)}/${chapter}`
-
-  const tryFetch = async (withToken: boolean) =>
-    fetch(url, {
-      headers: {
-        "Accept": "application/json",
-        ...(withToken && hasToken && { "Authorization": `Bearer ${token}` }),
-      },
-      cache: "no-store",
-    })
-
-  try {
-    let res = await tryFetch(true)
-    if ((res.status === 401 || res.status === 403) && hasToken) res = await tryFetch(false)
-
-    if (res.status === 429) return NextResponse.json({ error: "RATE_LIMIT" }, { status: 429 })
-    if (res.status === 401 || res.status === 403) return NextResponse.json({ error: "AUTH_REQUIRED", version }, { status: 401 })
-    if (!res.ok) {
-      console.error("[biblia/abibliadigital] upstream error", { status: res.status, version, book: bookId, chapter })
-      return NextResponse.json({ error: "API_ERROR", detail: `HTTP ${res.status}` }, { status: res.status })
-    }
-
-    const data   = await res.json()
-    const verses = (data.verses ?? []).map((v: { number: number; text: string }) => ({
-      number: v.number,
-      text:   v.text,
-    }))
-
-    cacheVerses(bookId, parseInt(chapter), version, verses)
-    return NextResponse.json({ verses, version, book: bookId, chapter: parseInt(chapter) })
-  } catch (err) {
-    console.error("[biblia/abibliadigital] Network error:", err)
-    return NextResponse.json({ error: "NETWORK_ERROR" }, { status: 502 })
-  }
-}
-
-// ─── GET handler ──────────────────────────────────────────────────────────────
+const SUPPORTED_VERSIONS = new Set(["nvi", "naa", "nvt"])
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
   const bookId  = searchParams.get("book") ?? ""
   const chapter = searchParams.get("chapter") ?? "1"
-  const version = searchParams.get("version") ?? "nvi"
+  const version = (searchParams.get("version") ?? "nvi").toLowerCase()
 
-  // NVI → YouVersion (aprovado e estável)
+  if (!SUPPORTED_VERSIONS.has(version)) {
+    return NextResponse.json(
+      { error: "VERSION_UNSUPPORTED", detail: "Use nvi, naa ou nvt" },
+      { status: 400 },
+    )
+  }
+
+  const cached = await tryCache(bookId, chapter, version)
+  if (cached) return cached
+
   if (version === "nvi") {
-    return fetchFromYouVersion(bookId, chapter)
+    const yv = await fetchFromYouVersion(bookId, chapter)
+    if (yv.ok) return yv
+    console.warn("[biblia] YouVersion falhou, tentando BibliaOnline", { bookId, chapter, status: yv.status })
+    return fetchFromBibliaOnline(bookId, chapter, "nvi")
   }
 
-  // NVT, NAA → cache primeiro, depois bibliaonline.com.br
-  if (version === "nvt" || version === "naa") {
-    try {
-      const cached = await readFromCache(bookId, parseInt(chapter), version)
-      if (cached) {
-        return NextResponse.json({ verses: cached, version, book: bookId, chapter: parseInt(chapter), cached: true })
-      }
-    } catch { /* cache miss */ }
-    return fetchFromBibliaOnline(bookId, chapter, version)
-  }
-
-  // Outras versões → cache primeiro, depois abibliadigital
-  try {
-    const cached = await readFromCache(bookId, parseInt(chapter), version)
-    if (cached) {
-      return NextResponse.json({ verses: cached, version, book: bookId, chapter: parseInt(chapter), cached: true })
-    }
-  } catch { /* cache miss */ }
-
-  return fetchFromAbibliaDigital(bookId, chapter, version)
+  return fetchFromBibliaOnline(bookId, chapter, version)
 }

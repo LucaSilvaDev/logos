@@ -9,20 +9,23 @@ import {
   ChevronsLeft, ChevronsRight, Brain, Map,
 } from "lucide-react"
 
-const navItems = [
-  { href: "/dashboard",   icon: LayoutDashboard, label: "Início" },
-  { href: "/busca",       icon: ScanSearch,       label: "Busca" },
-  { href: "/biblia",      icon: BookOpen,         label: "Bíblia" },
-  { href: "/progresso",   icon: Map,              label: "Progresso" },
-  { href: "/plano",       icon: Clock,            label: "Plano de Leitura" },
-  { href: "/devocional",  icon: NotebookPen,      label: "Devocional" },
-  { href: "/estudo",      icon: Search,           label: "Estudo" },
-  { href: "/memorizar",   icon: Brain,            label: "Memorizar" },
-  { href: "/oracoes",     icon: Heart,            label: "Orações" },
-  { href: "/historia",    icon: Church,           label: "História" },
-  { href: "/escatologia", icon: Flame,            label: "Escatologia" },
-  { href: "/biblioteca",  icon: Library,          label: "Biblioteca" },
-  { href: "/perfil",      icon: UserCircle,       label: "Perfil" },
+const primaryNav = [
+  { href: "/dashboard",  icon: LayoutDashboard, label: "Início" },
+  { href: "/biblia",     icon: BookOpen,         label: "Bíblia" },
+  { href: "/plano",      icon: Clock,            label: "Plano" },
+  { href: "/devocional", icon: NotebookPen,      label: "Devocional" },
+  { href: "/estudo",     icon: Search,           label: "Estudo" },
+]
+
+const moreNav = [
+  { href: "/busca",       icon: ScanSearch,  label: "Busca" },
+  { href: "/progresso",   icon: Map,         label: "Progresso" },
+  { href: "/memorizar",   icon: Brain,       label: "Memorizar" },
+  { href: "/oracoes",     icon: Heart,       label: "Orações" },
+  { href: "/historia",    icon: Church,      label: "História" },
+  { href: "/escatologia", icon: Flame,       label: "Escatologia" },
+  { href: "/biblioteca",  icon: Library,     label: "Biblioteca" },
+  { href: "/perfil",      icon: UserCircle,  label: "Perfil" },
 ]
 
 interface SidebarProps {
@@ -30,6 +33,59 @@ interface SidebarProps {
   onClose: () => void
   collapsed: boolean
   onToggleCollapse: () => void
+}
+
+type NavItem = { href: string; icon: typeof BookOpen; label: string }
+
+function NavGroup({
+  items, pathname, collapsed, onClose,
+}: {
+  items: NavItem[]
+  pathname: string
+  collapsed: boolean
+  onClose: () => void
+}) {
+  return (
+    <div className="space-y-0.5">
+      {items.map(({ href, icon: Icon, label }) => {
+        const active = href === "/dashboard"
+          ? pathname === "/dashboard"
+          : pathname.startsWith(href)
+        return (
+          <Link
+            key={href}
+            href={href}
+            onClick={onClose}
+            className={cn(
+              "group relative flex items-center gap-3 px-3 py-2 rounded-full text-[13px] transition-all duration-200",
+              collapsed && "md:justify-center md:px-2",
+              active ? "nav-glow-active" : "nav-glow"
+            )}
+          >
+            <Icon className={cn(
+              "w-4 h-4 shrink-0 transition-colors duration-200",
+              active ? "text-[#c9a654]" : "opacity-50 group-hover:opacity-80"
+            )} />
+            <span className={cn(
+              "whitespace-nowrap overflow-hidden transition-all duration-200",
+              collapsed ? "md:w-0 md:opacity-0" : "opacity-100"
+            )}>
+              {label}
+            </span>
+            <span className={cn(
+              "pointer-events-none absolute left-full ml-3 top-1/2 -translate-y-1/2",
+              "px-2.5 py-1 rounded-full text-[11px] whitespace-nowrap",
+              "nav-tooltip",
+              "opacity-0 group-hover:opacity-100 transition-opacity duration-150 z-50",
+              collapsed ? "hidden md:block" : "hidden"
+            )}>
+              {label}
+            </span>
+          </Link>
+        )
+      })}
+    </div>
+  )
 }
 
 export function Sidebar({ open, onClose, collapsed, onToggleCollapse }: SidebarProps) {
@@ -67,8 +123,10 @@ export function Sidebar({ open, onClose, collapsed, onToggleCollapse }: SidebarP
             "transition-all duration-200 overflow-hidden",
             collapsed ? "md:w-0 md:opacity-0" : "opacity-100"
           )}>
-            <p className="font-display text-[#e2d9c5] text-sm tracking-[0.25em] uppercase whitespace-nowrap">Selah</p>
-            <p className="text-[#3d3a55] text-[8px] tracking-widest uppercase font-sans mt-0.5 whitespace-nowrap">Pausa · Medita · Contempla</p>
+            <p className="font-display text-[#e2d9c5] text-sm tracking-[0.22em] uppercase whitespace-nowrap">Selah</p>
+            <p className="text-[9px] tracking-[0.14em] uppercase opacity-40 whitespace-nowrap mt-0.5">
+              Pausa · Medita
+            </p>
           </div>
           <button
             onClick={onClose}
@@ -82,55 +140,15 @@ export function Sidebar({ open, onClose, collapsed, onToggleCollapse }: SidebarP
         <div className="mx-4 h-px bg-[#2e2b42] opacity-20 shrink-0" />
 
         {/* Navegação */}
-        <nav className="flex-1 px-2 py-4 overflow-y-auto space-y-0.5">
-          {navItems.map(({ href, icon: Icon, label }) => {
-            const active = href === "/dashboard"
-              ? pathname === "/dashboard"
-              : pathname.startsWith(href)
-            return (
-              <Link
-                key={href}
-                href={href}
-                onClick={onClose}
-                className={cn(
-                  "group relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-[13px] transition-all duration-200",
-                  collapsed && "md:justify-center md:px-0",
-                  active ? "nav-glow-active" : "nav-glow text-[#55524a]"
-                )}
-              >
-                <Icon className={cn(
-                  "w-4 h-4 shrink-0 transition-colors duration-200",
-                  active ? "text-[#c9a654]" : "text-[#3d3a55] group-hover:text-[#8a8375]"
-                )} />
-
-                <span className={cn(
-                  "font-serif whitespace-nowrap transition-all duration-200 overflow-hidden",
-                  active && "font-medium",
-                  collapsed ? "md:w-0 md:opacity-0" : "opacity-100"
-                )}>
-                  {label}
-                </span>
-
-                {active && (
-                  <span className={cn(
-                    "w-1 h-1 rounded-full bg-[#c9a654] shrink-0 brasa-pulse transition-all duration-200",
-                    collapsed ? "md:hidden" : "ml-auto"
-                  )} />
-                )}
-
-                {/* Tooltip — só quando recolhido, desktop */}
-                <span className={cn(
-                  "pointer-events-none absolute left-full ml-3 top-1/2 -translate-y-1/2",
-                  "px-2.5 py-1.5 rounded-lg text-[11px] text-[#e2d9c5] whitespace-nowrap",
-                  "bg-[#1c1c1f] border border-[rgba(255,255,255,0.08)] shadow-lg",
-                  "opacity-0 group-hover:opacity-100 transition-opacity duration-150 z-50",
-                  collapsed ? "hidden md:block" : "hidden"
-                )}>
-                  {label}
-                </span>
-              </Link>
-            )
-          })}
+        <nav className="flex-1 px-2 py-4 overflow-y-auto">
+          <NavGroup items={primaryNav} pathname={pathname} collapsed={collapsed} onClose={onClose} />
+          <p className={cn(
+            "px-3 pt-5 pb-1 text-[10px] tracking-[0.16em] uppercase opacity-40",
+            collapsed && "md:hidden"
+          )}>
+            Mais
+          </p>
+          <NavGroup items={moreNav} pathname={pathname} collapsed={collapsed} onClose={onClose} />
         </nav>
 
         {/* Rodapé confessional */}

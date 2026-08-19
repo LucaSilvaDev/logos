@@ -3,57 +3,43 @@ import { BookOpen } from "lucide-react"
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-[#12111e] flex flex-col items-center justify-center p-6 overflow-hidden relative">
+    <main className="auth-page">
+      <div className="auth-orb auth-orb-1" aria-hidden />
+      <div className="auth-orb auth-orb-2" aria-hidden />
 
-      {/* Atmospheric background glow */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="landing-glow" />
-      </div>
+      <div className="auth-inner">
+        <nav className="auth-nav animate-fade-up">
+          <div className="flex items-center gap-2">
+            <BookOpen className="w-4 h-4 text-[#c9a654]" strokeWidth={1.6} />
+            <span className="font-display text-[13px] tracking-[0.22em] uppercase text-[#1a1614]">
+              Selah
+            </span>
+          </div>
+          <span className="text-[11px] text-[#66635f]">Reformado · TULIP</span>
+        </nav>
 
-      <div className="relative z-10 flex flex-col items-center text-center max-w-xs">
+        <div className="flex flex-1 flex-col items-center justify-center py-16 text-center">
+          <p className="auth-kicker animate-fade-up delay-60">Pausa · Medita · Contempla</p>
+          <h1 className="auth-title max-w-lg animate-fade-up delay-60">
+            A palavra, com espaço para respirar.
+          </h1>
+          <p className="auth-lede animate-fade-up delay-140">
+            &ldquo;A tua palavra é lâmpada que ilumina os meus passos&rdquo;
+            <span className="block mt-2 text-[11px] tracking-[0.16em] uppercase text-[#c9a654]">
+              Salmos 119:105
+            </span>
+          </p>
 
-        {/* Icon */}
-        <div className="landing-icon-glow mb-8">
-          <BookOpen className="w-10 h-10 text-[#c9a654]" strokeWidth={1.5} />
+          <div className="mt-10 flex w-full max-w-xs flex-col gap-3 animate-fade-up delay-220">
+            <Link href="/entrar" className="btn-ink">
+              Entrar →
+            </Link>
+            <Link href="/cadastro" className="btn-pill-ghost">
+              Criar conta
+            </Link>
+          </div>
         </div>
-
-        {/* Title */}
-        <h1 className="font-display text-[#e2d9c5] text-2xl tracking-[0.35em] uppercase mb-2">
-          Selah
-        </h1>
-        <p className="text-[#55524a] text-[10px] tracking-[0.3em] uppercase font-sans mb-10">
-          Pausa · Medita · Contempla
-        </p>
-
-        {/* Verse */}
-        <p className="font-serif italic text-[#55524a] text-sm leading-relaxed mb-1">
-          &ldquo;A tua palavra é lâmpada<br />que ilumina os meus passos&rdquo;
-        </p>
-        <p className="text-[#c9a654] text-[9px] tracking-widest uppercase font-display opacity-50 mb-12">
-          Salmos 119:105
-        </p>
-
-        {/* Actions */}
-        <div className="flex flex-col gap-3 w-full">
-          <Link
-            href="/entrar"
-            className="btn-gold py-3 text-sm font-serif tracking-wide text-center rounded-lg"
-          >
-            Entrar
-          </Link>
-          <Link
-            href="/cadastro"
-            className="py-3 text-sm font-serif tracking-wide text-center text-[#55524a] border border-[#2e2b42] rounded-lg hover:border-[#3d3a55] hover:text-[#8a8375] transition-colors"
-          >
-            Criar conta
-          </Link>
-        </div>
-
-        {/* Confessional footer */}
-        <p className="text-[#3d3a55] text-[8px] uppercase tracking-widest font-sans mt-12">
-          Reformado · TULIP · Pós-Trib
-        </p>
       </div>
-    </div>
+    </main>
   )
 }

@@ -3,7 +3,8 @@
 import { useState, Suspense } from "react"
 import { useSearchParams, useRouter } from "next/navigation"
 import Link from "next/link"
-import { BookOpen, Loader2, Eye, EyeOff } from "lucide-react"
+import { Loader2, Eye, EyeOff } from "lucide-react"
+import { AuthShell } from "@/components/auth/AuthShell"
 
 function ResetForm() {
   const params = useSearchParams()
@@ -43,22 +44,30 @@ function ResetForm() {
   if (!token || !email) {
     return (
       <div className="text-center space-y-4">
-        <p className="text-[#c96b5a] text-sm">Link inválido ou expirado.</p>
-        <Link href="/esqueci-senha" className="text-[#c9a654] text-sm hover:opacity-80">Solicitar novo link</Link>
+        <p className="text-sm text-[#c96b5a]">Link inválido ou expirado.</p>
+        <Link href="/esqueci-senha" className="btn-ink">Solicitar novo link →</Link>
       </div>
     )
   }
 
-  return done ? (
-    <div className="text-center space-y-3">
-      <p className="text-[#c9c0a8] text-sm">Senha redefinida com sucesso! Redirecionando…</p>
-    </div>
-  ) : (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      {error && <p className="text-[#c96b5a] text-xs text-center">{error}</p>}
+  if (done) {
+    return (
+      <p className="text-center text-sm text-[#66635f]">
+        Senha redefinida. Redirecionando…
+      </p>
+    )
+  }
 
-      <div className="space-y-1">
-        <label className="text-[10px] text-[#3d3a55] uppercase tracking-wider font-display">Nova senha</label>
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      {error && (
+        <p className="text-sm text-[#c96b5a] bg-[#c96b5a]/8 border border-[#c96b5a]/20 rounded-2xl px-3 py-2">
+          {error}
+        </p>
+      )}
+
+      <div>
+        <label className="auth-label">Nova senha</label>
         <div className="relative">
           <input
             type={showPass ? "text" : "password"}
@@ -66,34 +75,30 @@ function ResetForm() {
             onChange={e => setPassword(e.target.value)}
             required
             placeholder="••••••••"
-            className="app-input w-full px-3 py-2.5 pr-10 text-sm"
+            className="auth-field pr-10"
           />
           <button type="button" onClick={() => setShowPass(!showPass)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#3d3a55] hover:text-[#55524a] transition-colors">
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#a8a7a1] hover:text-[#1a1614] transition-colors">
             {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>
         </div>
       </div>
 
-      <div className="space-y-1">
-        <label className="text-[10px] text-[#3d3a55] uppercase tracking-wider font-display">Confirmar senha</label>
+      <div>
+        <label className="auth-label">Confirmar senha</label>
         <input
           type="password"
           value={confirm}
           onChange={e => setConfirm(e.target.value)}
           required
           placeholder="••••••••"
-          className="app-input w-full px-3 py-2.5 text-sm"
+          className="auth-field"
         />
       </div>
 
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full py-2.5 btn-gold text-sm flex items-center justify-center gap-2 disabled:opacity-50 mt-2"
-      >
+      <button type="submit" disabled={loading} className="btn-ink">
         {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-        Redefinir senha
+        Redefinir senha →
       </button>
     </form>
   )
@@ -101,17 +106,13 @@ function ResetForm() {
 
 export default function RedefinirSenhaPage() {
   return (
-    <div className="min-h-screen bg-[#12111e] flex items-center justify-center p-4">
-      <div className="w-full max-w-sm">
-        <div className="text-center mb-10">
-          <BookOpen className="w-8 h-8 text-[#c9a654] opacity-60 mx-auto mb-4" />
-          <h1 className="font-display text-[#e2d9c5] text-lg tracking-widest uppercase">Selah</h1>
-          <p className="text-[#55524a] text-xs mt-1 tracking-wider">Nova senha</p>
-        </div>
-        <Suspense>
-          <ResetForm />
-        </Suspense>
-      </div>
-    </div>
+    <AuthShell
+      kicker="Senha"
+      title="Escolha uma senha nova."
+    >
+      <Suspense fallback={<p className="text-sm text-[#66635f] text-center">Carregando…</p>}>
+        <ResetForm />
+      </Suspense>
+    </AuthShell>
   )
 }

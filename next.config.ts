@@ -9,7 +9,7 @@ const cspReportOnly = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
-  "connect-src 'self' https://www.abibliadigital.com.br https://www.bibliaonline.com.br https://platform.youversion.com",
+  "connect-src 'self' https://www.bibliaonline.com.br https://platform.youversion.com",
   "frame-ancestors 'none'",
   "base-uri 'self'",
   "form-action 'self'",
