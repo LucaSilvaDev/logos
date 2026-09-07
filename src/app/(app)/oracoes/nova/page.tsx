@@ -42,34 +42,26 @@ export default function NovaOracaoPage() {
           <ArrowLeft className="w-4 h-4" /> Voltar
         </button>
         <button onClick={save} disabled={!title.trim() || saving}
-          className="flex items-center gap-1.5 text-sm text-[#c9a654] hover:opacity-80 transition-opacity font-serif disabled:opacity-30">
+          className="text-link disabled:opacity-30">
           <Save className="w-3.5 h-3.5" /> {saving ? "Salvando…" : "Salvar"}
         </button>
       </div>
 
-      <div>
-        <p className="font-display text-[9px] text-[#55524a] uppercase tracking-[0.25em] mb-1">Comunhão com Deus</p>
-        <h1 className="font-serif text-2xl text-[#e2d9c5] font-normal">Nova Oração</h1>
-      </div>
+      <h1 className="page-title">Nova oração</h1>
 
-      <div className="h-px bg-[#2e2b42]" />
+      <div className="hairline" />
 
       <input
         value={title}
         onChange={e => setTitle(e.target.value)}
         placeholder="Intenção de oração…"
-        className="w-full bg-transparent border-b border-[#2e2b42] pb-3 text-[#c9c0a8] font-serif text-base placeholder:text-[#3d3a55] outline-none focus:border-[#c9a654] transition-colors"
+        className="title-field text-[1.25rem]"
       />
 
       <div className="flex gap-2 flex-wrap">
         {CATEGORIES.map(c => (
           <button key={c.id} onClick={() => setCategory(c.id)}
-            className={cn(
-              "px-3 py-1 rounded-full text-xs font-serif transition-all",
-              category === c.id
-                ? "bg-[#c9a65420] text-[#c9a654] border border-[#c9a65440]"
-                : "text-[#3d3a55] hover:text-[#55524a] border border-[#2e2b42]"
-            )}>
+            className={cn("chip", category === c.id && "chip-on")}>
             {c.label}
           </button>
         ))}
@@ -83,12 +75,11 @@ export default function NovaOracaoPage() {
         className="w-full bg-transparent text-[#8a8375] font-serif text-sm leading-relaxed placeholder:text-[#2e2b42] outline-none resize-none"
       />
 
-      <div className="relative pl-4 py-1">
-        <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-[#c9a654] opacity-20" />
-        <p className="font-serif text-[#3d3a55] text-xs italic leading-relaxed">
+      <div className="quote-card quote-card-accent">
+        <p className="font-serif text-[15px] italic leading-relaxed">
           &ldquo;Não andeis ansiosos por coisa alguma; antes em tudo apresentai as vossas petições a Deus em oração e súplica, com ação de graças.&rdquo;
         </p>
-        <p className="text-[#c9a654] text-[10px] mt-1">Filipenses 4:6</p>
+        <p className="quote-cite mt-3">Filipenses 4:6</p>
       </div>
     </div>
   )

@@ -3,7 +3,6 @@ import { db } from "@/lib/db"
 import { redirect } from "next/navigation"
 import { BOOK_ID_NAMES } from "@/lib/reading-plan"
 import { MemorizarClient, type FlashCard } from "./MemorizarClient"
-import { Brain } from "lucide-react"
 
 export const metadata = { title: "Memorizar — Selah" }
 
@@ -55,12 +54,9 @@ export default async function MemorizarPage() {
   return (
     <div className="max-w-2xl mx-auto px-6 py-10">
       <div className="mb-8">
-        <div className="flex items-center gap-2 mb-1">
-          <Brain className="w-4 h-4 text-[#c9a654] opacity-60" />
-          <h1 className="font-display text-[#e2d9c5] text-base tracking-wide">Memorização</h1>
-        </div>
-        <p className="text-[#3d3a55] text-[11px] font-sans tracking-wide">
-          Versículos grifados com cache disponível — {cards.length} flashcard{cards.length !== 1 ? "s" : ""}
+        <h1 className="page-title">Memorizar</h1>
+        <p className="page-desc">
+          {cards.length} flashcard{cards.length !== 1 ? "s" : ""} a partir dos seus grifos
         </p>
       </div>
 

@@ -29,7 +29,7 @@ function TextWithHighlight({ text, query }: { text: string; query: string }) {
   return (
     <>
       <span>{text.slice(0, idx)}</span>
-      <mark className="bg-[#c9a65430] text-[#c9a654] rounded-sm not-italic">
+      <mark className="bg-[#f2f2f3] text-inherit rounded-sm not-italic">
         {text.slice(idx, idx + q.length)}
       </mark>
       <span>{text.slice(idx + q.length)}</span>
@@ -91,8 +91,7 @@ export default function BuscaBibliaPage() {
           <ChevronLeft className="w-4 h-4" />
         </Link>
         <div>
-          <p className="font-display text-[9px] text-[#c9a654] uppercase tracking-[0.25em]">Bíblia</p>
-          <h1 className="font-serif text-[#c9c0a8] text-lg">Busca de Versículos</h1>
+          <h1 className="page-title">Busca na Bíblia</h1>
         </div>
       </div>
 
@@ -105,7 +104,7 @@ export default function BuscaBibliaPage() {
             onChange={e => setQuery(e.target.value)}
             placeholder="Buscar por palavra ou expressão..."
             autoFocus
-            className="w-full pl-11 pr-4 py-3 text-sm bg-[#1a1928] border border-[#2e2b42] rounded-xl text-[#c9c0a8] placeholder:text-[#3d3a55] outline-none focus:border-[#c9a654] transition-colors duration-200 font-serif"
+            className="w-full pl-11 pr-4 py-3 text-sm bg-[#1a1928] border border-[#2e2b42] rounded-xl text-[#c9c0a8] placeholder:text-[#3d3a55] outline-none focus:border-[#17191c] transition-colors duration-200 font-serif"
           />
         </div>
 
@@ -117,10 +116,8 @@ export default function BuscaBibliaPage() {
                 type="button"
                 onClick={() => setVersion(v.id)}
                 className={cn(
-                  "px-3 py-1.5 text-[10px] font-medium tracking-wider rounded-full border transition-colors",
-                  version === v.id
-                    ? "bg-[#c9a65415] text-[#c9a654] border-[#c9a65440]"
-                    : "border-[#2e2b42] text-[#3d3a55] hover:text-[#55524a]"
+                  "chip",
+                  version === v.id ? "chip-on" : ""
                 )}
               >
                 {v.label}
@@ -179,22 +176,21 @@ export default function BuscaBibliaPage() {
       {/* Results */}
       {results.length > 0 && (
         <div className="space-y-2">
-          <p className="text-[10px] text-[#3d3a55] uppercase tracking-[0.2em]">
+          <p className="quote-cite">
             {total > results.length ? `${results.length} de ${total}` : results.length} resultado{results.length !== 1 ? "s" : ""}
           </p>
           <div className="divide-y divide-[#1a1928]">
             {results.map((r, i) => (
               <button key={i}
                 onClick={() => goToBible(r.bookId, r.chapter)}
-                className="candle-flame w-full group flex items-start gap-4 px-2 py-4 text-left hover:bg-[linear-gradient(90deg,rgba(201,166,84,0.05),transparent)] rounded-xl transition-all duration-300"
-                style={{ animationDelay: `${i * 60}ms` }}
+                className="mist-row w-full text-left"
               >
-                <BookOpen className="w-3.5 h-3.5 text-[#2e2b42] mt-0.5 flex-shrink-0 group-hover:text-[#c9a654] transition-colors" />
+                <BookOpen className="w-3.5 h-3.5 text-[#979799] mt-0.5 flex-shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-[10px] text-[#c9a654] font-medium tracking-wider uppercase mb-1.5 opacity-70 group-hover:opacity-100 transition-opacity">
+                  <p className="quote-cite mb-1">
                     {r.bookName} {r.chapter}:{r.verse}
                   </p>
-                  <p className="font-serif text-[#55524a] text-sm leading-relaxed group-hover:text-[#c9c0a8] transition-colors">
+                  <p className="font-serif text-[15px] leading-relaxed">
                     <TextWithHighlight text={r.text} query={query} />
                   </p>
                 </div>

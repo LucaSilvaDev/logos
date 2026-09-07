@@ -169,8 +169,8 @@ export function PerfilClient({ userName, userEmail, userImage }: Props) {
           <ChevronLeft className="w-4 h-4" />
         </Link>
         <div>
-          <p className="page-kicker">Configurações</p>
           <h1 className="page-title">Perfil</h1>
+          <p className="page-desc">Conta, teologia e lembretes</p>
         </div>
       </div>
 
@@ -189,11 +189,10 @@ export function PerfilClient({ userName, userEmail, userImage }: Props) {
         </div>
       </div>
 
-      <div className="h-px bg-[#2e2b42]" />
+      <div className="hairline" />
 
-      {/* Posição Teológica */}
       <section className="space-y-5">
-        <p className="font-display text-[9px] text-[#55524a] uppercase tracking-[0.25em]">Posição Teológica</p>
+        <h2 className="section-title">Posição teológica</h2>
 
         <div className="space-y-2">
           <label className="text-xs text-[#55524a]">Linha teológica</label>
@@ -201,10 +200,8 @@ export function PerfilClient({ userName, userEmail, userImage }: Props) {
             {THEOLOGICAL_LINES.map(v => (
               <button key={v} type="button" onClick={() => setTheologicalLine(v)}
                 className={cn(
-                  "px-3 py-1.5 text-[11px] rounded-xl border transition-colors",
-                  theologicalLine === v
-                    ? "bg-[#c9a65415] text-[#c9a654] border-[#c9a65440]"
-                    : "border-[#2e2b42] text-[#3d3a55] hover:text-[#55524a]"
+                  "chip",
+                  theologicalLine === v ? "chip-on" : ""
                 )}>
                 {v}
               </button>
@@ -218,10 +215,8 @@ export function PerfilClient({ userName, userEmail, userImage }: Props) {
             {CALVIN_POINTS.map(v => (
               <button key={v} type="button" onClick={() => setCalvinPoints(v)}
                 className={cn(
-                  "px-3 py-1.5 text-[11px] rounded-xl border transition-colors",
-                  calvinPoints === v
-                    ? "bg-[#c9a65415] text-[#c9a654] border-[#c9a65440]"
-                    : "border-[#2e2b42] text-[#3d3a55] hover:text-[#55524a]"
+                  "chip",
+                  calvinPoints === v ? "chip-on" : ""
                 )}>
                 {v}
               </button>
@@ -235,10 +230,8 @@ export function PerfilClient({ userName, userEmail, userImage }: Props) {
             {ESCHATOLOGY.map(v => (
               <button key={v} type="button" onClick={() => setEschatologyPosition(v)}
                 className={cn(
-                  "px-3 py-2 text-[11px] rounded-xl border text-left transition-colors",
-                  eschatologyPosition === v
-                    ? "bg-[#c9a65415] text-[#c9a654] border-[#c9a65440]"
-                    : "border-[#2e2b42] text-[#3d3a55] hover:text-[#55524a]"
+                  "chip w-full justify-start rounded-2xl",
+                  eschatologyPosition === v ? "chip-on" : ""
                 )}>
                 {v}
               </button>
@@ -247,19 +240,16 @@ export function PerfilClient({ userName, userEmail, userImage }: Props) {
         </div>
       </section>
 
-      <div className="h-px bg-[#2e2b42]" />
+      <div className="hairline" />
 
-      {/* Versões preferidas */}
       <section className="space-y-3">
-        <p className="font-display text-[9px] text-[#55524a] uppercase tracking-[0.25em]">Versões Preferidas</p>
+        <h2 className="section-title">Versões preferidas</h2>
         <div className="flex gap-2">
           {VERSIONS.map(v => (
             <button key={v.id} type="button" onClick={() => toggleVersion(v.id)}
               className={cn(
-                "px-4 py-2 text-[11px] rounded-xl border transition-colors",
-                preferredVersions.includes(v.id)
-                  ? "bg-[#c9a65415] text-[#c9a654] border-[#c9a65440]"
-                  : "border-[#2e2b42] text-[#3d3a55] hover:text-[#55524a]"
+                "chip",
+                preferredVersions.includes(v.id) ? "chip-on" : ""
               )}>
               {v.label}
             </button>
@@ -267,11 +257,10 @@ export function PerfilClient({ userName, userEmail, userImage }: Props) {
         </div>
       </section>
 
-      <div className="h-px bg-[#2e2b42]" />
+      <div className="hairline" />
 
-      {/* Notificações */}
       <section className="space-y-4">
-        <p className="font-display text-[9px] text-[#55524a] uppercase tracking-[0.25em]">Lembrete Diário</p>
+        <h2 className="section-title">Lembrete diário</h2>
 
         <div className="card-soft px-5 py-4 flex items-center justify-between gap-4">
           <div>
@@ -288,10 +277,8 @@ export function PerfilClient({ userName, userEmail, userImage }: Props) {
             onClick={handleNotification}
             disabled={permission === "denied"}
             className={cn(
-              "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs border transition-colors disabled:opacity-30",
-              subscribed
-                ? "border-[#c9a65440] text-[#c9a654] bg-[#c9a65415]"
-                : "border-[#2e2b42] text-[#55524a] hover:text-[#c9c0a8]"
+              "chip",
+              subscribed ? "chip-on" : ""
             )}
           >
             {subscribed ? <Bell className="w-3.5 h-3.5" /> : <BellOff className="w-3.5 h-3.5" />}

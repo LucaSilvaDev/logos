@@ -33,10 +33,12 @@ export function useBiblePage() {
 
   const [verses,    setVerses]    = useState<Verse[]>([])
   const [loading,   setLoading]   = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
   const [apiError,  setApiError]  = useState<ApiError>(null)
   const [apiDetail, setApiDetail] = useState("")
   const [direction, setDirection] = useState<"next" | "prev">("next")
   const [animKey,   setAnimKey]   = useState(0)
+  const hasVersesRef = useRef(false)
   const [showBookModal,    setShowBookModal]    = useState(false)
   const [showChapterModal, setShowChapterModal] = useState(false)
   const [focusMode, setFocusMode] = useState(false)
@@ -49,11 +51,13 @@ export function useBiblePage() {
   const [compareLoading,  setCompareLoading]  = useState(false)
 
   const [scrollProgress, setScrollProgress] = useState(0)
+  const [barHidden, setBarHidden] = useState(false)
   const [readChapters,   setReadChapters]   = useState<Set<string>>(new Set())
   const [readSaving,     setReadSaving]     = useState(false)
 
   const touchStartX = useRef(0)
   const touchStartY = useRef(0)
+  const lastScrollTop = useRef(0)
 
   // ── Side effects ────────────────────────────────────────────────────────────
 
@@ -69,6 +73,11 @@ export function useBiblePage() {
     function onScroll() {
       const { scrollTop, scrollHeight, clientHeight } = el!
       setScrollProgress(scrollHeight <= clientHeight ? 0 : scrollTop / (scrollHeight - clientHeight))
+      const delta = scrollTop - lastScrollTop.current
+      lastScrollTop.current = scrollTop
+      if (scrollTop < 40) setBarHidden(false)
+      else if (delta > 4) setBarHidden(true)
+      else if (delta < -4) setBarHidden(false)
     }
     el.addEventListener("scroll", onScroll, { passive: true })
     return () => el.removeEventListener("scroll", onScroll)
@@ -203,7 +212,9 @@ export function useBiblePage() {
   }
 
   const fetchVerses = useCallback(async () => {
-    setLoading(true); setApiError(null); setVerses([])
+    setApiError(null)
+    if (!hasVersesRef.current) setLoading(true)
+    else setRefreshing(true)
     try {
       const res  = await fetch(`/api/biblia?book=${book.id}&chapter=${chapter}&version=${version}`)
       const data = await res.json()
@@ -212,8 +223,13 @@ export function useBiblePage() {
       if (data.error === "NOT_LICENSED")  { setApiError("NOT_LICENSED");  return }
       if (!res.ok || data.error)          { setApiDetail(data.detail ?? data.error ?? `HTTP ${res.status}`); setApiError("ERROR"); return }
       setVerses((data.verses ?? []).map((v: Verse) => ({ number: v.number, text: v.text, endNumber: v.endNumber, heading: v.heading })))
+      hasVersesRef.current = true
+      setAnimKey(k => k + 1)
     } catch { setApiError("ERROR") }
-    finally  { setLoading(false) }
+    finally  {
+      setLoading(false)
+      setRefreshing(false)
+    }
   }, [book, chapter, version])
 
   useEffect(() => { fetchVerses() }, [fetchVerses])
@@ -224,19 +240,20 @@ export function useBiblePage() {
     if (next < 1) {
       if (bookIdx <= 0) return
       const prev = BOOKS[bookIdx - 1]
-      setBook(prev); setChapter(prev.chapters); setDirection("prev"); setAnimKey(k => k + 1)
+      setBook(prev); setChapter(prev.chapters); setDirection("prev")
       return
     }
     if (next > book.chapters) {
       if (bookIdx >= BOOKS.length - 1) return
-      setBook(BOOKS[bookIdx + 1]); setChapter(1); setDirection("next"); setAnimKey(k => k + 1)
+      setBook(BOOKS[bookIdx + 1]); setChapter(1); setDirection("next")
       return
     }
-    setDirection(delta > 0 ? "next" : "prev"); setAnimKey(k => k + 1); setChapter(next)
+    setDirection(delta > 0 ? "next" : "prev")
+    setChapter(next)
   }
 
   function changeBook(b: typeof BOOKS[0]) {
-    setBook(b); setChapter(1); setDirection("next"); setAnimKey(k => k + 1)
+    setBook(b); setChapter(1); setDirection("next")
   }
 
   function openNote(verseNumber: number) {
@@ -435,11 +452,11 @@ export function useBiblePage() {
     highlighted, bookmarked, verseNotes,
     noteVerse, noteText, noteSaving,
     chapterNoteOpen, chapterNoteText, chapterNoteSaving,
-    verses, loading, apiError, apiDetail, direction, animKey,
+    verses, loading, refreshing, apiError, apiDetail, direction, animKey,
     showBookModal, showChapterModal, focusMode,
     selectedVerses, copied,
     compareOpen, compareVerseNum, compareData, compareLoading,
-    scrollProgress, readChapters, readSaving,
+    scrollProgress, barHidden, readChapters, readSaving,
     touchStartX, touchStartY,
     // setters
     setBook, setChapter, setVersion, setFontSize,

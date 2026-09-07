@@ -1,6 +1,6 @@
 ﻿import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
-import { CheckCircle2, BookOpen, X } from "lucide-react"
+import { CheckCircle2 } from "lucide-react"
 import { format } from "date-fns"
 import { ptBR } from "date-fns/locale"
 import { getPassage, PLAN_CONFIG } from "@/lib/reading-plan"
@@ -39,13 +39,12 @@ export default async function PlanoPage() {
     return (
       <div className="max-w-xl mx-auto px-2 py-8 space-y-8">
 
-        <div className="space-y-1">
-          <p className="page-kicker">Disciplina espiritual</p>
+        <div>
           <h1 className="page-title">Plano de Leitura</h1>
           <p className="page-desc">Escolha um plano para começar</p>
         </div>
 
-        <div className="candle-enter candle-delay-2 h-px bg-[#2e2b42] opacity-40" />
+        <div className="hairline" />
 
         <div className="stagger-in space-y-2">
           {PLANS.map((plan) => (
@@ -88,7 +87,6 @@ export default async function PlanoPage() {
 
       <div className="flex items-end justify-between">
         <div>
-          <p className="page-kicker mb-1">Disciplina espiritual</p>
           <h1 className="page-title">Plano de Leitura</h1>
           <p className="page-desc">
             {planLabel} · Dia {dayOfPlan} de {planDays}
@@ -100,52 +98,44 @@ export default async function PlanoPage() {
         </div>
       </div>
 
-      <div className="candle-enter candle-delay-1 h-px bg-[#2e2b42] opacity-40" />
+      <div className="hairline" />
 
-      {/* Progresso */}
-      <div className="candle-enter candle-delay-2 space-y-2">
-        <div className="flex justify-between text-[10px] text-[#3d3a55]">
-          <span className="font-display uppercase tracking-wider">Progresso</span>
-          <span>{progressCount} / {planDays} dias</span>
+      <div className="space-y-3">
+        <div className="flex justify-between text-[14px] text-[#777b86]">
+          <span>Progresso</span>
+          <span className="tabular-nums">{progressCount} / {planDays} dias</span>
         </div>
-        <div className="h-px w-full bg-[#2e2b42] relative">
-          <div className="absolute left-0 top-0 h-full bg-[#c9a654] transition-all duration-700"
-            style={{ width: `${completedPct}%` }} />
+        <div className="track">
+          <span style={{ width: `${completedPct}%` }} />
         </div>
       </div>
 
-      {/* Leitura de hoje */}
-      <div className="candle-flame candle-delay-3 card-soft relative pl-8 pr-5 py-5">
-        <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#c9a654] to-transparent opacity-60" />
-        <div className="flex items-center gap-2 mb-2">
-          <BookOpen className="w-3.5 h-3.5 text-[#c9a654] opacity-60" />
-          <p className="font-display text-[9px] text-[#55524a] uppercase tracking-[0.2em]">
-            Hoje · {format(today, "d 'de' MMMM", { locale: ptBR })}
-          </p>
-        </div>
-        <p className="font-serif text-[#c9c0a8] text-xl mb-4">{todayPassage}</p>
+      <div className="quote-card">
+        <p className="quote-cite mb-3">
+          Hoje · {format(today, "d 'de' MMMM", { locale: ptBR })}
+        </p>
+        <p className="font-serif text-[22px] leading-snug mb-5">{todayPassage}</p>
         <form action="/api/plano/concluir" method="POST">
-          <button type="submit"
-            className="flex items-center gap-1.5 text-sm text-[#5a9e72] hover:opacity-80 transition-opacity font-serif">
+          <button type="submit" className="pill-action pill-action-fill">
             <CheckCircle2 className="w-4 h-4" /> Marcar como lido
           </button>
         </form>
       </div>
 
-      {/* Leituras recentes */}
       {recentProgress.length > 0 && (
-        <div className="candle-enter candle-delay-4 space-y-3">
-          <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em]">Recentes</p>
+        <div className="space-y-3">
+          <h2 className="section-title">Recentes</h2>
           <div className="space-y-2">
-            {recentProgress.map((p: { id: string; completedAt: Date; readingDay: { passages: string; day: number } }, i: number) => (
+            {recentProgress.map((p: { id: string; completedAt: Date; readingDay: { passages: string; day: number } }) => (
               <div
                 key={p.id}
-                className="candle-flame card-soft flex items-center gap-3 px-4 py-2.5"
-                style={{ animationDelay: `${680 + i * 80}ms` }}
+                className="mist-row"
               >
-                <CheckCircle2 className="w-3 h-3 text-[#5a9e72] opacity-60 flex-shrink-0" />
-                <span className="font-serif text-[#8a8375] text-sm flex-1">{p.readingDay.passages}</span>
-                <span className="text-[#3d3a55] text-xs">{format(new Date(p.completedAt), "d MMM", { locale: ptBR })}</span>
+                <div className="flex items-center gap-3 w-full">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#777b86] flex-shrink-0" />
+                  <span className="font-serif text-[15px] flex-1">{p.readingDay.passages}</span>
+                  <span className="quote-cite">{format(new Date(p.completedAt), "d MMM", { locale: ptBR })}</span>
+                </div>
               </div>
             ))}
           </div>

@@ -2,13 +2,11 @@ import Link from "next/link"
 import { cn } from "@/lib/utils"
 
 export function PageHeader({
-  kicker,
   title,
   description,
   action,
   className,
 }: {
-  kicker?: string
   title: string
   description?: string
   action?: React.ReactNode
@@ -17,7 +15,6 @@ export function PageHeader({
   return (
     <div className={cn("flex items-end justify-between gap-4 animate-fade-up", className)}>
       <div className="min-w-0">
-        {kicker && <p className="page-kicker">{kicker}</p>}
         <h1 className="page-title">{title}</h1>
         {description && <p className="page-desc">{description}</p>}
       </div>

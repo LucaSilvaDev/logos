@@ -38,7 +38,7 @@ export default async function EstudoLivroPage({ params }: { params: Promise<{ id
         <div className="flex items-center gap-4">
           <QuickNotePanel bookName={bookName} />
           <Link href={`/estudo/nova?book=${encodeURIComponent(bookName)}`}
-            className="flex items-center gap-1.5 text-sm text-[#55524a] hover:text-[#c9a654] transition-colors font-serif">
+            className="text-link">
             <Plus className="w-4 h-4" /> Nota completa
           </Link>
         </div>

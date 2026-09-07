@@ -1,12 +1,10 @@
 import Link from "next/link"
 
 export function AuthShell({
-  kicker,
   title,
   lede,
   children,
 }: {
-  kicker?: string
   title: string
   lede?: string
   children: React.ReactNode
@@ -26,7 +24,6 @@ export function AuthShell({
         <div className="flex flex-1 items-center justify-center py-12">
           <div className="w-full max-w-md">
             <div className="auth-hero animate-fade-up delay-60">
-              {kicker && <p className="auth-kicker">{kicker}</p>}
               <h1 className="auth-title">{title}</h1>
               {lede && <p className="auth-lede">{lede}</p>}
             </div>

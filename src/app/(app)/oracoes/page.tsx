@@ -78,74 +78,62 @@ export default async function OracoesPage() {
     <div className="max-w-2xl mx-auto px-2 py-8 space-y-8">
 
       <PageHeader
-        kicker="Comunhão com Deus"
         title="Orações"
         description={`${personal.length} ativa${personal.length !== 1 ? "s" : ""} · ${answeredTotal} respondida${answeredTotal !== 1 ? "s" : ""}`}
         action={<PageActionLink href="/oracoes/nova">Nova oração →</PageActionLink>}
       />
 
-      <div className="candle-enter candle-delay-2 h-px bg-[#2e2b42] opacity-40" />
-
-      {/* Oração da hora */}
-      <section className="candle-flame candle-delay-3 space-y-2">
-        <div className="flex items-center gap-2">
-          <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em]">Oração da Hora</p>
-          <span className="text-[9px] text-[#3d3a55] font-sans">· muda a cada hora</span>
-        </div>
-        <div className="flame-hover card-soft relative pl-6 pr-5 py-5">
-          <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#c9a654] to-transparent opacity-50 rounded-l-full" />
-          <blockquote className="font-serif text-[#8a8375] text-sm leading-relaxed italic mb-3">
+      <section className="space-y-3">
+        <h2 className="section-title">Oração da hora</h2>
+        <div className="quote-card quote-card-accent">
+          <blockquote className="font-serif text-[17px] leading-relaxed italic mb-4">
             &ldquo;{prayerOfHour.text}&rdquo;
           </blockquote>
-          <p className="text-[#c9a654] text-xs font-medium">{prayerOfHour.author}</p>
-          <p className="text-[#3d3a55] text-[10px] mt-0.5">{prayerOfHour.source}</p>
+          <p className="text-[15px]">{prayerOfHour.author}</p>
+          <p className="quote-cite mt-1">{prayerOfHour.source}</p>
         </div>
       </section>
 
-      {/* Minhas orações — privadas */}
-      <section className="candle-enter candle-delay-4 space-y-3">
-        <div className="flex items-center gap-2">
-          <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em]">Minhas Orações</p>
-          <span className="flex items-center gap-1 text-[9px] text-[#3d3a55]">
-            <Lock className="w-2.5 h-2.5" /> privadas
+      <section className="space-y-3">
+        <div className="flex items-baseline justify-between gap-2">
+          <h2 className="section-title">Minhas orações</h2>
+          <span className="quote-cite inline-flex items-center gap-1">
+            <Lock className="w-3 h-3" /> privadas
           </span>
         </div>
         {personal.length === 0 ? (
           <div className="text-center py-8">
-            <Heart className="w-5 h-5 text-[#2e2b42] mx-auto mb-3" />
-            <p className="font-serif text-[#55524a]">Nenhuma oração registrada</p>
-            <p className="text-[#3d3a55] text-xs mt-1 mb-4 italic font-serif">Apresentai os vossos pedidos a Deus</p>
-            <Link href="/oracoes/nova"
-              className="inline-flex items-center gap-1.5 text-sm text-[#c9a654] hover:opacity-80 transition-opacity font-serif">
+            <Heart className="w-5 h-5 text-[#979799] mx-auto mb-3" />
+            <p className="font-serif text-[18px]">Nenhuma oração registrada</p>
+            <p className="page-desc italic mb-4">Apresentai os vossos pedidos a Deus</p>
+            <Link href="/oracoes/nova" className="pill-action">
               <Plus className="w-3.5 h-3.5" /> Adicionar oração
             </Link>
           </div>
         ) : (
           <div className="space-y-2">
-            {personal.map((p: { id: string; title: string; content: string; category: string; createdAt: Date }, i: number) => (
-              <div key={p.id} className="candle-flame" style={{ animationDelay: `${760 + i * 70}ms` }}>
-                <PrayerCard prayer={p} />
-              </div>
+            {personal.map((p: { id: string; title: string; content: string; category: string; createdAt: Date }) => (
+              <PrayerCard key={p.id} prayer={p} />
             ))}
           </div>
         )}
       </section>
 
-      {/* Respondidas */}
       {answered.length > 0 && (
-        <section className="candle-enter space-y-3" style={{ animationDelay: `${760 + personal.length * 70}ms` }}>
-          <div className="flex items-center justify-between">
-            <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em]">Respondidas</p>
-            <span className="text-[10px] text-[#3d3a55]">{answeredTotal} total</span>
+        <section className="space-y-3">
+          <div className="flex items-baseline justify-between">
+            <h2 className="section-title">Respondidas</h2>
+            <span className="quote-cite">{answeredTotal} total</span>
           </div>
           <div className="space-y-2">
-            {answered.map((p: { id: string; title: string; answeredAt: Date | null }, i: number) => (
-              <div key={p.id} className="candle-flame card-soft flex items-center gap-3 px-4 py-3"
-                style={{ animationDelay: `${820 + personal.length * 70 + i * 60}ms` }}>
-                <CheckCircle2 className="w-3.5 h-3.5 text-[#5a9e72] opacity-60 flex-shrink-0" />
-                <span className="font-serif text-[#8a8375] text-sm flex-1">{p.title}</span>
+            {answered.map((p: { id: string; title: string; answeredAt: Date | null }) => (
+              <div key={p.id} className="mist-row">
+                <div className="flex items-center gap-3 min-w-0">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#777b86] flex-shrink-0" />
+                  <span className="font-serif text-[15px] truncate">{p.title}</span>
+                </div>
                 {p.answeredAt && (
-                  <span className="text-[#3d3a55] text-xs">
+                  <span className="quote-cite shrink-0">
                     {format(new Date(p.answeredAt), "d MMM", { locale: ptBR })}
                   </span>
                 )}
@@ -153,48 +141,38 @@ export default async function OracoesPage() {
             ))}
           </div>
           {answeredTotal > 30 && (
-            <p className="text-[10px] text-[#3d3a55] text-center font-serif italic pt-1">
+            <p className="quote-cite text-center italic pt-1">
               Mostrando as 30 mais recentes de {answeredTotal}
             </p>
           )}
         </section>
       )}
 
-      {/* Orações Bíblicas Apostólicas */}
       <section className="space-y-4">
-        <div className="h-px bg-[#2e2b42] opacity-40" />
-        <div className="flex items-center gap-2">
-          <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em]">Orações Bíblicas</p>
-          <span className="text-[9px] text-[#3d3a55]">· dos apóstolos e profetas</span>
-        </div>
-        <div className="space-y-4">
+        <h2 className="section-title">Orações bíblicas</h2>
+        <div className="space-y-3">
           {APOSTOLIC_PRAYERS.map((q, i) => (
-            <div key={i} className="candle-flame flame-hover card-soft relative pl-6 pr-5 py-4"
-              style={{ animationDelay: `${200 + i * 90}ms` }}>
-              <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#c9a654] to-transparent opacity-40 rounded-l-full" />
-              <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.2em] mb-2">{q.ref}</p>
-              <blockquote className="font-serif text-[#8a8375] text-sm leading-relaxed italic mb-2">
+            <div key={i} className="quote-card">
+              <blockquote className="font-serif text-[16px] leading-relaxed italic mb-3">
                 &ldquo;{q.text}&rdquo;
               </blockquote>
-              <p className="text-[#c9a654] text-xs font-medium">{q.author}</p>
+              <p className="text-[14px]">{q.author}</p>
+              <p className="quote-cite mt-1">{q.ref}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Nuvem de Testemunhas */}
       <section className="space-y-4">
-        <div className="h-px bg-[#2e2b42] opacity-40" />
-        <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em]">Nuvem de Testemunhas</p>
+        <h2 className="section-title">Nuvem de testemunhas</h2>
         <div className="space-y-6">
           {REFORMED_PRAYERS.map((q, i) => (
-            <div key={i} className="candle-enter relative pl-6" style={{ animationDelay: `${150 + i * 60}ms` }}>
-              <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-[#c9a654] opacity-20" />
-              <blockquote className="font-serif text-[#8a8375] text-sm leading-relaxed italic mb-2">
+            <div key={i}>
+              <blockquote className="font-serif text-[16px] leading-relaxed italic mb-2">
                 &ldquo;{q.text}&rdquo;
               </blockquote>
-              <p className="text-[#c9a654] text-xs font-medium">{q.author}</p>
-              {q.source && <p className="text-[#3d3a55] text-[10px] mt-0.5">{q.source}</p>}
+              <p className="text-[14px]">{q.author}</p>
+              {q.source && <p className="quote-cite mt-0.5">{q.source}</p>}
             </div>
           ))}
         </div>

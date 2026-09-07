@@ -2,7 +2,7 @@
 
 import { X, Search } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { BOOK_CATEGORIES, AT_GROUPS, NT_GROUPS, getBookCategory } from "@/lib/bible-categories"
+import { BOOK_CATEGORIES, AT_GROUPS, NT_GROUPS } from "@/lib/bible-categories"
 import { BOOK_MAP } from "@/lib/bible-reader"
 import type { BiblePageState } from "@/hooks/useBiblePage"
 
@@ -32,8 +32,7 @@ export function ChapterModal({
         }}>
         <div className="flex items-center justify-between px-6 py-4">
           <div>
-            <p className="font-display text-[9px] text-[#c9a654] uppercase tracking-[0.25em] opacity-70">Capítulo</p>
-            <p className="font-serif text-[#c9c0a8] text-sm mt-0.5">{book.name}</p>
+            <p className="font-serif text-[18px]">{book.name}</p>
           </div>
           <button onClick={() => setShowChapterModal(false)} className="text-[#3d3a55] hover:text-[#8a8375] transition-colors">
             <X className="w-4 h-4" />
@@ -48,12 +47,12 @@ export function ChapterModal({
                   onClick={() => { setDirection(n > chapter ? "next" : "prev"); setAnimKey(k => k + 1); setChapter(n); setShowChapterModal(false) }}
                   className={cn(
                     "relative py-2 text-xs font-serif rounded-xl transition-all duration-200",
-                    n === chapter ? "bg-[#c9a65420] text-[#c9a654]"
-                      : isChRead ? "text-[#c9a654]/60 hover:text-[#c9a654] hover:bg-[#c9a65410]"
-                      : "text-[#55524a] hover:text-[#c9c0a8] hover:bg-[#ffffff08]"
+                    n === chapter ? "bg-white/10 text-white"
+                      : isChRead ? "text-white/50 hover:text-white hover:bg-white/6"
+                      : "text-white/35 hover:text-white/80 hover:bg-white/6"
                   )}>
                   {n}
-                  {isChRead && n !== chapter && <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#c9a654]/50" />}
+                  {isChRead && n !== chapter && <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-white/40" />}
                 </button>
               )
             })}
@@ -94,10 +93,8 @@ export function BookModal({
             {(["AT", "NT"] as const).map(t => (
               <button key={t} onClick={() => setTab(t)}
                 className={cn(
-                  "font-sans text-[10px] uppercase tracking-[0.2em] transition-all duration-200 px-3 py-1.5 rounded-full border",
-                  tab === t
-                    ? "bg-[#c9a65420] text-[#c9a654] border-[#c9a65440]"
-                    : "text-[#3d3a55] border-[#ffffff08] hover:text-[#55524a]"
+                  "chip text-[12px]",
+                  tab === t ? "chip-on" : "text-white/45"
                 )}>
                 {t === "AT" ? "Antigo Testamento" : "Novo Testamento"}
               </button>
@@ -116,7 +113,7 @@ export function BookModal({
               placeholder="Buscar livro..." autoFocus
               className="w-full pl-9 pr-4 py-2 text-sm rounded-xl text-[#8a8375] placeholder:text-[#3d3a55] outline-none font-serif transition-colors duration-200"
               style={{ background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.07)" }}
-              onFocus={e => (e.target.style.borderColor = "rgba(201,166,84,0.4)")}
+              onFocus={e => (e.target.style.borderColor = "rgba(255,255,255,0.4)")}
               onBlur={e => (e.target.style.borderColor = "rgba(255,255,255,0.07)")}
             />
           </div>
@@ -125,20 +122,17 @@ export function BookModal({
         <div className="overflow-y-auto p-4 pt-2">
           {filter.trim() ? (
             <div className="grid grid-cols-3 sm:grid-cols-4 gap-1">
-              {filteredBooks.map(b => {
-                const cat = getBookCategory(b.id)
-                return (
+              {filteredBooks.map(b => (
                   <button key={b.id}
                     onClick={() => { changeBook(b); setShowBookModal(false); setFilter("") }}
                     className={cn(
-                      "px-3 py-2.5 text-left text-sm font-serif rounded-xl transition-all duration-200 border-l-2",
-                      book.id === b.id ? "text-[#c9a654] bg-[#c9a65418]" : "text-[#55524a] hover:text-[#c9c0a8] hover:bg-[#ffffff06]"
+                      "px-3 py-2.5 text-left text-sm font-serif rounded-xl transition-all duration-200",
+                      book.id === b.id ? "text-white bg-white/10" : "text-white/40 hover:text-white/80 hover:bg-white/6"
                     )}
-                    style={{ borderLeftColor: cat ? BOOK_CATEGORIES[cat.category].color : "transparent" }}>
+                  >
                     {b.name}
                   </button>
-                )
-              })}
+              ))}
             </div>
           ) : (
             <div className="space-y-5">
@@ -147,20 +141,16 @@ export function BookModal({
                 const cat = BOOK_CATEGORIES[group.category]
                 return (
                   <div key={group.category}>
-                    <div className="flex items-center gap-2 px-1 mb-2">
-                      <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: cat.color }} />
-                      <span className="font-display text-[8px] uppercase tracking-[0.28em]" style={{ color: cat.color, opacity: 0.85 }}>{cat.label}</span>
-                      <div className="flex-1 h-px" style={{ background: cat.color, opacity: 0.12 }} />
-                    </div>
+                    <p className="quote-cite px-1 mb-2">{cat.label}</p>
                     <div className="grid grid-cols-3 sm:grid-cols-4 gap-1">
                       {groupBooks.map(b => (
                         <button key={b.id}
                           onClick={() => { changeBook(b); setShowBookModal(false); setFilter("") }}
                           className={cn(
-                            "px-3 py-2.5 text-left text-sm font-serif rounded-xl transition-all duration-200 border-l-2",
-                            book.id === b.id ? "text-[#c9c0a8] bg-[#ffffff08]" : "text-[#55524a] hover:text-[#c9c0a8] hover:bg-[#ffffff06]"
+                            "px-3 py-2.5 text-left text-sm font-serif rounded-xl transition-all duration-200",
+                            book.id === b.id ? "text-white bg-white/10" : "text-white/40 hover:text-white/80 hover:bg-white/6"
                           )}
-                          style={{ borderLeftColor: book.id === b.id ? cat.color : "transparent" }}>
+                        >
                           {b.name}
                         </button>
                       ))}

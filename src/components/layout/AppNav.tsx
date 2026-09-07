@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useLayoutEffect, useRef } from "react"
 import { usePathname } from "next/navigation"
 import { ChevronDown, Moon, Sun, User } from "lucide-react"
 import Link from "next/link"
@@ -47,10 +47,35 @@ export function AppNav({
   const title = currentTitle(pathname)
   const panelRef = useRef<HTMLDivElement>(null)
   const moreBtnRef = useRef<HTMLButtonElement>(null)
+  const clusterRef = useRef<HTMLElement>(null)
+  const pillRef = useRef<HTMLSpanElement>(null)
+  const activeRef = useRef<HTMLElement | null>(null)
+
+  function movePill(el: HTMLElement | null, instant = false) {
+    const cluster = clusterRef.current
+    const pill = pillRef.current
+    if (!cluster || !pill) return
+    if (!el) {
+      pill.style.opacity = "0"
+      return
+    }
+    const c = cluster.getBoundingClientRect()
+    const r = el.getBoundingClientRect()
+    pill.style.transition = instant
+      ? "none"
+      : "transform 200ms cubic-bezier(0.16, 1, 0.3, 1), width 200ms cubic-bezier(0.16, 1, 0.3, 1), opacity 140ms ease"
+    pill.style.width = `${r.width}px`
+    pill.style.transform = `translateX(${r.left - c.left}px)`
+    pill.style.opacity = "1"
+  }
 
   useEffect(() => {
     onCloseMore()
   }, [pathname]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useLayoutEffect(() => {
+    movePill(moreOpen ? moreBtnRef.current : activeRef.current, true)
+  }, [pathname, moreOpen])
 
   useEffect(() => {
     if (!moreOpen) return
@@ -73,20 +98,27 @@ export function AppNav({
   return (
     <>
       <header className="app-float-nav">
-        <Link href="/dashboard" className="flex items-center gap-2 shrink-0 px-1 text-[16px]" onClick={onCloseMore}>
+        <Link href="/dashboard" className="app-wordmark shrink-0" onClick={onCloseMore}>
           Selah
         </Link>
 
         <span className="md:hidden text-[13px] opacity-45 truncate">{title}</span>
 
-        <nav className="hidden md:flex items-center gap-0.5 flex-1 min-w-0 ml-2">
+        <nav
+          ref={clusterRef}
+          className="app-nav-cluster"
+          onMouseLeave={() => movePill(activeRef.current)}
+        >
+          <span ref={pillRef} className="app-nav-pill" aria-hidden />
           {primaryNav.map(({ href, label }) => {
             const active = isNavActive(pathname, href)
             return (
               <Link
                 key={href}
                 href={href}
+                ref={active ? (node) => { activeRef.current = node } : undefined}
                 onClick={onCloseMore}
+                onMouseEnter={e => movePill(e.currentTarget)}
                 className={cn("app-nav-link", active && "app-nav-link-active")}
               >
                 {label}
@@ -97,6 +129,7 @@ export function AppNav({
             ref={moreBtnRef}
             type="button"
             onClick={onToggleMore}
+            onMouseEnter={e => movePill(e.currentTarget)}
             aria-expanded={moreOpen}
             aria-haspopup="menu"
             className={cn("app-nav-link inline-flex items-center gap-1", moreOpen && "app-nav-link-active")}
@@ -117,7 +150,7 @@ export function AppNav({
             {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
 
-          <Link href="/perfil" title="Perfil" className="flex items-center gap-2 pl-1 pr-1.5 py-1 rounded-lg hover:bg-white/5 transition-colors" onClick={onCloseMore}>
+          <Link href="/perfil" title="Perfil" className="app-nav-icon flex items-center gap-2 !px-1.5" onClick={onCloseMore}>
             {userImage ? (
               <img src={userImage} alt="" className="w-6 h-6 rounded-full" />
             ) : (

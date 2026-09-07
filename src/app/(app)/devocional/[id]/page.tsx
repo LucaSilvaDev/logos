@@ -43,7 +43,7 @@ export default async function DevocionalDetailPage({ params }: { params: Promise
             {format(new Date(devotional.createdAt), "EEEE, d 'de' MMMM 'de' yyyy", { locale: ptBR })}
           </span>
           {devotional.bibleRef && (
-            <span className="flex items-center gap-1 text-xs text-[#c9a654] font-serif italic">
+            <span className="flex items-center gap-1 text-xs font-serif italic">
               <BookOpen className="w-3 h-3" />
               {devotional.bibleRef}
             </span>

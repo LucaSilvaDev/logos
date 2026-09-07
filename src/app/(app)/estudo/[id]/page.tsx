@@ -42,12 +42,10 @@ export default async function StudyNoteDetailPage({ params }: { params: Promise<
       </div>
 
       <div>
-        <span className="text-[10px] text-[#55524a] font-display uppercase tracking-wider">
-          {NOTE_TYPE_LABELS[note.type] ?? note.type}
-        </span>
-        <h1 className="font-serif text-2xl text-[#e2d9c5] font-normal mt-1">{note.title}</h1>
+        <h1 className="page-title">{note.title}</h1>
+        <p className="page-desc">{NOTE_TYPE_LABELS[note.type] ?? note.type}</p>
         <div className="flex items-center gap-3 mt-2">
-          <span className="flex items-center gap-1 text-xs text-[#c9a654] font-serif italic">
+          <span className="flex items-center gap-1 text-xs font-serif italic">
             <BookOpen className="w-3 h-3" />
             {note.book}{note.chapter ? ` ${note.chapter}` : ""}{note.verse ? `:${note.verse}` : ""}
           </span>

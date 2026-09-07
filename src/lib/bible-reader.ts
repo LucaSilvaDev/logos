@@ -66,16 +66,16 @@ export function generateVerseImage(verseText: string, verseRef: string): string 
   bg.addColorStop(0, "#16152a"); bg.addColorStop(1, "#0d0c1c")
   ctx.fillStyle = bg; ctx.fillRect(0, 0, S, S)
   const glow = ctx.createRadialGradient(S/2, S/2, 0, S/2, S/2, S*0.6)
-  glow.addColorStop(0, "rgba(201,166,84,0.07)"); glow.addColorStop(1, "transparent")
+  glow.addColorStop(0, "rgba(23,25,28,0.06)"); glow.addColorStop(1, "transparent")
   ctx.fillStyle = glow; ctx.fillRect(0, 0, S, S)
   const lineGrad = ctx.createLinearGradient(80, 0, S-80, 0)
   lineGrad.addColorStop(0, "transparent")
-  lineGrad.addColorStop(0.3, "rgba(201,166,84,0.5)")
-  lineGrad.addColorStop(0.7, "rgba(201,166,84,0.5)")
+  lineGrad.addColorStop(0.3, "rgba(23,25,28,0.35)")
+  lineGrad.addColorStop(0.7, "rgba(23,25,28,0.35)")
   lineGrad.addColorStop(1, "transparent")
   ctx.fillStyle = lineGrad
   ctx.fillRect(80, 240, S-160, 1); ctx.fillRect(80, S-240, S-160, 1)
-  ctx.fillStyle = "rgba(201,166,84,0.35)"
+  ctx.fillStyle = "rgba(23,25,28,0.45)"
   ctx.font = "500 22px 'Georgia', serif"
   ctx.textAlign = "center"
   ctx.fillText("SELAH", S/2, 185)
@@ -83,7 +83,7 @@ export function generateVerseImage(verseText: string, verseRef: string): string 
   ctx.font = `italic 44px 'Georgia', serif`
   ctx.textAlign = "center"
   const endY = wrapText(ctx, `"${verseText}"`, S/2, 340, S-200, 68)
-  ctx.fillStyle = "#c9a654"
+  ctx.fillStyle = "#17191c"
   ctx.font = "500 30px 'Georgia', serif"
   ctx.fillText(verseRef, S/2, Math.max(endY + 80, 740))
   return canvas.toDataURL("image/png")

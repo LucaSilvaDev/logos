@@ -35,7 +35,7 @@ export function QuickNotePanel({ bookName }: { bookName: string }) {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center gap-1.5 text-sm text-[#c9a654] hover:opacity-80 transition-opacity font-serif"
+        className="text-link"
       >
         <PenLine className="w-3.5 h-3.5" /> Nota rápida
       </button>
@@ -45,9 +45,7 @@ export function QuickNotePanel({ bookName }: { bookName: string }) {
   return (
     <div className="candle-flame card-soft px-4 py-4 space-y-3">
       <div className="flex items-center justify-between">
-        <p className="text-[#8a8375] text-[11px] font-display uppercase tracking-wider">
-          Nova nota · {bookName}
-        </p>
+        <p className="text-[14px]">Nova nota · {bookName}</p>
         <button onClick={() => setOpen(false)} className="text-[#3d3a55] hover:text-[#55524a] transition-colors">
           <X className="w-3.5 h-3.5" />
         </button>
@@ -58,7 +56,7 @@ export function QuickNotePanel({ bookName }: { bookName: string }) {
         type="number"
         min={1}
         placeholder="Capítulo (opcional)"
-        className="w-full px-3 py-1.5 text-xs bg-[#12111e] rounded-lg text-[#c9c0a8] placeholder:text-[#3d3a55] border border-[#2e2b42] font-serif outline-none focus:border-[#c9a654] transition-colors"
+        className="w-full px-3 py-1.5 text-xs bg-[#12111e] rounded-lg text-[#c9c0a8] placeholder:text-[#3d3a55] border border-[#2e2b42] font-serif outline-none focus:border-[#17191c] transition-colors"
       />
       <textarea
         value={content}
@@ -66,7 +64,7 @@ export function QuickNotePanel({ bookName }: { bookName: string }) {
         placeholder="Pontos importantes, observações, insights exegéticos..."
         autoFocus
         rows={4}
-        className="w-full px-3 py-2 text-sm bg-[#12111e] rounded-lg text-[#c9c0a8] placeholder:text-[#3d3a55] border border-[#2e2b42] font-serif outline-none focus:border-[#c9a654] transition-colors resize-none leading-relaxed"
+        className="w-full px-3 py-2 text-sm bg-[#12111e] rounded-lg text-[#c9c0a8] placeholder:text-[#3d3a55] border border-[#2e2b42] font-serif outline-none focus:border-[#17191c] transition-colors resize-none leading-relaxed"
       />
       <div className="flex justify-end gap-3">
         <button
@@ -78,7 +76,7 @@ export function QuickNotePanel({ bookName }: { bookName: string }) {
         <button
           onClick={save}
           disabled={saving || !content.trim()}
-          className="flex items-center gap-1.5 text-xs text-[#c9a654] hover:opacity-80 font-serif disabled:opacity-40 transition-opacity"
+          className="text-link disabled:opacity-40"
         >
           {saving && <Loader2 className="w-3 h-3 animate-spin" />}
           Salvar nota

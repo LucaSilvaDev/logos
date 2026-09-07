@@ -62,7 +62,6 @@ export default async function EscatologiaPage() {
 
       <div className="flex items-end justify-between">
         <div>
-          <p className="page-kicker mb-1">Profecia bíblica</p>
           <h1 className="page-title">Escatologia</h1>
           <p className="page-desc">Relógio profético · {totalProphetic} capítulos</p>
         </div>
@@ -72,80 +71,63 @@ export default async function EscatologiaPage() {
         </div>
       </div>
 
-      <div className="candle-enter candle-delay-2 h-px bg-[#2e2b42]" />
+      <div className="hairline" />
 
-      {/* Barra de progresso */}
-      <div className="candle-enter candle-delay-3 space-y-2">
-        <div className="flex justify-between text-[10px] text-[#3d3a55]">
-          <span className="font-display uppercase tracking-wider">Capítulos estudados</span>
-          <span>{studied} / {totalProphetic}</span>
+      <div className="space-y-3">
+        <div className="flex justify-between text-[14px] text-[#777b86]">
+          <span>Capítulos estudados</span>
+          <span className="tabular-nums">{studied} / {totalProphetic}</span>
         </div>
-        <div className="h-px w-full bg-[#2e2b42] relative">
-          <div className="absolute left-0 top-0 h-full bg-[#c9a654] transition-all duration-700"
-            style={{ width: `${pct}%` }} />
+        <div className="track">
+          <span style={{ width: `${pct}%` }} />
         </div>
       </div>
 
-      {/* Posição teológica */}
       <section className="space-y-3">
-        <p className="candle-enter font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em]"
-          style={{ animationDelay: "400ms" }}>Posição Escatológica</p>
+        <h2 className="section-title">Posição escatológica</h2>
         <div className="space-y-2">
-          {POSITION_NOTES.map((p, i) => (
-            <div key={p.label} className="candle-flame card-soft px-4 py-3"
-              style={{ animationDelay: `${450 + i * 80}ms` }}>
-              <p className="font-serif text-[#c9c0a8] text-sm mb-0.5">{p.label}</p>
-              <p className="text-[#55524a] text-xs leading-relaxed">{p.desc}</p>
+          {POSITION_NOTES.map((p) => (
+            <div key={p.label} className="quote-card">
+              <p className="font-serif text-[16px] mb-0.5">{p.label}</p>
+              <p className="quote-cite leading-relaxed">{p.desc}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Timeline escatológica */}
       <section className="space-y-3">
-        <p className="candle-enter font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em]"
-          style={{ animationDelay: "700ms" }}>Timeline Profética</p>
+        <h2 className="section-title">Timeline profética</h2>
         <div className="relative">
-          <div className="absolute left-[68px] top-0 bottom-0 w-px bg-[#2e2b42]" />
+          <div className="absolute left-[68px] top-0 bottom-0 w-px bg-[#ececec]" />
           {TIMELINE_EVENTS.map((e, i) => (
-            <div key={i} className="candle-flame flex gap-4 mb-5"
-              style={{ animationDelay: `${750 + i * 70}ms` }}>
+            <div key={i} className="flex gap-4 mb-5">
               <div className="w-16 text-right pt-0.5 flex-shrink-0">
-                <span className={cn("text-[9px] font-display uppercase tracking-wider",
-                  e.phase === "Eterno" ? "text-[#c9a654] opacity-60" :
-                  e.phase === "Presente" ? "text-[#5a9e72] opacity-60" :
-                  "text-[#55524a]"
-                )}>
-                  {e.phase}
-                </span>
+                <span className="quote-cite">{e.phase}</span>
               </div>
-              <div className="w-2 h-2 rounded-full border border-[#3d3a55] bg-[#12111e] flex-shrink-0 mt-1.5 relative z-10" />
+              <div className="w-2 h-2 rounded-full border border-[#ececec] bg-white flex-shrink-0 mt-1.5 relative z-10" />
               <div className="flex-1">
-                <p className="font-serif text-[#c9c0a8] text-sm mb-0.5">{e.title}</p>
-                <p className="text-[#55524a] text-xs leading-relaxed">{e.desc}</p>
+                <p className="font-serif text-[16px] mb-0.5">{e.title}</p>
+                <p className="quote-cite leading-relaxed">{e.desc}</p>
               </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Capítulos proféticos */}
       <section className="space-y-4">
-        <p className="candle-enter font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em]"
-          style={{ animationDelay: "1200ms" }}>Capítulos Proféticos</p>
+        <h2 className="section-title">Capítulos proféticos</h2>
         <div className="space-y-5">
-          {PROPHETIC_BOOKS.map((pb, bIdx) => {
+          {PROPHETIC_BOOKS.map((pb) => {
             const studiedChapters = pb.propheticChapters.filter(c => studiedSet.has(`${pb.book}-${c}`))
             const allDone = studiedChapters.length === pb.propheticChapters.length
             return (
-              <div key={pb.book} className="candle-enter"
-                style={{ animationDelay: `${1260 + bIdx * 50}ms` }}>
+              <div key={pb.book}>
                 <div className="flex items-baseline justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <BookOpen className="w-3 h-3 text-[#3d3a55]" />
-                    <h3 className="font-serif text-[#8a8375] text-sm">{pb.book}</h3>
+                    <BookOpen className="w-3.5 h-3.5 text-[#979799]" />
+                    <h3 className="font-serif text-[16px]">{pb.book}</h3>
                   </div>
-                  <span className={cn("text-[10px]", allDone ? "text-[#c9a654]" : "text-[#3d3a55]")}>
+                  <span className={cn("quote-cite tabular-nums", allDone && "text-inherit")}>
                     {studiedChapters.length}/{pb.propheticChapters.length}
                   </span>
                 </div>
@@ -156,10 +138,8 @@ export default async function EscatologiaPage() {
                     return (
                       <Link key={ch} href={`/escatologia/${encodeURIComponent(pb.book)}/${ch}`}
                         className={cn(
-                          "w-7 h-7 text-[11px] font-medium flex items-center justify-center transition-all rounded-lg",
-                          done
-                            ? "bg-[#c9a65418] text-[#c9a654] border border-[#c9a65430]"
-                            : "text-[#3d3a55] hover:text-[#55524a] border border-[#2e2b42] hover:border-[#3d3a55]"
+                          "w-8 h-8 text-[13px] font-medium flex items-center justify-center rounded-lg transition-colors",
+                          done ? "chip-on" : "chip"
                         )}>
                         {ch}
                       </Link>

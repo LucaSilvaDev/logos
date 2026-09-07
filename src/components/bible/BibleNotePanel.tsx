@@ -32,8 +32,8 @@ export function BibleVerseNotePanel({
       <div className="max-w-2xl mx-auto px-4 py-3">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            <MessageSquare className="w-3.5 h-3.5 text-[#c9a654] opacity-70" />
-            <span className="text-[#c9a654] text-[11px] font-serif">{bookName} {chapter}:{noteVerse}</span>
+            <MessageSquare className="w-3.5 h-3.5 opacity-70" />
+            <span className="text-[13px] font-serif">{bookName} {chapter}:{noteVerse}</span>
           </div>
           <button onClick={() => setNoteVerse(null)} className="text-[#3d3a55] hover:text-[#55524a] transition-colors p-1">
             <X className="w-4 h-4" />
@@ -56,7 +56,7 @@ export function BibleVerseNotePanel({
             Cancelar
           </button>
           <button onClick={saveNote} disabled={noteSaving}
-            className="bg-[#c9a65420] text-[#c9a654] border border-[#c9a65440] text-[11px] font-sans px-3 py-1.5 rounded-lg hover:bg-[#c9a65430] transition-all disabled:opacity-50">
+            className="chip chip-on text-[12px]">
             {noteSaving ? "Salvando…" : "Salvar"}
           </button>
         </div>
@@ -85,8 +85,8 @@ export function BibleChapterNotePanel({
       <div className="max-w-2xl mx-auto px-4 py-3">
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center gap-2">
-            <PenLine className="w-3.5 h-3.5 text-[#c9a654] opacity-70" />
-            <span className="text-[#c9a654] text-[11px] font-serif">{bookName} {chapter} — Notas do capítulo</span>
+            <PenLine className="w-3.5 h-3.5 opacity-70" />
+            <span className="text-[13px] font-serif">{bookName} {chapter} — Notas do capítulo</span>
           </div>
           <button onClick={() => setChapterNoteOpen(false)} className="text-[#3d3a55] hover:text-[#55524a] transition-colors p-1">
             <X className="w-4 h-4" />
@@ -109,7 +109,7 @@ export function BibleChapterNotePanel({
             Cancelar
           </button>
           <button onClick={saveChapterNote} disabled={chapterNoteSaving}
-            className="bg-[#c9a65420] text-[#c9a654] border border-[#c9a65440] text-[11px] font-sans px-3 py-1.5 rounded-lg hover:bg-[#c9a65430] transition-all disabled:opacity-50">
+            className="chip chip-on text-[12px]">
             {chapterNoteSaving ? "Salvando…" : "Salvar"}
           </button>
         </div>

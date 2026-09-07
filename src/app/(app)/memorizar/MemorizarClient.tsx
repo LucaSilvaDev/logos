@@ -134,7 +134,7 @@ export function MemorizarClient({ initialCards }: { initialCards: FlashCard[] })
         <p className="font-serif text-[#55524a] text-sm text-center max-w-xs leading-relaxed">
           Nenhum versículo grifado encontrado. Leia capítulos na Bíblia e grife versículos para criar flashcards.
         </p>
-        <Link href="/biblia" className="text-[#c9a654] text-xs font-sans hover:opacity-80 transition-opacity">
+        <Link href="/biblia" className="text-link">
           Ir para a Bíblia →
         </Link>
       </div>
@@ -144,7 +144,7 @@ export function MemorizarClient({ initialCards }: { initialCards: FlashCard[] })
   if (queue.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-[60vh] gap-4 px-6 text-center">
-        <p className="font-serif text-[#c9a654] text-xl">Parabéns!</p>
+        <p className="font-serif text-[22px]">Parabéns!</p>
         <p className="text-[#8a8375] text-sm font-serif">
           {knownCount} versículo{knownCount !== 1 ? "s" : ""} revisado{knownCount !== 1 ? "s" : ""}
         </p>
@@ -152,7 +152,7 @@ export function MemorizarClient({ initialCards }: { initialCards: FlashCard[] })
           <button
             onClick={loadRandom}
             disabled={loadingRandom}
-            className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-[13px] font-serif text-[#c9a654] bg-[#c9a65415] border border-[#c9a65430] hover:bg-[#c9a65425] transition-all disabled:opacity-50"
+            className="pill-action pill-action-fill justify-center disabled:opacity-50"
           >
             {loadingRandom
               ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -162,7 +162,7 @@ export function MemorizarClient({ initialCards }: { initialCards: FlashCard[] })
           </button>
           <button
             onClick={loadCatechism}
-            className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-[13px] font-serif text-[#c9a654] bg-[#c9a65415] border border-[#c9a65430] hover:bg-[#c9a65425] transition-all"
+            className="pill-action justify-center"
           >
             <ScrollText className="w-3.5 h-3.5" />
             Catecismo de Westminster
@@ -198,8 +198,8 @@ export function MemorizarClient({ initialCards }: { initialCards: FlashCard[] })
       {/* Progress */}
       <div className="flex items-center gap-3 mb-8 text-[#3d3a55] text-[11px] font-sans">
         <span className="text-[#55524a]">{index + 1} / {queue.length}</span>
-        {randomMode && <span className="text-[#c9a654] opacity-60">· aleatórios</span>}
-        {catechismMode && <span className="text-[#c9a654] opacity-60">· catecismo</span>}
+        {randomMode && <span className="text-[#777b86]">· aleatórios</span>}
+        {catechismMode && <span className="text-[#777b86]">· catecismo</span>}
         {knownCount > 0 && (
           <span className="text-[#5a9e72]">· {knownCount} memorizados</span>
         )}
@@ -236,11 +236,11 @@ export function MemorizarClient({ initialCards }: { initialCards: FlashCard[] })
             }}
           >
             {current.type === "catechism" ? (
-              <p className="font-serif text-[#c9a654] text-sm text-center mb-4 leading-relaxed overflow-y-auto max-h-48">{current.ref}</p>
+              <p className="font-serif text-[15px] text-center mb-4 leading-relaxed overflow-y-auto max-h-48">{current.ref}</p>
             ) : (
-              <p className="font-serif text-[#c9a654] text-2xl text-center mb-4 leading-snug">{current.ref}</p>
+              <p className="font-serif text-[26px] text-center mb-4 leading-snug">{current.ref}</p>
             )}
-            <p className="text-[#3d3a55] text-[10px] font-sans uppercase tracking-widest">Toque para revelar</p>
+            <p className="text-[10px] text-[#777b86] mt-4">Toque para revelar</p>
           </div>
 
           {/* Back — text */}
@@ -256,7 +256,7 @@ export function MemorizarClient({ initialCards }: { initialCards: FlashCard[] })
             <p className="font-serif text-[#c9c0a8] text-sm text-center leading-[1.9] italic overflow-y-auto max-h-48">
               &ldquo;{current.text}&rdquo;
             </p>
-            <p className="text-[#c9a654] text-[10px] font-serif mt-4 opacity-60">— {current.ref}</p>
+            <p className="quote-cite mt-4">— {current.ref}</p>
           </div>
         </div>
       </div>
@@ -291,8 +291,8 @@ export function MemorizarClient({ initialCards }: { initialCards: FlashCard[] })
               className={cn(
                 "rounded-full transition-all duration-300",
                 i === index
-                  ? "w-3 h-1.5 bg-[#c9a654]"
-                  : "w-1.5 h-1.5 bg-[#2e2b42]"
+                  ? "w-3 h-1.5 bg-[#17191c]"
+                  : "w-1.5 h-1.5 bg-[#ececec]"
               )}
             />
           ))}

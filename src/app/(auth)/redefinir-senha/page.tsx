@@ -107,7 +107,6 @@ function ResetForm() {
 export default function RedefinirSenhaPage() {
   return (
     <AuthShell
-      kicker="Senha"
       title="Escolha uma senha nova."
     >
       <Suspense fallback={<p className="text-sm text-[#66635f] text-center">Carregando…</p>}>

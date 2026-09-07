@@ -31,7 +31,6 @@ export default function EsqueciSenhaPage() {
 
   return (
     <AuthShell
-      kicker="Senha"
       title="Enviamos o caminho de volta."
       lede="Digite o email da conta. Se existir, o link chega em seguida."
     >

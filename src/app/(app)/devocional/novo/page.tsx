@@ -59,7 +59,7 @@ export default function NovoDevocionaPage() {
         value={title}
         onChange={e => setTitle(e.target.value)}
         placeholder="Título do devocional..."
-        className="w-full bg-transparent font-serif text-[#e2d9c5] text-2xl placeholder:text-[#3d3a55] outline-none border-b border-[#2e2b42] pb-3 focus:border-[#c9a654] transition-colors"
+        className="w-full bg-transparent font-serif text-[#e2d9c5] text-2xl placeholder:text-[#3d3a55] outline-none border-b border-[#2e2b42] pb-3 focus:border-[#17191c] transition-colors"
       />
 
       <div className="flex flex-wrap gap-3">

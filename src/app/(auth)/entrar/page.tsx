@@ -34,7 +34,6 @@ export default function LoginPage() {
 
   return (
     <AuthShell
-      kicker="Conta"
       title="Entre para continuar a leitura."
       lede="Seu plano, seus grifos e o último capítulo ficam aqui."
     >

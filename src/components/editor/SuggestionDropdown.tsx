@@ -182,10 +182,10 @@ export function SuggestionDropdown({ suggestion, onAccept, onDismiss }: Props) {
       {/* Header */}
       <div className="flex items-center gap-2 px-3 py-2 border-b border-[#2e2b42]/60">
         {suggestion.type === "verse"
-          ? <BookOpen className="w-3 h-3 text-[#c9a654] opacity-60" />
+          ? <BookOpen className="w-3 h-3 opacity-60" />
           : <FileText  className="w-3 h-3 text-[#7a9e7e] opacity-60" />
         }
-        <span className="text-[9px] font-display uppercase tracking-[0.2em] text-[#3d3a55]">
+        <span className="text-[12px] text-white/45">
           {label}
         </span>
       </div>
@@ -205,12 +205,12 @@ export function SuggestionDropdown({ suggestion, onAccept, onDismiss }: Props) {
             data-idx={i}
             className={cn(
               "w-full flex items-center gap-3 px-3 py-2 text-left transition-colors",
-              i === activeIdx ? "bg-[#c9a654]/10" : "hover:bg-[#1a1928]"
+              i === activeIdx ? "bg-white/8" : "hover:bg-white/4"
             )}
             onMouseEnter={() => setActiveIdx(i)}
             onClick={() => onAccept(`@${book.abbr} `)}
           >
-            <span className="w-9 text-[11px] font-display text-[#c9a654] opacity-80 shrink-0">{book.abbr}</span>
+            <span className="w-9 text-[11px] opacity-70 shrink-0">{book.abbr}</span>
             <span className="text-[12px] font-serif text-[#c9c0a8] truncate">{book.name}</span>
             <span className="ml-auto text-[9px] text-[#3d3a55] shrink-0">{book.group}</span>
           </button>

@@ -49,12 +49,6 @@ const CATEGORY_LABELS: Record<string, string> = {
   reformation: "Reforma", revival: "Avivamento", missions: "Missões", event: "Evento",
 }
 
-const CATEGORY_GOLD: Record<string, boolean> = {
-  reformation: true,
-  council: true,
-  canon: true,
-}
-
 export default function HistoriaPage() {
   const centuries = [...new Set(TIMELINE.map(e => e.century))].sort((a, b) => a - b)
   let globalIdx = 0
@@ -63,27 +57,21 @@ export default function HistoriaPage() {
     <div className="max-w-2xl mx-auto px-2 py-8 space-y-6">
 
       <div>
-        <p className="page-kicker mb-1">Fides et Historia</p>
         <h1 className="page-title">História da Igreja</h1>
-        <p className="page-desc">33 d.C. → Hoje · {TIMELINE.length} eventos</p>
+        <p className="page-desc">33 d.C. → hoje · {TIMELINE.length} eventos</p>
       </div>
 
-      <div className="candle-enter candle-delay-2 h-px bg-[#2e2b42]" />
+      <div className="hairline" />
 
-      {/* Legenda */}
-      <div className="candle-enter candle-delay-3 flex flex-wrap gap-x-4 gap-y-1">
+      <div className="flex flex-wrap gap-x-4 gap-y-1">
         {Object.entries(CATEGORY_LABELS).map(([id, label]) => (
-          <span key={id} className={cn("text-[10px]",
-            CATEGORY_GOLD[id] ? "text-[#c9a654] opacity-70" : "text-[#3d3a55]"
-          )}>
-            {label}
-          </span>
+          <span key={id} className="quote-cite">{label}</span>
         ))}
       </div>
 
       {/* Timeline */}
       <div className="relative">
-        <div className="absolute left-[72px] top-0 bottom-0 w-px bg-[#2e2b42]" />
+        <div className="absolute left-[72px] top-0 bottom-0 w-px bg-[#ececec]" />
 
         {centuries.map(century => {
           const events = TIMELINE.filter(e => e.century === century)
@@ -92,10 +80,10 @@ export default function HistoriaPage() {
             <div key={century} className="mb-10">
               <div className="candle-enter flex items-center gap-4 mb-4"
                 style={{ animationDelay: `${centuryDelay}ms` }}>
-                <span className="w-16 text-right font-display text-[9px] text-[#3d3a55] uppercase tracking-widest">
+                <span className="w-16 text-right quote-cite">
                   Séc. {century < 10 ? `0${century}` : century}
                 </span>
-                <div className="w-2 h-2 rounded-full bg-[#2e2b42] border border-[#3d3a55] relative z-10" />
+                <div className="w-2 h-2 rounded-full bg-[#ececec] relative z-10" />
               </div>
 
               <div className="space-y-6">
@@ -103,35 +91,28 @@ export default function HistoriaPage() {
                   const eventDelay = 320 + globalIdx * 35
                   globalIdx++
                   const isKey = event.importance >= 5
-                  const isGold = CATEGORY_GOLD[event.category]
                   return (
                     <div key={i} className="candle-flame flex gap-4"
                       style={{ animationDelay: `${eventDelay}ms` }}>
                       <div className="w-16 text-right pt-1 flex-shrink-0">
-                        <span className="text-[#3d3a55] text-xs font-mono">{event.year}</span>
+                        <span className="quote-cite tabular-nums">{event.year}</span>
                       </div>
                       <div className="relative z-10 flex-shrink-0 mt-1.5">
-                        <div className={cn("w-2.5 h-2.5 rounded-full border",
-                          isKey && isGold ? "border-[#c9a654] bg-[#c9a65420]" :
-                          isKey          ? "border-[#8a8375] bg-[#55524a30]" :
-                                           "border-[#2e2b42] bg-[#12111e]"
+                        <div className={cn("w-2.5 h-2.5 rounded-full",
+                          isKey ? "bg-[#17191c]" : "bg-[#ececec]"
                         )} />
                       </div>
                       <div className="flex-1 pb-2">
-                        <div className="card-soft px-4 py-3">
+                        <div className="quote-card">
                           <div className="flex items-baseline gap-2 mb-1">
-                            <h3 className={cn("font-serif text-sm leading-snug",
-                              isKey ? "text-[#c9c0a8]" : "text-[#8a8375]"
-                            )}>
+                            <h3 className="font-serif text-[16px] leading-snug">
                               {event.title}
                             </h3>
-                            <span className={cn("text-[9px] flex-shrink-0",
-                              isGold ? "text-[#c9a654] opacity-60" : "text-[#3d3a55]"
-                            )}>
+                            <span className="quote-cite shrink-0">
                               {CATEGORY_LABELS[event.category]}
                             </span>
                           </div>
-                          <p className="text-[#55524a] text-xs leading-relaxed">{event.desc}</p>
+                          <p className="quote-cite leading-relaxed">{event.desc}</p>
                           {event.figures && event.figures.length > 0 && (
                             <div className="flex flex-wrap gap-x-2 mt-1.5">
                               {event.figures.map(f => (

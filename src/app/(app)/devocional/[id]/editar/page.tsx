@@ -90,7 +90,7 @@ export default function EditarDevocionalPage() {
         <>
           <input value={title} onChange={e => setTitle(e.target.value)}
             placeholder="Título..."
-            className="w-full bg-transparent font-serif text-[#e2d9c5] text-2xl placeholder:text-[#3d3a55] outline-none border-b border-[#2e2b42] pb-3 focus:border-[#c9a654] transition-colors" />
+            className="w-full bg-transparent font-serif text-[#e2d9c5] text-2xl placeholder:text-[#3d3a55] outline-none border-b border-[#2e2b42] pb-3 focus:border-[#17191c] transition-colors" />
 
           <div className="flex flex-wrap gap-3">
             <div className="flex items-center gap-2 flex-1 min-w-[160px]">

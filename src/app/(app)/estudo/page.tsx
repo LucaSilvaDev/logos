@@ -109,85 +109,57 @@ export default async function EstudoPage() {
 
   // Grupos únicos para a legenda (cartas unificadas em uma entrada)
   const LEGEND = [
-    { color: "#c9a654", label: "Lei — Pentateuco",   desc: "Os 5 livros de Moisés: criação, aliança e a lei dada a Israel no Sinai." },
-    { color: "#6b8fa8", label: "História",            desc: "Do Josué ao Ester e Atos — a narrativa histórica do povo de Deus na terra." },
-    { color: "#a87b9c", label: "Poesia e Sabedoria",  desc: "Jó a Cânticos — adoração, sofrimento, sabedoria prática e amor contemplativo." },
-    { color: "#4a7a5a", label: "Grandes Profetas",    desc: "Isaías a Daniel — profecias extensas sobre julgamento e esperança messiânica." },
-    { color: "#7aaa82", label: "Profetas Menores",    desc: "Oséias a Malaquias — doze vozes proféticas, curtas, mas não menos importantes." },
-    { color: "#7a6aaa", label: "Evangelhos",          desc: "Mateus a João — a vida, morte e ressurreição de Jesus Cristo em quatro perspectivas." },
-    { color: "#c4783a", label: "Cartas",              desc: "Romanos a Judas — ensinos doutrinários e práticos enviados às igrejas e líderes." },
-    { color: "#c9a654", label: "Profecia",            desc: "Apocalipse — visões do fim dos tempos, juízo final e a vitória definitiva de Cristo." },
+    { label: "Lei — Pentateuco",   desc: "Os 5 livros de Moisés: criação, aliança e a lei dada a Israel no Sinai." },
+    { label: "História",            desc: "Do Josué ao Ester e Atos — a narrativa histórica do povo de Deus na terra." },
+    { label: "Poesia e Sabedoria",  desc: "Jó a Cânticos — adoração, sofrimento, sabedoria prática e amor contemplativo." },
+    { label: "Grandes Profetas",    desc: "Isaías a Daniel — profecias extensas sobre julgamento e esperança messiânica." },
+    { label: "Profetas Menores",    desc: "Oséias a Malaquias — doze vozes proféticas, curtas, mas não menos importantes." },
+    { label: "Evangelhos",          desc: "Mateus a João — a vida, morte e ressurreição de Jesus Cristo em quatro perspectivas." },
+    { label: "Cartas",              desc: "Romanos a Judas — ensinos doutrinários e práticos enviados às igrejas e líderes." },
+    { label: "Profecia",            desc: "Apocalipse — visões do fim dos tempos, juízo final e a vitória definitiva de Cristo." },
   ]
 
   return (
     <div className="max-w-3xl mx-auto px-2 py-8 space-y-8 animate-page-in">
 
       <PageHeader
-        kicker="Aprofundamento"
         title="Estudo"
         description={`${notes.length} nota${notes.length !== 1 ? "s" : ""}`}
         action={<PageActionLink href="/estudo/nova">Nova nota →</PageActionLink>}
       />
 
-      <div className="h-px bg-[#2e2b42]" />
+      <div className="hairline" />
 
-      {/* Legenda de cores */}
-      <section className="card-soft px-5 py-4 space-y-3">
-        <p className="font-display text-[9px] text-[#55524a] uppercase tracking-[0.25em]">Guia de Cores — Gêneros Literários</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
-          {LEGEND.map((item, i) => (
-            <div key={i} className="flex items-start gap-3">
-              <div className="w-[3px] self-stretch rounded-full flex-shrink-0 mt-0.5"
-                style={{ background: item.color }} />
-              <div>
-                <p className="font-display text-[9px] uppercase tracking-[0.2em] mb-0.5"
-                  style={{ color: item.color }}>
-                  {item.label}
-                </p>
-                <p className="text-[#55524a] text-[10px] leading-relaxed">{item.desc}</p>
-              </div>
+      <section className="quote-card space-y-4">
+        <h2 className="section-title">Gêneros literários</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
+          {LEGEND.map((item) => (
+            <div key={item.label}>
+              <p className="text-[15px] mb-0.5">{item.label}</p>
+              <p className="quote-cite leading-relaxed">{item.desc}</p>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Antigo Testamento — agrupado por gênero */}
       <section className="space-y-6">
-        <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.28em]">Antigo Testamento</p>
+        <h2 className="section-title">Antigo Testamento</h2>
         {AT_GROUPS.map(group => {
           const cat = BOOK_CATEGORIES[group.category]
           return (
             <div key={group.category} className="space-y-2">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: cat.color }} />
-                <span className="font-display text-[8px] uppercase tracking-[0.28em]"
-                  style={{ color: cat.color }}>
-                  {cat.label}
-                </span>
-                <div className="flex-1 h-px" style={{ background: cat.color, opacity: 0.15 }} />
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+              <p className="quote-cite">{cat.label}</p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {group.ids.map(id => {
                   const b = BOOK_META[id]
                   if (!b) return null
                   return (
-                    <Link key={id} href={`/estudo/livro/${id}`}
-                      className="group card-soft px-3 py-3 flex flex-col gap-1.5 transition-all"
-                      style={{ borderLeft: `3px solid ${cat.color}` }}>
-                      <div className="flex items-center justify-between">
-                        <span className="font-display text-[7px] uppercase tracking-[0.18em]"
-                          style={{ color: cat.color }}>
-                          {cat.label}
-                        </span>
-                        {notesPerBook[id] ? (
-                          <span className="text-[9px] text-[#55524a] px-1.5 py-0.5 rounded-full"
-                            style={{ background: cat.color + "22" }}>
-                            {notesPerBook[id]}
-                          </span>
-                        ) : null}
-                      </div>
-                      <p className="font-serif text-[#8a8375] text-sm group-hover:text-[#c9c0a8] transition-colors leading-tight">{b.name}</p>
-                      <p className="text-[#3d3a55] text-[10px] leading-tight">{b.desc}</p>
+                    <Link key={id} href={`/estudo/livro/${id}`} className="mist-row flex-col items-start !gap-1">
+                      {notesPerBook[id] ? (
+                        <span className="chip chip-on text-[11px] py-0">{notesPerBook[id]}</span>
+                      ) : null}
+                      <p className="font-serif text-[16px] leading-tight">{b.name}</p>
+                      <p className="quote-cite leading-tight">{b.desc}</p>
                     </Link>
                   )
                 })}
@@ -197,45 +169,26 @@ export default async function EstudoPage() {
         })}
       </section>
 
-      <div className="h-px bg-[#2e2b42] opacity-50" />
+      <div className="hairline" />
 
-      {/* Novo Testamento — agrupado por gênero */}
       <section className="space-y-6">
-        <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.28em]">Novo Testamento</p>
+        <h2 className="section-title">Novo Testamento</h2>
         {NT_GROUPS.map(group => {
           const cat = BOOK_CATEGORIES[group.category]
           return (
             <div key={group.category} className="space-y-2">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: cat.color }} />
-                <span className="font-display text-[8px] uppercase tracking-[0.28em]"
-                  style={{ color: cat.color }}>
-                  {cat.label}
-                </span>
-                <div className="flex-1 h-px" style={{ background: cat.color, opacity: 0.15 }} />
-              </div>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+              <p className="quote-cite">{cat.label}</p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 {group.ids.map(id => {
                   const b = BOOK_META[id]
                   if (!b) return null
                   return (
-                    <Link key={id} href={`/estudo/livro/${id}`}
-                      className="group card-soft px-3 py-3 flex flex-col gap-1.5 transition-all"
-                      style={{ borderLeft: `3px solid ${cat.color}` }}>
-                      <div className="flex items-center justify-between">
-                        <span className="font-display text-[7px] uppercase tracking-[0.18em]"
-                          style={{ color: cat.color }}>
-                          {cat.label}
-                        </span>
-                        {notesPerBook[id] ? (
-                          <span className="text-[9px] text-[#55524a] px-1.5 py-0.5 rounded-full"
-                            style={{ background: cat.color + "22" }}>
-                            {notesPerBook[id]}
-                          </span>
-                        ) : null}
-                      </div>
-                      <p className="font-serif text-[#8a8375] text-sm group-hover:text-[#c9c0a8] transition-colors leading-tight">{b.name}</p>
-                      <p className="text-[#3d3a55] text-[10px] leading-tight">{b.desc}</p>
+                    <Link key={id} href={`/estudo/livro/${id}`} className="mist-row flex-col items-start !gap-1">
+                      {notesPerBook[id] ? (
+                        <span className="chip chip-on text-[11px] py-0">{notesPerBook[id]}</span>
+                      ) : null}
+                      <p className="font-serif text-[16px] leading-tight">{b.name}</p>
+                      <p className="quote-cite leading-tight">{b.desc}</p>
                     </Link>
                   )
                 })}
@@ -245,15 +198,13 @@ export default async function EstudoPage() {
         })}
       </section>
 
-      {/* Notas recentes */}
       <section className="space-y-3">
-        <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em]">Notas Recentes</p>
+        <h2 className="section-title">Notas recentes</h2>
         {notes.length === 0 ? (
           <div className="text-center py-12">
-            <FileText className="w-5 h-5 text-[#2e2b42] mx-auto mb-3" />
-            <p className="font-serif text-[#55524a]">Nenhuma nota ainda</p>
-            <Link href="/estudo/nova"
-              className="inline-flex items-center gap-1.5 mt-3 text-sm text-[#c9a654] hover:opacity-80 transition-opacity font-serif">
+            <FileText className="w-5 h-5 text-[#979799] mx-auto mb-3" />
+            <p className="font-serif text-[18px]">Nenhuma nota ainda</p>
+            <Link href="/estudo/nova" className="pill-action mt-4">
               <Plus className="w-3.5 h-3.5" /> Criar nota
             </Link>
           </div>
@@ -262,18 +213,15 @@ export default async function EstudoPage() {
             {notes.map((n: { id: string; title: string; book: string; chapter: number | null; verse: number | null; type: string; tags: string; updatedAt: Date }) => {
               const typeLabel = NOTE_TYPE_LABELS[n.type] ?? n.type
               return (
-                <Link key={n.id} href={`/estudo/${n.id}`}
-                  className="card-soft flex items-center gap-4 px-4 py-3.5 group">
-                  <div className="flex-1 min-w-0">
-                    <p className="font-serif text-[#c9c0a8] text-sm group-hover:text-[#e2d9c5] transition-colors truncate">
-                      {n.title}
-                    </p>
-                    <p className="text-[#55524a] text-xs mt-0.5 font-serif italic">
+                <Link key={n.id} href={`/estudo/${n.id}`} className="mist-row">
+                  <div className="min-w-0">
+                    <p className="font-serif text-[16px] truncate">{n.title}</p>
+                    <p className="quote-cite italic mt-0.5">
                       {n.book}{n.chapter ? ` ${n.chapter}` : ""}{n.verse ? `:${n.verse}` : ""}
                     </p>
                   </div>
-                  <span className="text-[10px] text-[#3d3a55] flex-shrink-0">{typeLabel}</span>
-                  <span className="text-[10px] text-[#3d3a55] flex-shrink-0">
+                  <span className="quote-cite shrink-0">{typeLabel}</span>
+                  <span className="quote-cite shrink-0">
                     {format(new Date(n.updatedAt), "d MMM", { locale: ptBR })}
                   </span>
                 </Link>

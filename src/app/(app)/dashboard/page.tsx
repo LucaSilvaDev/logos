@@ -82,12 +82,14 @@ export default async function DashboardPage() {
     <div className="max-w-5xl mx-auto px-5 py-10 md:py-16 space-y-16">
 
       <header className="space-y-6 max-w-2xl">
-        <p className="home-kicker animate-fade-up">
-          {format(new Date(), "EEEE, d 'de' MMMM", { locale: ptBR })}
-        </p>
-        <h1 className="home-title animate-fade-up delay-60">
-          {greeting()}, {firstName}.
-        </h1>
+        <div>
+          <h1 className="home-title animate-fade-up">
+            {greeting()}, {firstName}.
+          </h1>
+          <p className="page-desc animate-fade-up delay-60">
+            {format(new Date(), "EEEE, d 'de' MMMM", { locale: ptBR })}
+          </p>
+        </div>
         <div className="flex flex-wrap gap-2 stagger-in">
           {quickActions.map(({ href, icon: Icon, label }, i) => (
             <Link
@@ -106,7 +108,6 @@ export default async function DashboardPage() {
 
       <section className="grid grid-cols-1 md:grid-cols-5 gap-4 stagger-in">
         <Link href="/biblia" className="quote-card quote-card-accent md:col-span-3 group">
-          <p className="home-kicker mb-4">Versículo do dia</p>
           <blockquote className="font-serif text-[1.5rem] leading-snug italic">
             &ldquo;{verse.text}&rdquo;
           </blockquote>
@@ -114,17 +115,16 @@ export default async function DashboardPage() {
         </Link>
 
         <div className="quote-card md:col-span-2">
-          <p className="home-kicker mb-4">Nuvem de testemunhas</p>
           <blockquote className="text-[18px] leading-relaxed">
             &ldquo;{quote.content}&rdquo;
           </blockquote>
           <p className="mt-4 text-[15px]">{quote.author}</p>
-          {quote.source && <p className="text-[14px] text-[#979799] mt-1">{quote.source}</p>}
+          {quote.source && <p className="quote-cite mt-1">{quote.source}</p>}
         </div>
       </section>
 
       <section className="animate-fade-up delay-220">
-        <p className="home-kicker mb-6">Progresso</p>
+        <h2 className="section-title mb-6">Progresso</h2>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 stagger-in">
           <Link href="/progresso" className="artifact-card">
             <p className="home-stat">{biblePercent}%</p>
@@ -158,7 +158,7 @@ export default async function DashboardPage() {
       {recentDevotionals.length > 0 && (
         <section className="animate-fade-up delay-220">
           <div className="flex items-baseline justify-between mb-4">
-            <p className="home-kicker">Devocionais</p>
+            <h2 className="section-title">Devocionais</h2>
             <Link href="/devocional" className="text-link">
               Ver todos →
             </Link>

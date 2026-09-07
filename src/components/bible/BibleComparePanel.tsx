@@ -31,8 +31,8 @@ export function BibleComparePanel({
       <div className="max-w-2xl mx-auto px-4 py-3">
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2">
-            <ArrowLeftRight className="w-3.5 h-3.5 text-[#c9a654] opacity-70" />
-            <span className="text-[#c9a654] text-[11px] font-serif">
+            <ArrowLeftRight className="w-3.5 h-3.5 opacity-70" />
+            <span className="text-[13px] font-serif">
               {bookName} {chapter}:{compareVerseNum} — comparar versões
             </span>
           </div>
@@ -46,7 +46,7 @@ export function BibleComparePanel({
             <div className="space-y-3 pb-1">
               {VERSIONS.map(v => (
                 <div key={v.id} className="flex gap-3">
-                  <span className={cn("text-[10px] font-medium tracking-wider shrink-0 mt-0.5 w-7", version === v.id ? "text-[#c9a654]" : "text-[#3d3a55]")}>
+                  <span className={cn("text-[12px] font-medium shrink-0 mt-0.5 w-8", version === v.id ? "text-white" : "text-white/35")}>
                     {v.label}
                   </span>
                   <p className="font-serif text-[#8a8375] text-sm leading-relaxed flex-1">{compareData[v.id] ?? "—"}</p>

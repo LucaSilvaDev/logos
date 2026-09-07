@@ -47,11 +47,7 @@ export function ContinueReading() {
 
   return (
     <Link href={href} className="artifact-card group animate-fade-up delay-140">
-      <div className="flex items-center justify-between mb-5">
-        <p className="home-kicker">Continue onde parou</p>
-        <ChevronRight className="w-4 h-4 opacity-30 group-hover:opacity-80 group-hover:translate-x-0.5 transition-all" />
-      </div>
-      <div className="flex items-end justify-between gap-4">
+      <div className="flex items-start justify-between mb-5">
         <div>
           <p className="font-serif text-[26px] leading-none tracking-tight">{bookName}</p>
           <p className="mt-2 text-[15px] text-[#777b86]">
@@ -59,13 +55,14 @@ export function ContinueReading() {
             <span className="ml-2 text-[14px] text-[#979799]">{versionLabel}</span>
           </p>
         </div>
+        <ChevronRight className="w-4 h-4 mt-1 opacity-30 group-hover:opacity-80 group-hover:translate-x-0.5 transition-all" />
+      </div>
+      <div className="flex items-end justify-between gap-4 mb-4">
+        <p className="text-[15px] text-[#777b86]">Continue onde parou</p>
         <p className="text-[20px] font-medium tabular-nums">{Math.round(progress * 100)}%</p>
       </div>
-      <div className="mt-5 h-px bg-[#ececec] overflow-hidden">
-        <div
-          className="h-px bg-[#5d2a1a] transition-all duration-700"
-          style={{ width: `${progress * 100}%` }}
-        />
+      <div className="track">
+        <span style={{ width: `${progress * 100}%` }} />
       </div>
     </Link>
   )

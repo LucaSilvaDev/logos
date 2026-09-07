@@ -4,30 +4,30 @@ import Link from "next/link"
 import { ChevronLeft, ChevronRight, Search, ChevronDown, Maximize2, Minimize2, PenLine } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { VERSIONS } from "@/lib/bible-reader"
-import { BOOK_CATEGORIES, getBookCategory } from "@/lib/bible-categories"
+import { getBookCategory } from "@/lib/bible-categories"
 import type { BiblePageState } from "@/hooks/useBiblePage"
 
 type Props = Pick<BiblePageState,
   "book" | "chapter" | "version" | "fontSize" | "focusMode" | "chapterNoteOpen" |
-  "verseNotes" | "setVersion" | "setFontSize" | "setFocusMode" | "setShowBookModal" |
-  "setShowChapterModal" | "openChapterNote" | "goChapter" | "setAnimKey" | "setDirection"
+  "verseNotes" | "barHidden" | "setVersion" | "setFontSize" | "setFocusMode" | "setShowBookModal" |
+  "setShowChapterModal" | "openChapterNote" | "goChapter" | "setDirection"
 >
 
 export function BibleControlsBar({
   book, chapter, version, fontSize, focusMode, chapterNoteOpen,
-  verseNotes, setVersion, setFontSize, setFocusMode,
+  verseNotes, barHidden, setVersion, setFontSize, setFocusMode,
   setShowBookModal, setShowChapterModal, openChapterNote,
-  goChapter, setAnimKey, setDirection,
+  goChapter, setDirection,
 }: Props) {
   const bookCat = getBookCategory(book.id)
 
   return (
-    <div className="bible-float-bar">
+    <div className={cn("bible-float-bar", barHidden && "bible-float-bar-hidden")}>
       <button onClick={() => setShowBookModal(true)} className="bible-ctrl-label">
         <span className="w-3.5 h-3.5 opacity-70 flex items-center justify-center">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-3.5 h-3.5"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
         </span>
-        {bookCat && <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: BOOK_CATEGORIES[bookCat.category].color }} />}
+        {bookCat && <div className="w-1.5 h-1.5 rounded-full shrink-0 bg-current opacity-40" />}
         <span className="font-serif text-[15px] text-inherit">{book.name}</span>
         <ChevronDown className="w-3 h-3 opacity-50" />
       </button>
@@ -45,10 +45,14 @@ export function BibleControlsBar({
         </button>
       </div>
 
-      <div className="flex items-center gap-0.5">
+      <div className="bible-versions">
+        <span
+          className="bible-version-pill"
+          style={{ transform: `translateX(${VERSIONS.findIndex(v => v.id === version) * 100}%)` }}
+        />
         {VERSIONS.map(v => (
           <button key={v.id}
-            onClick={() => { setDirection("next"); setAnimKey(k => k + 1); setVersion(v.id) }}
+            onClick={() => { setDirection("next"); setVersion(v.id) }}
             title={v.desc}
             className={cn("bible-version", version === v.id && "bible-version-active")}>
             {v.label}

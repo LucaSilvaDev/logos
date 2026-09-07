@@ -109,33 +109,24 @@ export default function BibliotecaPage() {
     <div className="max-w-3xl mx-auto px-2 py-8 space-y-12">
 
       <div>
-        <p className="page-kicker mb-1">Teologia reformada</p>
         <h1 className="page-title">Biblioteca</h1>
         <p className="page-desc">Credo · TULIP · Westminster · Catecismo · Citações</p>
       </div>
 
-      <div className="candle-enter candle-delay-2 h-px bg-[#2e2b42]" />
+      <div className="hairline" />
 
-      {/* Credos */}
       <section className="space-y-8">
-        <div className="candle-enter candle-delay-3">
-          <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em] mb-1">Confissões Ecumênicas</p>
-          <h2 className="font-serif text-xl text-[#c9c0a8]">Os Credos da Igreja</h2>
-        </div>
+        <h2 className="section-title">Os credos da Igreja</h2>
 
-        {/* Credo Apostólico */}
-        <div className="candle-flame flame-hover card-soft relative px-6 py-6" style={{ animationDelay: "400ms" }}>
-          <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#c9a654] to-transparent opacity-60 rounded-l-full" />
-          <div className="mb-4">
-            <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em] mb-0.5">Século II · Universal</p>
-            <h3 className="font-serif text-[#c9c0a8] text-base">Credo Apostólico</h3>
-          </div>
+        <div className="quote-card">
+          <h3 className="font-serif text-[20px] mb-1">Credo Apostólico</h3>
+          <p className="quote-cite mb-4">Século II · Universal</p>
           <div className="space-y-2">
             {CREDO_APOSTOLICO.map((line, i) => (
               <p key={i} className={`font-serif leading-relaxed ${
                 line === "Amém."
-                  ? "text-[#c9a654] text-sm font-medium mt-4"
-                  : "text-[#8a8375] text-sm"
+                  ? "text-[16px] mt-4"
+                  : "text-[15px] text-[#777b86]"
               }`}>
                 {line}
               </p>
@@ -143,19 +134,15 @@ export default function BibliotecaPage() {
           </div>
         </div>
 
-        {/* Credo Niceno */}
-        <div className="candle-flame flame-hover card-soft relative px-6 py-6" style={{ animationDelay: "520ms" }}>
-          <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#c9a654] to-transparent opacity-60 rounded-l-full" />
-          <div className="mb-4">
-            <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em] mb-0.5">381 d.C. · Concílio de Constantinopla</p>
-            <h3 className="font-serif text-[#c9c0a8] text-base">Credo Niceno-Constantinopolitano</h3>
-          </div>
+        <div className="quote-card">
+          <h3 className="font-serif text-[20px] mb-1">Credo Niceno-Constantinopolitano</h3>
+          <p className="quote-cite mb-4">381 d.C. · Concílio de Constantinopla</p>
           <div className="space-y-2">
             {CREDO_NICENO.map((line, i) => (
               <p key={i} className={`font-serif leading-relaxed ${
                 line === "Amém."
-                  ? "text-[#c9a654] text-sm font-medium mt-4"
-                  : "text-[#8a8375] text-sm"
+                  ? "text-[16px] mt-4"
+                  : "text-[15px] text-[#777b86]"
               }`}>
                 {line}
               </p>
@@ -164,30 +151,26 @@ export default function BibliotecaPage() {
         </div>
       </section>
 
-      <div className="candle-enter h-px bg-[#2e2b42]" style={{ animationDelay: "600ms" }} />
-
-      {/* TULIP */}
       <section className="space-y-6">
-        <div className="candle-enter" style={{ animationDelay: "640ms" }}>
-          <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em] mb-1">Os 5 Pontos do Calvinismo</p>
-          <h2 className="font-serif text-xl text-[#c9c0a8]">TULIP</h2>
+        <div>
+          <h2 className="section-title">TULIP</h2>
+          <p className="page-desc">Os cinco pontos do calvinismo</p>
         </div>
 
         <div className="space-y-3">
-          {TULIP.map((point, i) => (
-            <div key={point.letter} className="candle-flame card-soft py-5 px-5 flex gap-6"
-              style={{ animationDelay: `${700 + i * 80}ms` }}>
-              <div className="font-display text-4xl text-[#c9a654] opacity-30 leading-none flex-shrink-0 w-10 text-right">
+          {TULIP.map((point) => (
+            <div key={point.letter} className="quote-card flex gap-6">
+              <div className="font-serif text-4xl opacity-20 leading-none flex-shrink-0 w-10 text-right">
                 {point.letter}
               </div>
               <div className="flex-1">
-                <h3 className="font-serif text-[#c9c0a8] text-base mb-0.5">{point.title}</h3>
-                <p className="text-[#3d3a55] text-[10px] italic mb-3 font-serif">{point.latin}</p>
-                <p className="text-[#8a8375] text-sm leading-relaxed mb-4">{point.desc}</p>
+                <h3 className="font-serif text-[18px] mb-0.5">{point.title}</h3>
+                <p className="quote-cite italic mb-3">{point.latin}</p>
+                <p className="text-[15px] leading-relaxed mb-4">{point.desc}</p>
                 <div className="flex flex-wrap gap-2">
                   {point.refs.map(ref => (
-                    <span key={ref} className="flex items-center gap-1 text-[10px] text-[#55524a] font-serif italic">
-                      <BookOpen className="w-2.5 h-2.5 text-[#3d3a55]" />{ref}
+                    <span key={ref} className="quote-cite inline-flex items-center gap-1 italic">
+                      <BookOpen className="w-2.5 h-2.5" />{ref}
                     </span>
                   ))}
                 </div>
@@ -197,84 +180,69 @@ export default function BibliotecaPage() {
         </div>
       </section>
 
-      {/* Westminster */}
       <section className="space-y-6">
-        <div className="candle-enter" style={{ animationDelay: "1100ms" }}>
-          <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em] mb-1">1646</p>
-          <h2 className="font-serif text-xl text-[#c9c0a8]">Confissão de Westminster</h2>
+        <div>
+          <h2 className="section-title">Confissão de Westminster</h2>
+          <p className="page-desc">1646</p>
         </div>
 
         <div className="space-y-2">
-          {WESTMINSTER.map((ch, i) => (
-            <div key={ch.cap} className="candle-flame card-soft py-4 px-4 flex gap-4"
-              style={{ animationDelay: `${1160 + i * 60}ms` }}>
-              <span className="font-mono text-[10px] text-[#3d3a55] flex-shrink-0 w-8 text-right pt-0.5">
+          {WESTMINSTER.map((ch) => (
+            <div key={ch.cap} className="mist-row items-start">
+              <span className="quote-cite shrink-0 w-8 tabular-nums pt-0.5">
                 {ch.cap}
               </span>
-              <div>
-                <h3 className="font-serif text-[#8a8375] text-sm mb-1">{ch.title}</h3>
-                <p className="text-[#55524a] text-xs leading-relaxed">{ch.summary}</p>
+              <div className="min-w-0">
+                <h3 className="font-serif text-[16px] mb-1">{ch.title}</h3>
+                <p className="quote-cite leading-relaxed">{ch.summary}</p>
               </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Catecismo Menor de Westminster */}
       <section className="space-y-6">
-        <div className="candle-enter" style={{ animationDelay: "1760ms" }}>
-          <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em] mb-1">1647 · 107 Perguntas</p>
-          <h2 className="font-serif text-xl text-[#c9c0a8]">Catecismo Menor de Westminster</h2>
-          <p className="text-[#3d3a55] text-xs mt-1">Use os flashcards no <span className="text-[#c9a654] opacity-70">Memorizar</span> para aprender de cor</p>
+        <div>
+          <h2 className="section-title">Catecismo Menor de Westminster</h2>
+          <p className="page-desc">1647 · 107 perguntas · use os flashcards em Memorizar</p>
         </div>
 
         <div className="space-y-1">
-          {WSC.map((qa, i) => (
-            <div key={qa.n} className="candle-enter flex gap-4 py-3 border-b border-[#1a1928]"
-              style={{ animationDelay: `${1820 + Math.min(i, 30) * 30}ms` }}>
-              <span className="font-mono text-[10px] text-[#3d3a55] flex-shrink-0 w-7 text-right pt-0.5">{qa.n}</span>
+          {WSC.map((qa) => (
+            <div key={qa.n} className="flex gap-4 py-3 border-b border-[#ececec]">
+              <span className="quote-cite shrink-0 w-7 tabular-nums pt-0.5">{qa.n}</span>
               <div className="flex-1">
-                <p className="font-serif text-[#8a8375] text-xs mb-1 leading-relaxed">{qa.q}</p>
-                <p className="text-[#55524a] text-xs leading-relaxed">{qa.a}</p>
+                <p className="font-serif text-[15px] mb-1 leading-relaxed">{qa.q}</p>
+                <p className="quote-cite leading-relaxed">{qa.a}</p>
               </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* Citações */}
       <section className="space-y-6">
-        <div className="candle-enter" style={{ animationDelay: "2000ms" }}>
-          <p className="font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em] mb-1">Nuvem de Testemunhas</p>
-          <h2 className="font-serif text-xl text-[#c9c0a8]">Citações Reformadas</h2>
-        </div>
+        <h2 className="section-title">Citações reformadas</h2>
 
         <div className="space-y-8">
           {QUOTES.map((q, i) => (
-            <div key={i} className="candle-enter relative pl-6"
-              style={{ animationDelay: `${2060 + i * 60}ms` }}>
-              <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-[#c9a654] opacity-20" />
-              <blockquote className="font-serif text-[#8a8375] text-sm leading-relaxed italic mb-2">
+            <div key={i}>
+              <blockquote className="font-serif text-[16px] leading-relaxed italic mb-2">
                 &ldquo;{q.text}&rdquo;
               </blockquote>
-              <p className="text-[#c9a654] text-xs font-medium">{q.author}</p>
-              {q.source && <p className="text-[#3d3a55] text-[10px] mt-0.5">{q.source}</p>}
+              <p className="text-[14px]">{q.author}</p>
+              {q.source && <p className="quote-cite mt-0.5">{q.source}</p>}
             </div>
           ))}
         </div>
       </section>
 
-      {/* Solas */}
       <section className="space-y-4">
-        <div className="candle-enter h-px bg-[#2e2b42]" style={{ animationDelay: "2540ms" }} />
-        <p className="candle-enter font-display text-[9px] text-[#3d3a55] uppercase tracking-[0.25em]"
-          style={{ animationDelay: "2580ms" }}>As 5 Solas da Reforma</p>
+        <h2 className="section-title">As cinco solas</h2>
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
-          {SOLAS.map((s, i) => (
-            <div key={s.sola} className="candle-flame card-soft p-4 text-center"
-              style={{ animationDelay: `${2620 + i * 60}ms` }}>
-              <p className="font-display text-[10px] text-[#c9a654] opacity-70 tracking-wider uppercase mb-1">{s.sola}</p>
-              <p className="text-[#55524a] text-[10px]">{s.desc}</p>
+          {SOLAS.map((s) => (
+            <div key={s.sola} className="quote-card text-center p-4">
+              <p className="font-serif text-[15px] mb-1">{s.sola}</p>
+              <p className="quote-cite">{s.desc}</p>
             </div>
           ))}
         </div>

@@ -34,7 +34,6 @@ export default function CadastroPage() {
 
   return (
     <AuthShell
-      kicker="Começar"
       title="Crie o espaço da sua leitura."
       lede="Uma conta para plano, notas e memorização — no seu ritmo."
     >

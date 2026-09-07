@@ -8,11 +8,11 @@ import type { SearchResult } from "@/app/api/search/route"
 
 type FilterType = "todos" | "verse" | "devocional" | "estudo" | "oracao"
 
-const TYPE_META: Record<string, { label: string; icon: React.ElementType; color: string }> = {
-  verse:      { label: "Bíblia",     icon: BookOpen,    color: "#c9a654" },
-  devocional: { label: "Devocional", icon: NotebookPen, color: "#7a9e7e" },
-  estudo:     { label: "Estudo",     icon: Search,      color: "#7a8fa8" },
-  oracao:     { label: "Oração",     icon: Heart,       color: "#a87a7a" },
+const TYPE_META: Record<string, { label: string; icon: React.ElementType }> = {
+  verse:      { label: "Bíblia",     icon: BookOpen },
+  devocional: { label: "Devocional", icon: NotebookPen },
+  estudo:     { label: "Estudo",     icon: Search },
+  oracao:     { label: "Oração",     icon: Heart },
 }
 
 const FILTERS: { id: FilterType; label: string }[] = [
@@ -30,7 +30,7 @@ function highlight(text: string, query: string) {
   return (
     <>
       {text.slice(0, idx)}
-      <mark className="bg-[#c9a654]/20 text-[#c9a654] rounded-sm px-px">{text.slice(idx, idx + query.length)}</mark>
+      <mark className="bg-[#f2f2f3] text-inherit rounded-sm px-px">{text.slice(idx, idx + query.length)}</mark>
       {text.slice(idx + query.length)}
     </>
   )
@@ -73,24 +73,18 @@ export default function BuscaPage() {
   return (
     <div className="max-w-2xl mx-auto px-4 py-8 md:py-12">
       <div className="mb-8">
-        <p className="page-kicker">Devocionais · Estudos · Orações · Versículos</p>
         <h1 className="page-title">Busca</h1>
+        <p className="page-desc">Devocionais, estudos, orações e versículos</p>
       </div>
 
-      {/* Search input */}
       <div className="relative mb-6">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#3d3a55] pointer-events-none" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#979799] pointer-events-none" />
         <input
           ref={inputRef}
           value={query}
           onChange={e => setQuery(e.target.value)}
           placeholder="Buscar palavra, versículo, título…"
-          className={cn(
-            "w-full pl-11 pr-10 py-3.5 rounded-2xl text-[14px] font-sans",
-            "bg-[#1a1928] border border-[#2e2b42] text-[#e2d9c5]",
-            "placeholder:text-[#3d3a55] outline-none",
-            "focus:border-[#c9a654]/40 focus:ring-1 focus:ring-[#c9a654]/20 transition-all",
-          )}
+          className="app-input w-full pl-11 pr-10 py-3.5 rounded-2xl text-[15px]"
         />
         {query && (
           <button
@@ -113,10 +107,8 @@ export default function BuscaPage() {
                 key={f.id}
                 onClick={() => setFilter(f.id)}
                 className={cn(
-                  "px-3 py-1 rounded-full text-[11px] font-sans transition-all border",
-                  filter === f.id
-                    ? "bg-[#c9a654]/15 border-[#c9a654]/40 text-[#c9a654]"
-                    : "border-[#2e2b42] text-[#55524a] hover:border-[#3d3a55] hover:text-[#8a8375]"
+                  "chip",
+                  filter === f.id ? "chip-on" : ""
                 )}
               >
                 {f.label}
@@ -137,8 +129,8 @@ export default function BuscaPage() {
 
       {!loading && searched && filtered.length === 0 && (
         <div className="text-center py-16">
-          <p className="text-[#3d3a55] text-sm font-serif italic">Nenhum resultado para "{query}"</p>
-          <p className="text-[#2e2b42] text-[11px] mt-2 font-sans">
+          <p className="quote-cite italic">Nenhum resultado para &ldquo;{query}&rdquo;</p>
+          <p className="quote-cite mt-2">
             Tente palavras-chave diferentes ou verifique a ortografia
           </p>
         </div>
@@ -146,7 +138,7 @@ export default function BuscaPage() {
 
       {!loading && !searched && (
         <div className="text-center py-16">
-          <p className="text-[#2e2b42] text-[11px] font-sans tracking-wide uppercase">
+          <p className="quote-cite">
             Digite para começar a busca
           </p>
         </div>
@@ -162,35 +154,27 @@ export default function BuscaPage() {
               <Link
                 key={result.id}
                 href={result.url}
-                className="group block card-soft px-5 py-4 rounded-2xl hover:border-[#c9a654]/20 transition-all duration-200"
+                className="mist-row"
               >
-                <div className="flex items-start gap-3">
-                  <div
-                    className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5"
-                    style={{ background: `${meta.color}18` }}
-                  >
-                    <Icon className="w-3.5 h-3.5" style={{ color: meta.color }} />
+                <div className="flex items-start gap-3 min-w-0 w-full">
+                  <div className="w-8 h-8 rounded-full bg-[#f2f2f3] flex items-center justify-center shrink-0 mt-0.5">
+                    <Icon className="w-3.5 h-3.5" />
                   </div>
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <span
-                        className="text-[9px] font-display uppercase tracking-[0.2em] opacity-60"
-                        style={{ color: meta.color }}
-                      >
-                        {meta.label}
-                      </span>
+                      <span className="quote-cite">{meta.label}</span>
                       {result.meta && (
-                        <span className="text-[10px] text-[#3d3a55] font-sans">{result.meta}</span>
+                        <span className="quote-cite">{result.meta}</span>
                       )}
                     </div>
 
-                    <p className="text-[#c9c0a8] text-sm font-serif group-hover:text-[#e2d9c5] transition-colors leading-snug truncate">
+                    <p className="text-[16px] font-serif leading-snug truncate">
                       {highlight(result.title, query)}
                     </p>
 
                     {result.excerpt && (
-                      <p className="text-[#55524a] text-[12px] font-sans mt-1 leading-relaxed line-clamp-2">
+                      <p className="quote-cite mt-1 leading-relaxed line-clamp-2">
                         {highlight(result.excerpt, query)}
                       </p>
                     )}

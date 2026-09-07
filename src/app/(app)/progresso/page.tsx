@@ -44,12 +44,12 @@ export default async function ProgressoPage() {
         <div className="flex items-baseline justify-between gap-1">
           <Link
             href={`/biblia?book=${bookId}`}
-            className={`text-[11px] font-serif truncate transition-colors ${allDone ? "text-[#c9a654]" : "text-[#55524a] hover:text-[#8a8375]"}`}
+            className={`text-[13px] font-serif truncate transition-colors ${allDone ? "text-inherit" : "text-[#777b86] hover:text-inherit"}`}
           >
             {name}
           </Link>
           {doneN > 0 && (
-            <span className="text-[9px] text-[#3d3a55] shrink-0 tabular-nums">
+            <span className="quote-cite shrink-0 tabular-nums">
               {doneN}/{total}
             </span>
           )}
@@ -63,13 +63,7 @@ export default async function ProgressoPage() {
                 key={ch}
                 href={`/biblia?book=${bookId}&chapter=${ch}`}
                 title={`${name} ${ch}`}
-                className={`
-                  w-[10px] h-[10px] rounded-[2px] transition-all duration-200
-                  ${done
-                    ? "bg-[#c9a654] opacity-90 hover:opacity-100"
-                    : "bg-[#1e1c2e] hover:bg-[#2e2b42]"
-                  }
-                `}
+                className={`chapter-dot ${done ? "is-read" : ""}`}
               />
             )
           })}
@@ -82,41 +76,32 @@ export default async function ProgressoPage() {
     <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
 
       <PageHeader
-        kicker="Jornada"
         title="Progresso da Bíblia"
+        description={`${totalRead} de ${totalChapters} capítulos`}
       />
 
-      {/* Overall progress */}
-      <div className="card-soft px-6 py-5 space-y-3">
+      <div className="quote-card space-y-4">
         <div className="flex items-end justify-between">
-          <div>
-            <p className="font-display text-[9px] text-[#c9a654] uppercase tracking-[0.2em] opacity-70 mb-1">Total lido</p>
-            <p className="font-serif text-3xl text-[#e2d9c5]">
-              {pct.toFixed(1)}<span className="text-lg text-[#8a8375]">%</span>
-            </p>
-          </div>
-          <p className="text-[#3d3a55] text-sm font-serif">
-            {totalRead} <span className="text-[#2e2b42]">/</span> {totalChapters} capítulos
+          <p className="home-stat">
+            {pct.toFixed(1)}<span className="text-[15px] text-[#777b86]">%</span>
+          </p>
+          <p className="quote-cite tabular-nums">
+            {totalRead} / {totalChapters}
           </p>
         </div>
-        <div className="h-2 rounded-full bg-[#1a1928] overflow-hidden">
-          <div
-            className="h-full rounded-full bg-gradient-to-r from-[#c9a654] to-[#e8c87a] transition-all duration-700"
-            style={{ width: `${Math.max(pct, pct > 0 ? 0.3 : 0)}%` }}
-          />
+        <div className="track">
+          <span style={{ width: `${Math.max(pct, pct > 0 ? 0.3 : 0)}%` }} />
         </div>
-        <div className="flex justify-between text-[10px] text-[#2e2b42]">
+        <div className="flex justify-between quote-cite">
           <span>Gênesis</span>
           <span>Apocalipse</span>
         </div>
       </div>
 
-      {/* AT */}
       <section className="space-y-5">
-        <div className="flex items-center gap-3">
-          <p className="font-display text-[9px] text-[#55524a] uppercase tracking-[0.25em]">Antigo Testamento</p>
-          <div className="flex-1 h-px bg-[#1e1c2e]" />
-          <p className="text-[10px] text-[#3d3a55] tabular-nums">
+        <div className="flex items-baseline justify-between gap-3">
+          <h2 className="section-title">Antigo Testamento</h2>
+          <p className="quote-cite tabular-nums">
             {AT_BOOKS.reduce((acc, id) => {
               const total = BOOK_CHAPTERS[id] ?? 0
               return acc + Array.from({ length: total }, (_, i) => i + 1).filter(c => readSet.has(`${id}-${c}`)).length
@@ -132,10 +117,9 @@ export default async function ProgressoPage() {
 
       {/* NT */}
       <section className="space-y-5">
-        <div className="flex items-center gap-3">
-          <p className="font-display text-[9px] text-[#55524a] uppercase tracking-[0.25em]">Novo Testamento</p>
-          <div className="flex-1 h-px bg-[#1e1c2e]" />
-          <p className="text-[10px] text-[#3d3a55] tabular-nums">
+        <div className="flex items-baseline justify-between gap-3">
+          <h2 className="section-title">Novo Testamento</h2>
+          <p className="quote-cite tabular-nums">
             {NT_BOOKS.reduce((acc, id) => {
               const total = BOOK_CHAPTERS[id] ?? 0
               return acc + Array.from({ length: total }, (_, i) => i + 1).filter(c => readSet.has(`${id}-${c}`)).length
