@@ -151,9 +151,61 @@
 }
 
 .el-hero {
+  position: relative;
+  isolation: isolate;
   text-align: center;
   max-width: 920px;
   margin: 0 auto 28px;
+  padding: 56px 24px 40px;
+  border-radius: 32px;
+  overflow: hidden;
+}
+
+.el-hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  will-change: transform;
+}
+
+.el-hero-bg img {
+  filter: saturate(0.82) brightness(0.72);
+}
+
+.el-hero-scrim {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(23, 25, 28, 0.35) 0%, rgba(23, 25, 28, 0.78) 78%, rgba(23, 25, 28, 0.92) 100%);
+}
+
+.el-hero .el-eyebrow {
+  background: rgba(255, 255, 255, 0.14);
+  color: rgba(247, 244, 239, 0.86);
+  backdrop-filter: blur(6px);
+}
+
+.el-hero .el-title-lead {
+  color: #f7f4ef;
+}
+
+.el-hero .el-title-shift {
+  color: var(--el-peach);
+}
+
+.el-hero .el-tabs-wrap {
+  background: rgba(23, 25, 28, 0.4);
+  border-color: rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(10px);
+}
+
+.el-hero .el-tab {
+  color: rgba(247, 244, 239, 0.72);
+}
+
+.el-hero .el-tab[aria-selected="true"] {
+  color: #17191c;
+  background: #f7f4ef;
 }
 
 .el-eyebrow {
@@ -189,8 +241,10 @@
   min-height: 1.2em;
 }
 
-.el-title-shift.is-swap {
-  animation: el-line-in 520ms var(--el-ease);
+.el-title-shift.is-roll {
+  animation: el-roll-in 640ms var(--el-ease);
+  transform-style: preserve-3d;
+  perspective: 800px;
 }
 
 .el-tabs-wrap {
@@ -277,17 +331,25 @@
 
 .el-card-art {
   position: absolute;
-  inset: -16%;
+  inset: 0;
   z-index: -1;
   opacity: 0;
-  transform: scale(1.06);
-  filter: blur(18px) saturate(0.72);
+  overflow: hidden;
+  transition: opacity 640ms var(--el-ease);
+}
+
+.el-card-art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
   background:
-    radial-gradient(42% 38% at 22% 28%, rgba(251, 225, 209, 0.55) 0%, transparent 70%),
-    radial-gradient(48% 42% at 78% 22%, rgba(93, 42, 26, 0.28) 0%, transparent 68%),
-    radial-gradient(60% 50% at 60% 78%, rgba(119, 123, 134, 0.35) 0%, transparent 70%),
-    linear-gradient(160deg, #1c2224 0%, #17191c 48%, #2a2420 100%);
-  transition: opacity 640ms var(--el-ease), transform 8s linear;
+    linear-gradient(180deg, rgba(23, 25, 28, 0.35) 0%, rgba(23, 25, 28, 0.72) 72%, rgba(23, 25, 28, 0.9) 100%);
+}
+
+.el-card-art img {
+  transform: scale(1.06);
+  filter: saturate(0.78) brightness(0.82);
+  transition: transform 8s linear;
 }
 
 .el-card.is-active {
@@ -300,6 +362,9 @@
 
 .el-card.is-active .el-card-art {
   opacity: 1;
+}
+
+.el-card.is-active .el-card-art img {
   transform: scale(1.14);
 }
 
@@ -394,6 +459,114 @@
   to { transform: translate3d(-4%, 6%, 0) scale(1.08); }
 }
 
+@keyframes el-roll-in {
+  from {
+    opacity: 0;
+    transform: rotateX(-55deg) translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: rotateX(0) translateY(0);
+  }
+}
+
+/* Reveal-on-scroll: os cards nascem discretamente inclinados e "endireitam"
+   ao entrar na viewport (ver useRevealOnScroll no componente). */
+.el-reveal {
+  opacity: 0;
+  transform: translateY(28px) rotateX(6deg);
+  transform-origin: top center;
+  transition: opacity 720ms var(--el-ease), transform 720ms var(--el-ease);
+}
+
+.el-reveal.is-revealed {
+  opacity: 1;
+  transform: translateY(0) rotateX(0);
+}
+
+.el-reveal-card {
+  min-width: 0;
+}
+
+.el-reveal-card .el-card {
+  height: 100%;
+}
+
+.el-plates {
+  margin-top: 56px;
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 16px;
+}
+
+.el-plate-col {
+  display: grid;
+  gap: 16px;
+}
+
+.el-plate {
+  position: relative;
+  isolation: isolate;
+  border-radius: 24px;
+  overflow: hidden;
+  min-height: 220px;
+  display: flex;
+  align-items: flex-end;
+  padding: 22px;
+}
+
+.el-plate-tall {
+  min-height: 456px;
+}
+
+.el-plate-media {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+}
+
+.el-plate-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(23, 25, 28, 0.05) 0%, rgba(23, 25, 28, 0.75) 100%);
+}
+
+.el-plate-media img {
+  filter: saturate(0.85);
+  transition: transform 900ms var(--el-ease);
+}
+
+.el-plate:hover .el-plate-media img {
+  transform: scale(1.05);
+}
+
+.el-plate-quote {
+  color: #f7f4ef;
+  font-family: var(--el-display);
+  font-size: clamp(17px, 1.6vw, 21px);
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  max-width: 34ch;
+}
+
+.el-plate-quote span {
+  display: block;
+  margin-top: 10px;
+  font-family: var(--el-ui);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(247, 244, 239, 0.64);
+}
+
+.el-credit {
+  margin: 20px 4px 0;
+  font-size: 11px;
+  color: var(--el-ash);
+  text-align: right;
+}
+
 @media (hover: hover) and (pointer: fine) {
   .el-card:hover {
     transform: translateY(-5px);
@@ -427,10 +600,18 @@
     padding-bottom: 8px;
   }
   .el-gallery::-webkit-scrollbar { display: none; }
-  .el-card {
+  .el-reveal-card {
     flex: 0 0 84vw;
-    min-height: 300px;
     scroll-snap-align: start;
+  }
+  .el-card {
+    min-height: 300px;
+  }
+  .el-plates {
+    grid-template-columns: 1fr;
+  }
+  .el-plate-tall {
+    min-height: 260px;
   }
 }
 
@@ -438,13 +619,18 @@
   .el-glow,
   .el-rise,
   .el-swap,
-  .el-title-shift.is-swap,
+  .el-title-shift.is-roll,
   .el-card,
   .el-card-art,
+  .el-card-art img,
+  .el-plate-media img,
+  .el-reveal,
   .el-btn-text,
   .el-btn-fill {
     animation: none !important;
     transition: none !important;
   }
   .el-rise { opacity: 1; transform: none; }
+  .el-reveal { opacity: 1; transform: none; }
+  .el-hero-bg { transform: none !important; }
 }

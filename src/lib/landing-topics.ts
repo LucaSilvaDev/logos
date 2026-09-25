@@ -10,6 +10,8 @@ export type LandingTopic = {
   name: string
   headline: string
   href: string
+  image: string
+  imageAlt: string
   cards: [InsightCard, InsightCard, InsightCard, InsightCard]
 }
 
@@ -37,6 +39,8 @@ export const LANDING_TOPICS: LandingTopic[] = [
     name: "Leitura",
     href: "/biblia",
     headline: "muda o modo como você abre o texto",
+    image: "/images/landing/jerusalem.jpg",
+    imageAlt: "Cidade Velha de Jerusalém ao entardecer",
     cards: [
       {
         label: "Ritmo",
@@ -69,6 +73,8 @@ export const LANDING_TOPICS: LandingTopic[] = [
     name: "Plano",
     href: "/plano",
     headline: "sustenta o hábito sem cobrá-lo",
+    image: "/images/landing/arvore-colina.jpg",
+    imageAlt: "Árvore solitária no topo de uma colina rochosa",
     cards: [
       {
         label: "Desenho",
@@ -101,6 +107,8 @@ export const LANDING_TOPICS: LandingTopic[] = [
     name: "Oração",
     href: "/oracoes",
     headline: "abre espaço antes da palavra",
+    image: "/images/landing/cruz.jpg",
+    imageAlt: "Cruz de madeira no topo de uma colina ao pôr do sol",
     cards: [
       {
         label: "Entrada",
@@ -133,6 +141,8 @@ export const LANDING_TOPICS: LandingTopic[] = [
     name: "Estudo",
     href: "/estudo",
     headline: "liga o trecho ao restante da Escritura",
+    image: "/images/landing/jerusalem.jpg",
+    imageAlt: "Cidade Velha de Jerusalém ao entardecer",
     cards: [
       {
         label: "Contexto",
@@ -165,6 +175,8 @@ export const LANDING_TOPICS: LandingTopic[] = [
     name: "Memória",
     href: "/memorizar",
     headline: "fica quando o dia já fechou",
+    image: "/images/landing/arvore-colina.jpg",
+    imageAlt: "Árvore solitária no topo de uma colina rochosa",
     cards: [
       {
         label: "Escolha",
@@ -197,6 +209,8 @@ export const LANDING_TOPICS: LandingTopic[] = [
     name: "Silêncio",
     href: "/biblia",
     headline: "ensina a ouvir o versículo",
+    image: "/images/landing/cruz.jpg",
+    imageAlt: "Cruz de madeira no topo de uma colina ao pôr do sol",
     cards: [
       {
         label: "Corte",
@@ -229,6 +243,8 @@ export const LANDING_TOPICS: LandingTopic[] = [
     name: "Comunidade",
     href: "/devocional",
     headline: "guarda o que foi lido juntos",
+    image: "/images/landing/mar-galileia.jpg",
+    imageAlt: "Barco no Mar da Galileia",
     cards: [
       {
         label: "Partilha",
@@ -261,6 +277,8 @@ export const LANDING_TOPICS: LandingTopic[] = [
     name: "Esperança",
     href: "/biblia",
     headline: "orienta o olhar adiante",
+    image: "/images/landing/mar-galileia.jpg",
+    imageAlt: "Barco no Mar da Galileia",
     cards: [
       {
         label: "Horizonte",
