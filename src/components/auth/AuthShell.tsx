@@ -13,10 +13,10 @@ export function AuthShell({
     <main className="auth-page">
       <div className="auth-inner">
         <nav className="auth-nav animate-fade-up">
-          <Link href="/" className="text-[16px] text-[#17191c]">
+          <Link href="/" className="text-xs tracking-[0.15em] uppercase font-medium text-[#1D3045]">
             Selah
           </Link>
-          <span className="text-[14px] text-[#979799] truncate">
+          <span className="text-xs tracking-[0.2em] uppercase text-[#979799] truncate">
             Pausa · Medita · Contempla
           </span>
         </nav>

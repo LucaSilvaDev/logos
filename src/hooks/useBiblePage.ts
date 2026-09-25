@@ -3,13 +3,13 @@
 import { useState, useEffect, useCallback, useRef } from "react"
 import { BOOKS, BOOK_ID_NAMES } from "@/lib/reading-plan"
 import {
-  VERSIONS, HL_COLORS, readSavedPos, readSavedFont,
+  VERSIONS, HL_COLORS, readUrlPos, readSavedPos, readSavedFont,
   generateVerseImage,
   type Verse, type HlEntry, type BibleVersion, type FontSize, type ApiError,
 } from "@/lib/bible-reader"
 
 export function useBiblePage() {
-  const pos0 = readSavedPos()
+  const pos0 = readUrlPos() ?? readSavedPos()
 
   const [book,    setBook]    = useState(() => pos0?.book    ?? BOOKS[0])
   const [chapter, setChapter] = useState(() => pos0?.chapter ?? 1)
@@ -116,6 +116,13 @@ export function useBiblePage() {
     try {
       localStorage.setItem("selah-bible-pos", JSON.stringify({ bookId: book.id, chapter, version }))
       window.dispatchEvent(new CustomEvent("selah-bible-pos"))
+      const url = new URL(window.location.href)
+      if (url.pathname.startsWith("/biblia")) {
+        url.searchParams.set("book", book.id)
+        url.searchParams.set("chapter", String(chapter))
+        url.searchParams.set("version", version)
+        window.history.replaceState(null, "", `${url.pathname}${url.search}`)
+      }
     } catch { /* ignore */ }
     const t = setTimeout(() => {
       fetch("/api/biblia/last-read", {

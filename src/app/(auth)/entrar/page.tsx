@@ -1,12 +1,16 @@
 ﻿"use client"
 
+import { Suspense, useState } from "react"
 import { signIn } from "next-auth/react"
-import { useState } from "react"
 import Link from "next/link"
+import { useSearchParams } from "next/navigation"
 import { Loader2, Eye, EyeOff } from "lucide-react"
 import { AuthShell, GoogleMark } from "@/components/auth/AuthShell"
+import { safeAppPath } from "@/lib/safe-next"
 
-export default function LoginPage() {
+function LoginForm() {
+  const searchParams = useSearchParams()
+  const nextPath = safeAppPath(searchParams.get("callbackUrl") ?? searchParams.get("next"))
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPass, setShowPass] = useState(false)
@@ -23,13 +27,13 @@ export default function LoginPage() {
       setError("Email ou senha incorretos.")
       setLoading(false)
     } else {
-      window.location.href = "/dashboard"
+      window.location.href = nextPath
     }
   }
 
   async function handleGoogle() {
     setGoogleLoading(true)
-    await signIn("google", { callbackUrl: "/dashboard" })
+    await signIn("google", { callbackUrl: nextPath })
   }
 
   return (
@@ -101,10 +105,18 @@ export default function LoginPage() {
 
       <p className="text-center text-sm text-[#66635f] mt-6">
         Não tem conta?{" "}
-        <Link href="/cadastro" className="text-[#1a1614] underline-offset-4 hover:underline">
+        <Link href={`/cadastro?callbackUrl=${encodeURIComponent(nextPath)}`} className="text-[#1a1614] underline-offset-4 hover:underline">
           Criar conta →
         </Link>
       </p>
     </AuthShell>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
   )
 }

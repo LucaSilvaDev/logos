@@ -1,6 +1,6 @@
 "use client"
 
-import { useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import { ChevronLeft, ChevronRight, Loader2, AlertCircle, Check } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { BiblePageState } from "@/hooks/useBiblePage"
@@ -12,6 +12,26 @@ type Props = Pick<BiblePageState,
   "isFirstInBible" | "isLastInBible" |
   "fetchVerses" | "goChapter" | "handleVerseClick" | "toggleRead"
 >
+
+function ReadHint() {
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    try {
+      setVisible(localStorage.getItem("selah-bible-hint") !== "1")
+    } catch {
+      setVisible(true)
+    }
+  }, [])
+
+  if (!visible) return null
+
+  return (
+    <p className="bible-read-hint">
+      Toque um versículo para grifar, anotar ou comparar.
+    </p>
+  )
+}
 
 function rubberband(overshoot: number, dimension = 280, constant = 0.55) {
   return (overshoot * dimension * constant) / (dimension + constant * Math.abs(overshoot))
@@ -171,6 +191,7 @@ export function BibleReadingArea({
             >
               <div className="relative text-center mb-10">
                 <h1 className="bible-book-title">{book.name}</h1>
+                <ReadHint />
                 <p className="bible-chapter-meta">
                   <span className="bible-chapter-now">{chapter}</span>
                   <span className="bible-chapter-track" aria-hidden>
@@ -190,6 +211,7 @@ export function BibleReadingArea({
                       key={v.number}
                       onClick={e => {
                         if (drag.current.dragged) return
+                        try { localStorage.setItem("selah-bible-hint", "1") } catch { /* ignore */ }
                         handleVerseClick(e, v.number)
                       }}
                       style={{ "--verse-i": Math.min(index, 6) } as React.CSSProperties}

@@ -21,6 +21,26 @@ export type BibleVersion = "nvi" | "naa" | "nvt"
 export type FontSize = "sm" | "md" | "lg"
 export type ApiError = "ERROR" | "AUTH_REQUIRED" | "RATE_LIMIT" | "NOT_LICENSED" | null
 
+export function readUrlPos() {
+  try {
+    if (typeof window === "undefined") return null
+    const q = new URLSearchParams(window.location.search)
+    const book = BOOKS.find(b => b.id === q.get("book"))
+    if (!book) return null
+    const rawChapter = Number(q.get("chapter"))
+    const chapter = Number.isFinite(rawChapter) && rawChapter >= 1
+      ? Math.min(book.chapters, Math.floor(rawChapter))
+      : 1
+    const rawVersion = q.get("version") ?? ""
+    const version: BibleVersion = ["nvi", "naa", "nvt"].includes(rawVersion)
+      ? rawVersion as BibleVersion
+      : "nvi"
+    return { book, chapter, version }
+  } catch {
+    return null
+  }
+}
+
 export function readSavedPos() {
   try {
     if (typeof window === "undefined") return null

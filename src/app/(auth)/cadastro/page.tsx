@@ -1,12 +1,16 @@
 ﻿"use client"
 
-import { useState } from "react"
+import { Suspense, useState } from "react"
 import Link from "next/link"
+import { useSearchParams } from "next/navigation"
 import { signIn } from "next-auth/react"
+import { safeAppPath } from "@/lib/safe-next"
 import { Loader2, Eye, EyeOff } from "lucide-react"
 import { AuthShell, GoogleMark } from "@/components/auth/AuthShell"
 
-export default function CadastroPage() {
+function CadastroForm() {
+  const searchParams = useSearchParams()
+  const nextPath = safeAppPath(searchParams.get("callbackUrl") ?? searchParams.get("next"))
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
@@ -29,7 +33,7 @@ export default function CadastroPage() {
       setLoading(false)
       return
     }
-    await signIn("credentials", { email, password, callbackUrl: "/dashboard" })
+    await signIn("credentials", { email, password, callbackUrl: nextPath })
   }
 
   return (
@@ -38,7 +42,7 @@ export default function CadastroPage() {
       lede="Uma conta para plano, notas e memorização — no seu ritmo."
     >
       <button
-        onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
+        onClick={() => signIn("google", { callbackUrl: nextPath })}
         className="btn-pill-ghost mb-1"
       >
         <GoogleMark />
@@ -89,10 +93,18 @@ export default function CadastroPage() {
 
       <p className="text-center text-sm text-[#66635f] mt-6">
         Já tem conta?{" "}
-        <Link href="/entrar" className="text-[#1a1614] underline-offset-4 hover:underline">
+        <Link href={`/entrar?callbackUrl=${encodeURIComponent(nextPath)}`} className="text-[#1a1614] underline-offset-4 hover:underline">
           Entrar →
         </Link>
       </p>
     </AuthShell>
+  )
+}
+
+export default function CadastroPage() {
+  return (
+    <Suspense>
+      <CadastroForm />
+    </Suspense>
   )
 }

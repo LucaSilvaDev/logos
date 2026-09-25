@@ -1,7 +1,6 @@
 "use client"
 
 import Link from "next/link"
-import { ChevronRight } from "lucide-react"
 import { BOOK_ID_NAMES, BOOK_CHAPTERS } from "@/lib/reading-plan"
 import { useEffect, useState } from "react"
 
@@ -23,6 +22,7 @@ function readLocalPos(): SavedPos | null {
 
 export function ContinueReading() {
   const [pos, setPos] = useState<SavedPos | null>(null)
+  const [ready, setReady] = useState(false)
 
   useEffect(() => {
     setPos(readLocalPos())
@@ -35,35 +35,36 @@ export function ContinueReading() {
         }
       })
       .catch(() => {})
+      .finally(() => setReady(true))
   }, [])
 
-  if (!pos) return null
+  if (!ready) return <div className="site-read-block" aria-hidden />
 
-  const bookName    = BOOK_ID_NAMES[pos.bookId] ?? pos.bookId
-  const totalChaps  = BOOK_CHAPTERS[pos.bookId] ?? 1
-  const progress    = Math.min(1, pos.chapter / totalChaps)
+  if (!pos) {
+    return (
+      <Link href="/biblia?book=JHN&chapter=1&version=nvi" className="site-read-block">
+        <p className="site-kicker">Comece aqui</p>
+        <h2>João 1</h2>
+        <p className="site-read-lede">O Evangelho que apresenta Cristo sem rodeios.</p>
+        <span className="text-link">Abrir a Bíblia →</span>
+      </Link>
+    )
+  }
+
+  const bookName = BOOK_ID_NAMES[pos.bookId] ?? pos.bookId
+  const totalChaps = BOOK_CHAPTERS[pos.bookId] ?? 1
   const versionLabel = pos.version?.toUpperCase() ?? "NVI"
   const href = `/biblia?book=${pos.bookId}&chapter=${pos.chapter}&version=${pos.version ?? "nvi"}`
 
   return (
-    <Link href={href} className="artifact-card group animate-fade-up delay-140">
-      <div className="flex items-start justify-between mb-5">
-        <div>
-          <p className="font-serif text-[26px] leading-none tracking-tight">{bookName}</p>
-          <p className="mt-2 text-[15px] text-[#777b86]">
-            Capítulo {pos.chapter} de {totalChaps}
-            <span className="ml-2 text-[14px] text-[#979799]">{versionLabel}</span>
-          </p>
-        </div>
-        <ChevronRight className="w-4 h-4 mt-1 opacity-30 group-hover:opacity-80 group-hover:translate-x-0.5 transition-all" />
-      </div>
-      <div className="flex items-end justify-between gap-4 mb-4">
-        <p className="text-[15px] text-[#777b86]">Continue onde parou</p>
-        <p className="text-[20px] font-medium tabular-nums">{Math.round(progress * 100)}%</p>
-      </div>
-      <div className="track">
-        <span style={{ width: `${progress * 100}%` }} />
-      </div>
+    <Link href={href} className="site-read-block">
+      <p className="site-kicker">Onde você parou</p>
+      <h2>{bookName}</h2>
+      <p className="site-read-lede">
+        Capítulo {pos.chapter} de {totalChaps}
+        <span> · {versionLabel}</span>
+      </p>
+      <span className="text-link">Continuar a leitura →</span>
     </Link>
   )
 }

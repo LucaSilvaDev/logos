@@ -87,8 +87,9 @@ export function BibleControlsBar({
 
       <button onClick={() => setFocusMode(f => !f)}
         title={focusMode ? "Sair da leitura focada (Esc)" : "Leitura focada"}
-        className="bible-ctrl">
+        className="bible-ctrl-label">
         {focusMode ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+        <span className="hidden sm:inline text-[13px]">{focusMode ? "Sair" : "Foco"}</span>
       </button>
     </div>
   )

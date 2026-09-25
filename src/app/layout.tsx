@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className="h-full" suppressHydrationWarning>
+    <html lang="pt-BR" className="min-h-full" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{
           __html: `try{var t=localStorage.getItem('selah-theme');if(t!=='dark')document.documentElement.setAttribute('data-theme','light');}catch(e){}
@@ -52,11 +52,15 @@ if('serviceWorker' in navigator){navigator.serviceWorker.register('/sw.js')}`
         <link rel="apple-touch-startup-image" media="screen and (device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/splash/splash-1640x2360.png" />
 
         {/* Icons */}
+        <link
+          href="https://db.onlinewebfonts.com/c/95cecf452d3208890088a5b4c19c7ecf?family=Helvetica+Neue+ME"
+          rel="stylesheet"
+        />
         <link rel="icon" href="/favicon-32.png" type="image/png" sizes="32x32" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
       </head>
-      <body className="h-full bg-glass-base dark:bg-glass-base antialiased">
+      <body className="min-h-full bg-glass-base dark:bg-glass-base antialiased">
         {children}
       </body>
     </html>
