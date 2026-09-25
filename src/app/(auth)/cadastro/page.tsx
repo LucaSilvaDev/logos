@@ -58,19 +58,19 @@ function CadastroForm() {
           </p>
         )}
 
-        <div>
+        <div className="auth-field-group">
           <label className="auth-label">Nome</label>
           <input type="text" value={name} onChange={e => setName(e.target.value)} required
             placeholder="Seu nome" autoComplete="name" className="auth-field" />
         </div>
 
-        <div>
+        <div className="auth-field-group">
           <label className="auth-label">Email</label>
           <input type="email" value={email} onChange={e => setEmail(e.target.value)} required
             placeholder="seu@email.com" autoComplete="email" className="auth-field" />
         </div>
 
-        <div>
+        <div className="auth-field-group">
           <label className="auth-label">
             Senha <span className="font-normal text-[#a8a7a1]">· mín. 8 caracteres</span>
           </label>

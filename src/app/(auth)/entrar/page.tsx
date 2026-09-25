@@ -59,7 +59,7 @@ function LoginForm() {
           </p>
         )}
 
-        <div>
+        <div className="auth-field-group">
           <label className="auth-label">Email</label>
           <input
             type="email"
@@ -72,7 +72,7 @@ function LoginForm() {
           />
         </div>
 
-        <div>
+        <div className="auth-field-group">
           <label className="auth-label">Senha</label>
           <div className="relative">
             <input

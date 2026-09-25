@@ -66,7 +66,7 @@ function ResetForm() {
         </p>
       )}
 
-      <div>
+      <div className="auth-field-group">
         <label className="auth-label">Nova senha</label>
         <div className="relative">
           <input
@@ -84,7 +84,7 @@ function ResetForm() {
         </div>
       </div>
 
-      <div>
+      <div className="auth-field-group">
         <label className="auth-label">Confirmar senha</label>
         <input
           type="password"

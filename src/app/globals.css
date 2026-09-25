@@ -398,6 +398,7 @@ body.nav-hidden .app-more-panel {
   font-size: 14px;
   font-weight: 400;
   color: #979799;
+  transition: color 320ms var(--ease-out), transform 320ms var(--ease-out);
 }
 .auth-field {
   width: 100%;
@@ -408,9 +409,32 @@ body.nav-hidden .app-more-panel {
   border: 1px solid #ececec;
   border-radius: 16px;
   outline: none;
-  transition: border-color 0.2s ease-out, box-shadow 0.2s ease-out;
+  transition: border-color 320ms var(--ease-out), box-shadow 320ms var(--ease-out),
+              padding 320ms var(--ease-out), background 320ms var(--ease-out);
 }
-.auth-field::placeholder { color: #a3a6af; }
+.auth-field::placeholder { color: #a3a6af; transition: color 320ms var(--ease-out); }
+
+/* Campo "respira" ao passar o mouse ou focar — expande o padding e ganha
+   elevação, encolhe de volta quando o cursor sai (ver skiper53 ExpandOnHover). */
+.auth-field-group:hover .auth-field,
+.auth-field-group:focus-within .auth-field {
+  padding: 20px 18px;
+  border-color: #1D3045;
+  background: #fdfdfd;
+  box-shadow: 0 10px 24px -12px rgba(29, 48, 69, 0.28);
+}
+.auth-field-group:hover .auth-field::placeholder,
+.auth-field-group:focus-within .auth-field::placeholder {
+  color: #c7c5c1;
+}
+.auth-field-group:hover .auth-label,
+.auth-field-group:focus-within .auth-label {
+  color: #1D3045;
+  transform: translateX(3px);
+}
+@media (prefers-reduced-motion: reduce) {
+  .auth-field, .auth-label, .auth-field::placeholder { transition: none; }
+}
 .auth-field:focus {
   border-color: #1D3045;
   box-shadow: none;

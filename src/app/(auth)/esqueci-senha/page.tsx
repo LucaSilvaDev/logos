@@ -51,7 +51,7 @@ export default function EsqueciSenhaPage() {
             </p>
           )}
 
-          <div>
+          <div className="auth-field-group">
             <label className="auth-label">Email</label>
             <input
               type="email"
