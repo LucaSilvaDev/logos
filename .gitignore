@@ -3,6 +3,13 @@
 # Claude Code
 .claude/
 
+# other AI coding tool state (personal, not shared team config)
+.agents/
+.codex/
+.cursor/
+.impeccable/
+skills-lock.json
+
 # dependencies
 /node_modules
 /.pnp

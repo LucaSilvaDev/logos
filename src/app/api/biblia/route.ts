@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server"
 import { ApiClient, BibleClient } from "@youversion/platform-core"
+import { auth } from "@/lib/auth"
 import { db } from "@/lib/db"
+import { parseYVHtml, parseBibliaOnlineHtml, type Verse } from "@/lib/bible-parsers"
 
 export const dynamic = "force-dynamic"
-
-type Verse = { number: number; text: string }
 
 function jsonChapter(
   verses: Verse[],
@@ -71,20 +71,6 @@ function getYVClient(): BibleClient {
   return yvClient
 }
 
-// Parses YouVersion HTML: <span class="yv-v" v="N"></span><span class="yv-vlbl">N</span>TEXT
-function parseYVHtml(html: string): Verse[] {
-  const verses: Verse[] = []
-  const marker = /<span class="yv-v" v="(\d+)"><\/span><span class="yv-vlbl">\d+<\/span>/g
-  const parts = html.split(marker)
-  for (let i = 1; i < parts.length; i += 2) {
-    const num = parseInt(parts[i])
-    const raw = parts[i + 1] ?? ""
-    const text = raw.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim()
-    if (num > 0 && text.length > 0) verses.push({ number: num, text })
-  }
-  return verses
-}
-
 async function fetchFromYouVersion(bookId: string, chapter: string) {
   const appKey = process.env.YOUVERSION_APP_KEY
   if (!appKey || appKey === "COLE_AQUI_SEU_APP_KEY") {
@@ -134,46 +120,6 @@ const ABBR_MAP: Record<string, string> = {
   JUD: "jd",    REV: "ap",
 }
 
-function parseBibliaOnlineHtml(html: string): Verse[] {
-  const verseRe = /data-v="\.(\d+)\."/g
-  const starts: { num: number; idx: number }[] = []
-  let m: RegExpExecArray | null
-  verseRe.lastIndex = 0
-  while ((m = verseRe.exec(html)) !== null) {
-    starts.push({ num: parseInt(m[1]), idx: m.index })
-  }
-  if (starts.length === 0) return []
-
-  const verseMap = new Map<number, string[]>()
-
-  for (let i = 0; i < starts.length; i++) {
-    const segStart = starts[i].idx
-    const segEnd   = i + 1 < starts.length ? starts[i + 1].idx : html.length
-    let   segment  = html.slice(segStart, segEnd)
-
-    segment = segment.replace(/^[^>]*>/, "")
-    segment = segment.replace(/<button[^>]*data-note[^>]*>[\s\S]*?<\/button>/gi, "")
-    segment = segment.replace(/<span[^>]*data-vn[^>]*>[\s\S]*?<\/span>/gi, "")
-    segment = segment.replace(/<!--[\s\S]*?-->/g, "")
-    segment = segment.replace(/<[^>]+>/g, " ")
-    segment = segment.replace(/<[^>]*$/, "")
-    segment = segment.replace(/&quot;/g, '"').replace(/&#39;/g, "'")
-      .replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&nbsp;/g, " ")
-    segment = segment.replace(/\s*Copyright[©®].*$/i, "").replace(/\s*Nova Almeida Atualizada[©®].*$/i, "")
-    const text = segment.replace(/\s+/g, " ").trim()
-
-    const num = starts[i].num
-    if (num > 0 && text.length > 0) {
-      if (!verseMap.has(num)) verseMap.set(num, [])
-      verseMap.get(num)!.push(text)
-    }
-  }
-
-  return Array.from(verseMap.entries())
-    .sort(([a], [b]) => a - b)
-    .map(([number, parts]) => ({ number, text: parts.join(" ") }))
-}
-
 async function fetchFromBibliaOnline(bookId: string, chapter: string, version: string) {
   const abbr = ABBR_MAP[bookId]
   if (!abbr) return NextResponse.json({ error: "Livro inválido" }, { status: 400 })
@@ -210,6 +156,11 @@ async function fetchFromBibliaOnline(bookId: string, chapter: string, version: s
 const SUPPORTED_VERSIONS = new Set(["nvi", "naa", "nvt"])
 
 export async function GET(req: Request) {
+  const session = await auth()
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+
   const { searchParams } = new URL(req.url)
   const bookId  = searchParams.get("book") ?? ""
   const chapter = searchParams.get("chapter") ?? "1"

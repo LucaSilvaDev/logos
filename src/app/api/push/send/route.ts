@@ -8,9 +8,9 @@ export async function GET(req: Request) {
     process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ?? "",
     process.env.VAPID_PRIVATE_KEY ?? "",
   )
-  const auth = req.headers.get("authorization") ?? ""
+  const authHeader = req.headers.get("authorization") ?? ""
   const secret = process.env.CRON_SECRET
-  if (secret && auth !== `Bearer ${secret}`) {
+  if (!secret || authHeader !== `Bearer ${secret}`) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 
