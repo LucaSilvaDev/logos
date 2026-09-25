@@ -193,7 +193,9 @@ export function BibleReadingArea({
                 <h1 className="bible-book-title">{book.name}</h1>
                 <ReadHint />
                 <p className="bible-chapter-meta">
-                  <span className="bible-chapter-now">{chapter}</span>
+                  <span className="bible-chapter-now" data-dir={direction}>
+                    <span key={chapter}>{chapter}</span>
+                  </span>
                   <span className="bible-chapter-track" aria-hidden>
                     <span style={{ transform: `scaleX(${progress})` }} />
                   </span>

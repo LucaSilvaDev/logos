@@ -896,6 +896,32 @@ a.btn-pill-ghost { text-decoration: none; }
   font-variant-numeric: tabular-nums;
   color: #777b86;
 }
+.bible-chapter-now {
+  position: relative;
+  display: inline-block;
+  min-width: 1.4em;
+  font-weight: 600;
+  color: #e2d9c5;
+  overflow: hidden;
+}
+.bible-chapter-now > span {
+  display: inline-block;
+  animation: chapterNumInNext 320ms var(--ease-out) both;
+}
+.bible-chapter-now[data-dir="prev"] > span {
+  animation-name: chapterNumInPrev;
+}
+@keyframes chapterNumInNext {
+  from { opacity: 0; transform: translateY(60%); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes chapterNumInPrev {
+  from { opacity: 0; transform: translateY(-60%); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bible-chapter-now > span { animation: none; }
+}
 .bible-chapter-track {
   position: relative;
   width: 88px;
@@ -971,6 +997,47 @@ a.btn-pill-ghost { text-decoration: none; }
 }
 .bible-verse-action:hover { color: #ffffff; background: rgba(255,255,255,0.06); }
 .bible-verse-action:active { transform: scale(0.96); }
+
+/* Marcador de texto: cada cor vira uma "caneta" com ponta arredondada em vez
+   de uma bolinha — sobe e ganha brilho ao passar o mouse, e cravou uma
+   checkmark quando é a cor ativa da seleção. */
+.bible-marker {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border-radius: 11px 11px 6px 6px;
+  color: #1a1614;
+  background: var(--marker-color);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.35) inset, 0 2px 6px -2px rgba(0,0,0,0.5);
+  transition: transform 180ms var(--ease-out), box-shadow 180ms var(--ease-out);
+}
+.bible-marker:hover { transform: translateY(-3px) scale(1.04); }
+.bible-marker:active { transform: translateY(-1px) scale(0.98); }
+.bible-marker-active {
+  transform: translateY(-3px);
+  box-shadow: 0 1px 0 rgba(255,255,255,0.35) inset, 0 6px 14px -4px var(--marker-color);
+}
+.bible-marker-check {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  width: 15px;
+  height: 15px;
+  padding: 1.5px;
+  border-radius: 9999px;
+  background: #1D3045;
+  color: #ffffff;
+  box-shadow: 0 0 0 2px #1D3045;
+  animation: readPop 200ms var(--ease-out);
+}
+[data-theme="light"] .bible-marker-check { background: #ffffff; color: #1D3045; box-shadow: 0 0 0 2px #ffffff; }
+@media (prefers-reduced-motion: reduce) {
+  .bible-marker { transition: none; }
+}
 .bible-focus-overlay { background: #1D3045; }
 .bible-focus-exit {
   width: 36px;

@@ -1,6 +1,6 @@
 "use client"
 
-import { X, Trash2, Bookmark, Copy, Check, MessageSquare, Share2, Download, ArrowLeftRight } from "lucide-react"
+import { X, Trash2, Bookmark, Copy, Check, MessageSquare, Share2, Download, ArrowLeftRight, Highlighter } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { HL_COLORS } from "@/lib/bible-reader"
 import type { BiblePageState } from "@/hooks/useBiblePage"
@@ -29,14 +29,25 @@ export function BibleVerseActionBar({
 
   return (
     <div className="bible-verse-bar">
-      <div className="flex items-center gap-2 px-1 pb-2">
+      <div className="flex items-center gap-2 px-1 pb-2.5">
         <span className="bible-verse-bar-ref shrink-0">{selectionRef()}</span>
-        <div className="flex items-center gap-2.5 flex-1">
-          {HL_COLORS.map(c => (
-            <button key={c.id} onClick={() => applyHighlightColor(c.id)} title={c.id}
-              className={cn("w-7 h-7 rounded-full shrink-0 transition-transform duration-150", allSameColor(c.id) && "ring-2 ring-current scale-110")}
-              style={{ background: c.style }} />
-          ))}
+        <div className="flex items-center gap-2 flex-1">
+          {HL_COLORS.map(c => {
+            const active = allSameColor(c.id)
+            return (
+              <button
+                key={c.id}
+                onClick={() => applyHighlightColor(c.id)}
+                title={`Grifar em ${c.id}`}
+                aria-pressed={active}
+                className={cn("bible-marker", active && "bible-marker-active")}
+                style={{ "--marker-color": c.style } as React.CSSProperties}
+              >
+                <Highlighter className="w-3.5 h-3.5" strokeWidth={2.2} />
+                {active && <Check className="bible-marker-check w-3 h-3" strokeWidth={3} />}
+              </button>
+            )
+          })}
           {anyHighlighted && (
             <button onClick={removeHighlightSelection} title="Remover grifo" className="bible-ctrl">
               <Trash2 className="w-3.5 h-3.5" />
